@@ -1,7 +1,6 @@
 node_modules/
 public/css
 .DS_store
-NLPj/stanford-parser-3.3.1-models.jar
-NLPj/stanford-parser.jar
+*.jar
 nlp/
 public/images
