@@ -1,0 +1,37 @@
+<% include ejs/header.ejs %>
+  <header>
+    <h1>
+    	Settings
+    </h1>
+  </header>
+        <a href="/">Main</a>
+
+  <section id = "groups">
+	  <ul>
+		  <%= title %>
+	  </ul>
+    <ul>
+     Name: <%= user.name %>
+    </ul>
+    <ul>
+     Email: <%= user.email %>
+    </ul>
+    <ul>
+     Created: <%= user.created %>
+    </ul>
+    <ul>
+     Pending: <%= user.pending %>
+    </ul>
+    <ul>
+     Teams: <%= user.teams %>
+    </ul>
+		<%= user %>
+  </section>
+
+  <footer>
+    <% include ejs/navbar.ejs %>
+    <script type = "text/javascript" src = "../js/navbar.js"></script>
+  </footer>
+
+</body>
+</html>

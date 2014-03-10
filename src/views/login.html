@@ -1,0 +1,48 @@
+<% include ejs/header.ejs %>
+  <div id = "content">
+    <header>
+      <svg id = "logo">
+        <circle cx = "50%" cy = "50%" r = "24px"/>
+      </svg>
+      <h1>Achieve</h1>
+    </header>
+
+    <section id = "main">
+  	  <form action='/login' method='post'>
+  	    <div class = "formfield">
+  	      <input type='email' name='email' <% if (typeof email != 'undefined') { %> value = <%=email%> <% }else{ %> value = "" <%} %>> </input>
+          <div class = "form_label">
+            <svg class = "form_icon">
+              <circle cx = "50%" cy = "50%" r = "12px"/>
+              <line x1 = "96%" x2 = "96%" y1 = "8px" y2 = "32px" />
+            </svg>
+            <h4>Email</h4>
+          </div>
+  	    </div>
+  	    <div class = "formfield">
+  	      <input type='password' name='password' value = ""></input>
+          <div class = "form_label">
+            <svg class = "form_icon">
+              <circle cx = "50%" cy = "50%" r = "12px"/>
+              <line x1 = "96%" x2 = "96%" y1 = "8px" y2 = "32px" />
+            </svg>
+            <h4>Password</h4>
+          </div>
+  	    </div>
+  	    <div class = "formfield">
+  	      <input type="submit" value="Log In"></input>
+  	    </div>
+        <div id = "remember">
+          <label for = "rememberPass">Remember Password </label><input type="checkbox" name = "rememberPass" />
+        </div>
+  	  </form>
+      <p><a href="">Forgot your password?</a></p>
+      <p><a href="/signup">Need an account?</a></p>
+    </section>
+
+    <footer>
+      <script type = "text/javascript" src = "js/placeholders.js"></script>
+    </footer>
+  </div>
+</body>
+</html>

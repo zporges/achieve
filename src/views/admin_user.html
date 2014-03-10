@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" type="text/css" href="css/signup.css">
+  <title>Admin Page</title>
+</head>
+<body>
+
+  <header>
+    <h1>
+    	Pact
+    </h1>
+  </header>
+  
+  <section id = "main">
+    <div class = "formfield">
+      <input type='text' name='name' <% if (typeof name != 'undefined') { %> value = <%=name%> <% } %> </input>
+      <div class = "form_label">
+        <h4>Name</h4>
+      </div>
+    </div>
+    <% if (typeof errors != 'undefined' && typeof errors.name != 'undefined') { %>
+    <p class = "error"> <%=errors.name.msg%> </p>
+    <% } %>
+
+    <div class = "formfield">
+      <input type='text' name='gender' <% if (typeof gender != 'undefined') { %> value = <%=gender%> <% } %> </input>
+      <div class = "form_label">
+        <h4>Gender</h4>
+      </div>
+    </div>
+    <% if (typeof errors != 'undefined' && typeof errors.name != 'undefined') { %>
+    <p class = "error"> <%=errors.name.msg%> </p>
+    <% } %>
+
+    <div class = "formfield">
+      <input type='email' name='email' <% if (typeof email != 'undefined') { %> value = <%=email%> <% } %> </input>
+      <div class = "form_label">      
+        <h4>Email</h4>
+      </div>
+    </div>
+    <% if (typeof errors != 'undefined' && typeof errors.email != 'undefined') { %>
+    <p class = "error"> <%=errors.email.msg%> </p>
+    <% } %>
+
+    <div class = "formfield">
+      <input type='password' name='password' ></input>
+      <div class = "form_label">        
+        <h4>Password</h4>
+      </div>
+    </div>
+    <% if (typeof errors != 'undefined' && typeof errors.password != 'undefined') { %>
+    <p class = "error"> <%=errors.password.msg%> </p>
+    <% } %>
+
+    <div class = "formfield">
+      <input type='password' name='password2' ></input>
+      <div class = "form_label">        
+        <h4>Re-enter PW</h4>
+      </div>
+    </div>
+    <% if (typeof errors != 'undefined' && typeof errors.password2 != 'undefined') { %>
+    <p class = "error"> <%=errors.password2.msg%> </p>
+    <% } %>
+
+  </section>
+  
+  <footer>
+  	
+  </footer>
+  
+</body>
+</html>

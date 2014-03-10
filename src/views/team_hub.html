@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <link rel="stylesheet" type="text/css" href="css/index.css">
+  <title>Pact Team Hub</title>
+</head>
+<body>
+
+  <header>
+    <h1>
+			<%= team.name %> 
+    </h1>
+  </header>
+  
+  <section id = "groups">
+        <a href="/">Main</a>
+	  <ul>
+			<%= title %> 
+	  </ul>
+    <ul>
+			Team Name: <%= team.name %> 
+    </ul>
+    <ul>
+			Date Created: <%= team.created %> 
+    </ul>
+    <ul>
+			Deadline: <%= team.deadline %> 
+    </ul>
+    <ul>
+			Countdown until Deadline: <%= team.countdown %> days until the deadline<br/>
+    </ul>
+    <ul>
+			 Has Deadline Passed? <%= team.has_deadline_passed %> <br/>
+    </ul>
+    <ul>
+			Wager: <%= team.wager %> 
+    </ul>
+  </section>
+  
+  <footer>
+  
+  </footer>
+  
+</body>
+</html>

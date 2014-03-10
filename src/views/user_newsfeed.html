@@ -1,0 +1,68 @@
+<% include ejs/header.ejs %>
+  <header>
+    <h1>Achieve</h1>
+  </header>
+
+<!--   <section id = "userPage">
+    <a href="/user/<%= user.id %>">User Settings</a>
+    <a href="/pending">Pending Requests</a>
+    <a href= "/logout">Logout</a>
+
+  </section> -->
+
+  <section id = "main">
+  	<h2>My Goals</h2>
+	  <ul id = "checkins">
+
+
+			<% for(var i=0; i<teams.length; i++) {%>
+			<li class = "checkin_box">
+        <div class = "checkin_header">
+          <div class = "checkbox">
+            <svg>
+              <rect class="outer" x="15" y="15" width="20" height="20"/>
+              <rect class="fill" x="17" y="17" width="16" height="16"/>
+            </svg>
+          </div>
+          <h3><%= teams[i].name %></h3>
+          <h4>
+            Last Checkin:
+            <%
+              for(var k=0; k < teams[i].users.length; k++){
+                var uID = teams[i].users[k];
+                if (uID.user_id == user.id){
+                  if (uID.checkin.length > 0){
+                    var time = uID.checkin[uID.checkin.length - 1].created.toDateString();%>
+                    <%=time%>
+                  <%}
+                else{%>
+                  Never
+                <%}
+
+                }
+              }
+            %>
+          </h4>
+        </div>
+        <form method= "post" action="/checkin/new/<%= teams[i].id %>">
+          <div>
+            <textarea rows="4" cols="50" name="status" placeholder="Comment"></textarea>
+            <input type="number" name="amount" placeholder="0"/>
+          </div>
+          <h5>unit per time period</h5>
+          <input type="submit" value="Checkin"/>
+        </form>
+		  </li>
+			<% } %>
+	  </ul>
+	<a href="team/new">Create Team</a>
+  </section>
+
+  <footer>
+    <% include ejs/navbar.ejs %>
+    <script type = "text/javascript" src = "js/navbar.js"></script>
+    <script type = "text/javascript" src = "js/homepage.js"></script>
+  </footer>
+
+</body>
+</html>
