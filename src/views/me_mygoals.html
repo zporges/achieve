@@ -1,0 +1,37 @@
+<% include ejs/header.ejs %>
+  <div id = "content">
+    <header>
+      <h1>Name</h1>
+    </header>
+
+    <section id = "main">
+	 	<ul id = "topnav">
+	 		<li><a href = "me_mygoals.html">My goals</a></li>
+	 		<li><a href = "me_settings.html">Settings</a></li>
+	 	</ul>
+	 	<div id = "info">
+	 		<div id = "profile">
+	 			<div id= "profilepic"></div>
+	 			<div id = "userName"></div>
+	 		</div>
+	 		<div id = "goalsInfo">
+	 			<p class = "goalsInfoTitle">Goals in progress</p>
+	 			<h3 id = "inProgress">0</h3>
+	 			<p class = "goalsInfoTitle">Total goals completed</p>
+	 			<h3 id = "totalCompleted">0</h3>
+	 			<p class = "goalsInfoTitle">Total check-ins</p>
+	 			<h3 id = "totalCheckins">0</h3>
+	 		</div>
+	 	</div>
+	 	<div id = "dataVis">
+	 		<h2>Individual goal progress</h2>
+	 	</div>
+
+ 	 </section>
+
+    <footer>
+      <script type = "text/javascript" src = "js/d3.min.js"></script>
+    </footer>
+  </div>
+</body>
+</html>
