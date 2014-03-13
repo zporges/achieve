@@ -251,7 +251,13 @@ module.exports = function(app, passport) {
 	    });
 	  };
   });
-  
+  // Notification Page
+  app.get('/notifications', auth.isAuthenticated, function(req,res){
+    res.render('notifications',{
+      title: 'Notifications'
+    });
+  });
+
   // Create a new checkin
   app.post('/checkin/new/:id', auth.isAuthenticated, function(req,res){
 	  Team.checkin({
