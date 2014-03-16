@@ -519,7 +519,7 @@ client.on('error', console.log);
     //Validate passed information
     req.assert('name', 'Name is required').notEmpty();
     req.assert('email', 'Valid email required').notEmpty().isEmail();
-    req.assert('password', 'Password must be at least 6 characters and contain a number and letter').len(6).regex('^.*(?=.*[0-9])(?=.*[A-Za-z]).*$');
+    req.assert('password', 'Password must be at least 6 characters and contain a number and letter').len(6);//.regex('^.*(?=.*[0-9])(?=.*[A-Za-z]).*$');
     req.assert('password2', 'Passwords do not match').equals(req.body.password);
     User.findOne({email : req.body.email}, function(err, user) {
       if (err) {
