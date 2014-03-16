@@ -158,13 +158,19 @@ pact.start();
 var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
 var p = process.env.OPENSHIFT_NODEJS_PORT
 p = (p == undefined) ? p : p.substring(0, p.length-4) + 8191 //8767
-var python_port = p || 8191; //8767
+var python_port = p || 15151;//8191; //8767
 var exec = require('child_process').exec;
 var child;
 
 //child = exec("python python-server.py -h " + python_host + " -p " + python_port,
-//child = exec("java -jar NLPj/server.jar " + python_host + " " + python_port,
-child = exec("java -cp NLPj/stanford-parser-3.3.1-models.jar:NLPj/stanford-parser.jar:NLPj Server " + python_host + " " + python_port,
+java_command = "java -cp "
+java_command += "NLPj/stanford-parser-3.3.1-models.jar:"
+java_command += "NLPj/stanford-parser.jar:"
+java_command += "NLPj/stanford-postagger-3.3.1.jar:"
+java_command += "NLPj/simplenlg-v4.4.2.jar:"
+java_command += "NLPj Server "
+java_command += python_host + " " + python_port
+child = exec(java_command,
    function (error, stdout, stderr) {
       console.log('stdout: ' + stdout);
       console.log('stderr: ' + stderr);
