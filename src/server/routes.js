@@ -252,9 +252,13 @@ module.exports = function(app, passport) {
 	  };
   });
   // Notification Page
-  app.get('/notifications', auth.isAuthenticated, function(req,res){
-    res.render('notifications',{
-      title: 'Notifications'
+  app.get('/notifications/:id', auth.isAuthenticated, function(req,res){
+    User.findById(req.params.id, function(error, user){
+      res.render('notifications',{
+        title: 'Notifications',
+        user: user,
+        stylesheet: 'notifications.css'
+      });
     });
   });
 
