@@ -279,9 +279,13 @@ module.exports = function(app, passport) {
 	  };
   });
   // Notification Page
-  app.get('/notifications', auth.isAuthenticated, function(req,res){
-    res.render('notifications',{
-      title: 'Notifications'
+  app.get('/notifications/:id', auth.isAuthenticated, function(req,res){
+    User.findById(req.params.id, function(error, user){
+      res.render('notifications',{
+        title: 'Notifications',
+        user: user,
+        stylesheet: 'notifications.css'
+      });
     });
   });
 
@@ -448,16 +452,17 @@ module.exports = function(app, passport) {
     res.render('login', {stylesheet: 'login.css'});
 
 
-//var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
-var python_host = "127.2.40.129";
+
+var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
+//var python_host = "127.2.40.129";
 var p = process.env.OPENSHIFT_NODEJS_PORT
 p = (p == undefined) ? p : p.substring(0, p.length-4) + 8191 //8767
 var python_port = p || 8191; //8767
-python_port = 7959
+python_port = 15151
 
 var net = require('net');
-//var client = net.connect({port: python_port, host: python_host},
-var client = net.connect({port: 15555, host: "nlp-groupgoals.rhcloud.com"},
+var client = net.connect({port: python_port, host: python_host},
+//var client = net.connect({port: 15555, host: "nlp-groupgoals.rhcloud.com"},
     function() { //'connect' listener
   console.log('client connected');
   client.write('toPastTense clean my room\r\n');
@@ -470,7 +475,6 @@ client.on('end', function() {
   console.log('client disconnected');
 });
 client.on('error', console.log);
-
 
   });
 
