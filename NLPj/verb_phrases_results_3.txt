@@ -1,0 +1,178 @@
+#General phrases
+study chemistry
+ | study chemistry
+clean my apartment
+ | clean his/her apartment
+wash the dog
+ | wash the dog
+ignore my ex
+ | ignore his/her ex
+call my mom
+ | call his/her mom
+take a short nap
+ | take a short nap
+turn off my phone for an hour
+ | turn off his/her phone for an hour
+check my email
+ | check his/her email
+compliment someone
+ | compliment someone
+say hi to a stranger
+ | said hi to a stranger
+bake for my roommates
+ | bake for his/her roommates
+hang out with my roommates
+ | hang out with his/her roommates
+swim twenty miles
+ | swim twenty miles
+revolutionize the world
+ | revolutionize the world
+throw away my trash
+ | throw away his/her trash
+eat good food
+ | eat good food
+pour out my liquids
+ | pour out his/her liquids
+rely on my parents less
+ | rely on his/her parents less
+
+#Nouns that look like verbs
+do 3 sets of dead lifts
+ | did 3 sets of dead lifted
+perform 3 sets of squats
+ | perform 3 sets of squats
+bake for my room mates
+ | bake for his/her room mates
+tell fewer lies
+ | tell fewer lied
+
+#Adjectives/adverbs/etc that look like verbs
+go running
+ | go running
+get ripped
+ | get ripped
+work on my programming assignments
+ | work on his/her programming assignments
+find a sunken ship
+ | find a sunken ship
+visit the house of my grown parents
+ | visit the house of his/her grown parents
+
+#Possessive
+visit my parent's house
+ | visit his/her parent's house
+
+#Punctuation
+eat healthy, delicious, and good-looking food
+ | eat healthy, delicious, and good-looking food
+be a good friend; be a good brother
+ | be a good friend; be a good brother
+
+#Case sensitivity
+BLESS MY COOL FRIENDS
+ | BLESS his/her COOL FRIENDS
+WORK out
+ | worked out
+pray to God
+ | pray to God
+
+#Quotes
+watch "All Dogs go to Heaven"
+ | watch "All Dogs go to Heaven"
+watch " All Dogs go to Heaven "
+ | watch " All Dogs go to Heaven "
+watch " All Dogs go to Heaven"
+ | watch " All Dogs go to Heaven"
+watch "All Dogs go to" Heaven 
+ | watch "All Dogs go to" Heaven
+watch "All Dogs go to "Heaven 
+ | watch "All Dogs go to "Heaven
+watch" All Dogs go to "Heaven 
+ | watch" All Dogs go to "Heaven
+watch "All Dogs go to " Heaven
+ | watch "All Dogs go to " Heaven
+watch "All Dogs " go to Heaven
+ | watch "All Dogs " go to Heaven
+watch "All Dogs go to Heaven" and "All Cats go to Elsewhere"
+ | watch "All Dogs go to Heaven" and "All Cats go to Elsewhere"
+watch 'All Dogs go to Heaven'
+ | watch 'All Dogs go to Heaven'
+
+#Extra clauses
+fold my laundry when it dries
+ | fold his/her laundry when it dries
+visit my parents and be nice
+ | visit his/her parents and be nice
+visit my parents because I am nice
+ | visit his/her parents because s/he was nice
+fold my laundry once it is dry
+ | fold his/her laundry once it was dry
+fold my laundry once it's dry
+ | fold his/her laundry once it's dry
+find a ship that is broken
+ | find a ship that was broken
+find a ship that is sunken
+ | find a ship that was sunken
+
+take a shower in order to smell good for the ladies
+ | take a shower in order to smell good for the ladies
+take a shower to smell good for the ladies
+ | take a shower to smell good for the ladies
+
+#Modal verbs and to be
+exercise because I don't want to be fat
+ | exercise because s/he don't wanted to be fat
+exercise because I can't want to be fat
+ | exercise because s/he can't wanted to be fat
+exercise because I won't want to be fat
+ | exercise because s/he won't wanted to be fat
+exercise because I shouldn't want to be fat
+ | exercise because s/he shouldn't wanted to be fat
+exercise because I couldn't want to be fat
+ | exercise because s/he couldn't wanted to be fat
+exercise because, although I don't have a girlfriend, I don't want to be fat
+ | exercise because, although s/he don't had a girlfriend, s/he don't wanted to be fat
+exercise because, although I don't have a girlfriend, I couldn't want to be fat
+ | exercise because, although s/he don't had a girlfriend, s/he couldn't wanted to be fat
+
+
+exercise because I do not want to be fat
+ | exercise because s/he did not wanted to be fat
+exercise because I cannot want to be fat
+ | exercise because s/he cannot wanted to be fat
+exercise because I will not want to be fat
+ | exercise because s/he will not wanted to be fat
+exercise because I should not want to be fat
+ | exercise because s/he should not wanted to be fat
+exercise because I could not want to be fat
+ | exercise because s/he could not wanted to be fat
+exercise because I must not want to be fat
+ | exercise because s/he must not wanted to be fat
+exercise because I may not want to be fat
+ | exercise because s/he may not wanted to be fat
+exercise because I shall not want to be fat
+ | exercise because s/he shall not wanted to be fat
+
+be good and I won't be bad
+ | be good and s/he won't be bad
+be good and I will be bad
+ | be good and s/he will be bad
+
+#To verbs
+try to run
+ | try to run
+attempt to not run
+ | attempt to not run
+try to happily run
+ | try to happily run
+
+#Conjunctions
+run faster and lift more weights
+ | run faster and lift more weights
+go to the gym and lift more weights
+ | go to the gym and lift more weights
+lift more weights and go to the gym
+ | lift more weights and go to the gym
+lift more weights, go to the gym, and run faster
+ | lift more weights, go to the gym, and run faster
+lift more weights go to the gym and run faster | lift more weights go to the gym and run faster
