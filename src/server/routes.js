@@ -21,7 +21,8 @@ function mail_confirm_account(user) {
     to: user.email,
     subject: "Confirm your account for Achieve!",
     text: "necessary?",
-    html: user.name + ", thank you for signing up for Achieve! Click the following link to confirm your account. If this is not you, please disregard this email. <br/>" + link
+    html: user.name + ", thank you for signing up for Achieve! Click the following " +
+      "link to confirm your account. If this is not you, please disregard this email. <br/>" + link
 
   }
   smtpTransport.sendMail(mailOptions, function(error, response){
@@ -35,7 +36,7 @@ function mail_confirm_account(user) {
 }
 
 // for faster performance, directly pass in the appropriate email link
-function mailSignup(user, leader, groupname) {
+function mailSignup(user, leader, groupname, team_id) {
 	linkSignup = "http://localhost:8080/signup/" + user._id;
 	if (! user.pending){
 		linkSignup = "http://localhost:8080/login/" + user._id;
@@ -95,6 +96,31 @@ module.exports = function(app, passport) {
         res.render('account_pending');
       }
     });
+
+    // list pending team requests:
+    console.log("THIS USER: " + req.user.id);
+    teams_remaining = [];
+    User.findById(req.user.id, function(error, user){
+      all_teams = user.teams;
+      console.log("]]]]] " + all_teams[0]);
+      for (var i = 0; i < all_teams.length; i++) {  // the teams this user is part of
+        console.log(">>> " + i + " " + all_teams[i].team_id); 
+        Team.findById(all_teams[i].team_id, function(error, team) {
+          console.log(team);
+          for (var j = 0; j < team.users.length; j++) { // the users that are part of this team.
+            if (team.users[j].user_id == req.user.id) {
+              if (team.users[j].pending == true) {
+                res.redirect('/goal/new/' + team._id);
+                return;
+                teams_remaining.push(team._id);
+              }              
+            }
+          }
+        });
+      }      
+      
+    });
+
 
 	  Team.findList(req.user.teams,function(err, doc_teams){
 		  if (err){
@@ -188,7 +214,8 @@ module.exports = function(app, passport) {
     obj.errors = errors;
 
 
-		//TODO: Still needs to assert if deadline is after than today, Did not know how to convert "html input date" type into Javascript Date type to compare the dates
+		//TODO: Still needs to assert if deadline is after than today, Did not know how to convert 
+    //"html input date" type into Javascript Date type to compare the dates
     var now = new Date();
     now.setDate(now.getDate());
 		var deadline = new Date();
@@ -266,9 +293,13 @@ module.exports = function(app, passport) {
   });
 
   // Notification Page
-  app.get('/notifications', auth.isAuthenticated, function(req,res){
-    res.render('notifications',{
-      title: 'Notifications'
+  app.get('/notifications/:id', auth.isAuthenticated, function(req,res){
+    User.findById(req.params.id, function(error, user){
+      res.render('notifications',{
+        title: 'Notifications',
+        user: user,
+        stylesheet: 'notifications.css'
+      });
     });
   });
 
@@ -435,16 +466,17 @@ module.exports = function(app, passport) {
     res.render('login', {stylesheet: 'login.css'});
 
 
-//var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
-var python_host = "127.2.40.129";
+
+var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
+//var python_host = "127.2.40.129";
 var p = process.env.OPENSHIFT_NODEJS_PORT
 p = (p == undefined) ? p : p.substring(0, p.length-4) + 8191 //8767
 var python_port = p || 8191; //8767
-python_port = 7959
+python_port = 15151
 
 var net = require('net');
-//var client = net.connect({port: python_port, host: python_host},
-var client = net.connect({port: 15555, host: "nlp-groupgoals.rhcloud.com"},
+var client = net.connect({port: python_port, host: python_host},
+//var client = net.connect({port: 15555, host: "nlp-groupgoals.rhcloud.com"},
     function() { //'connect' listener
   console.log('client connected');
   client.write('toPastTense clean my room\r\n');
@@ -457,7 +489,6 @@ client.on('end', function() {
   console.log('client disconnected');
 });
 client.on('error', console.log);
-
 
   });
 
