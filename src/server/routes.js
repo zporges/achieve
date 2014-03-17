@@ -399,6 +399,31 @@ module.exports = function(app, passport) {
         if(user) {
           user.pending = false;
           user.verb = req.param('verb');
+
+          //to past tense
+          user.verb_past = "accomplished part of the goal"
+          var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
+          var java_port = 15151;
+          var net = require('net');
+
+          var client = net.connect({port: java_port, host: java_host},
+              function() { //'connect' listener
+            console.log('client connected');
+            client.write('toPastTense ' + req.param('verb') +'\r\n');
+          });
+          client.on('data', function(data) {
+            console.log(data.toString());
+            var past = data.toString();
+            past = past.substring(past.indexOf("]")+2);
+            user.verb_past = past;
+            console.log("verb past: " + user.verb_past);
+            client.end();
+          });
+          client.on('end', function() {
+            console.log('client disconnected');
+          });
+          client.on('error', console.log);
+
           user.frequency = req.param('frequency');
           user.freq_progress = req.param('number');
           //Use frequency to calculate cumulative desired progressonsol
@@ -468,10 +493,8 @@ module.exports = function(app, passport) {
 
 var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
 //var python_host = "127.2.40.129";
-var p = process.env.OPENSHIFT_NODEJS_PORT
-p = (p == undefined) ? p : p.substring(0, p.length-4) + 8191 //8767
-var python_port = p || 8191; //8767
-python_port = 15151
+//var p = process.env.OPENSHIFT_NODEJS_PORT
+var python_port = 15151;
 
 var net = require('net');
 var client = net.connect({port: python_port, host: python_host},
