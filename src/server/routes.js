@@ -410,11 +410,10 @@ module.exports = function(app, passport) {
     });
 	}
 	
-	app.get("/team/progress/:id", function(req, res) {
+	app.get('/team/progress/:id', auth.isAuthenticated, function(req,res) {
 	  Team.findCheckins(req.params.id, function(err, team_data) {
 	  	res.render('team_progress', {stylesheet: "../../css/progress.css", team: team_data});
 	  })
-    //res.render('team_progress', {stylesheet: "../../css/progress.css"});
   });
 
   app.get('/login', function(req, res) {
