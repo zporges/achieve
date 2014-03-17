@@ -38,6 +38,19 @@ public class VerbTense {
 	static NLGFactory nlgFactory = new NLGFactory(lexicon);
 	static HashMap<String,String> pastTenseMap = new HashMap<String, String>(){{
 		put("hang","hung"); put("hangs","hung");
+		put("lay","laid"); put("pay","paid");
+		put("ring","rung"); put("blot","blotted");
+		put("clap","clapped"); put("clip","clipped");
+		put("drip","dripped"); put("drum","drummed");
+		put("flap","flapped"); put("hum", "hummed");
+		put("jam","jammed"); put("jog","jogged");
+		put("knot","knotted"); put("mine","mined");
+		put("mug","mugged"); put("occur","occurred");
+		put("program","programmed"); put("rot","rotted");
+		put("scrub","srubbed"); put("sin","sinned");
+		put("skip","skipped"); put("strap","strapped");
+		put("trot","trotted"); put("tug","tugged");
+		put("zip","zipped");
 		put("'s","was"); 
 		put("can","could"); put("ca","could");
 		put("will","would"); put("wo","would");
@@ -248,7 +261,7 @@ public class VerbTense {
 	}
 
 	public static void main(String[] args) {
-		test("verb_phrases_3.txt");
+		test("verb_phrases_1.txt");
 
 		/*
 		toPastTense("I clean my room, and eat more food");
