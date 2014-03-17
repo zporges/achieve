@@ -1,0 +1,28 @@
+<% include ejs/header.ejs %>
+    <header>
+      <h1>Name</h1>
+    </header>
+
+  <section id = "main">
+    <ul>
+      <%for (var i=0; i<user.teams.length; i++){%>
+          <li><a href = "/team/progress/<%=user.teams[i].team_id%>">
+          <%
+            var teamName = "";
+            for (var j=0; j < teams.length; j++){
+              if (user.teams[i].team_id == teams[j]._id){%>
+                <%=teams[j].name%>
+              <%}
+            }
+          %>
+          </a></li>
+      <%}%>
+    </ul>
+  </section>
+
+  <footer>
+    <% include ejs/navbar.ejs %>
+    <script type = "text/javascript" src = "../js/navbar.js"></script>
+  </footer>
+</body>
+</html>
