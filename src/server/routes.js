@@ -111,7 +111,7 @@ module.exports = function(app, passport) {
 				    now.setDate(now.getDate());
 						for (var i = 0; i < doc_teams.length; i++){
 							//figure out if deadline includes the last day
-							doc_teams[i].countdown = Math.floor((doc_teams[i].deadline - now) / 86400000)	
+							doc_teams[i].countdown = Math.floor((doc_teams[i].deadline - now) / 86400000)
 							if (doc_teams[i].deadline < now){
 								doc_teams[i].has_deadline_passed = true;
 								doc_teams[i].save(function(err, team, num) {
@@ -137,7 +137,7 @@ module.exports = function(app, passport) {
 		mail_confirm_account(req.user);
     res.redirect('/');
   });
-	
+
   app.get('/admin/user', auth.isAuthenticated, function(req,res){
     res.render('admin_user',{
       title: 'Admin User Page'
@@ -174,7 +174,7 @@ module.exports = function(app, passport) {
   app.post('/team/new', auth.isAuthenticated, function(req,res){
     req.assert('name', 'Name is required').notEmpty();
     req.assert('deadline', 'Valid deadline required').notEmpty();
-		
+
 	  //Checks to see the number of users and loops through the array and gets inputs based on number of users
 	  var num_user = parseInt(req.param('num_user'),10);
 	  var arr = [];
@@ -251,6 +251,20 @@ module.exports = function(app, passport) {
 	    });
 	  };
   });
+
+  // Teams Page
+  app.get("/teams/:id", auth.isAuthenticated, function(req, res){
+    User.findById(req.params.id, function(error, user){
+      Team.findList(user.teams, function(error, team){
+        res.render('teams_page',{
+          title: 'Teams Page',
+          user: user,
+          teams: team
+        });
+      });
+    });
+  });
+
   // Notification Page
   app.get('/notifications', auth.isAuthenticated, function(req,res){
     res.render('notifications',{
@@ -316,7 +330,7 @@ module.exports = function(app, passport) {
 
 	    var now = new Date();
 	    now.setDate(now.getDate());
-			team.countdown = Math.floor((team.deadline - now) / 86400000);	
+			team.countdown = Math.floor((team.deadline - now) / 86400000);
       res.render('team_hub',{
 		    title: 'Team Hub',
         team: team
@@ -409,7 +423,7 @@ module.exports = function(app, passport) {
 			}
     });
 	}
-	
+
 	app.get("/team/progress/:id", function(req, res) {
 	  Team.findCheckins(req.params.id, function(err, team_data) {
 	  	res.render('team_progress', {stylesheet: "../../css/progress.css", team: team_data});
