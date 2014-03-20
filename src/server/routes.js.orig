@@ -36,7 +36,7 @@ function mail_confirm_account(user) {
 }
 
 // for faster performance, directly pass in the appropriate email link
-function mailSignup(user, leader, groupname) {
+function mailSignup(user, leader, groupname, team_id) {
 	linkSignup = "http://localhost:8080/signup/" + user._id;
 	if (! user.pending){
 		linkSignup = "http://localhost:8080/login/" + user._id;
@@ -292,15 +292,6 @@ module.exports = function(app, passport) {
     });
   });
 
-  app.get("/user/settings", auth.isAuthenticated, function(req, res){
-    User.findById(req.user.id, function(error, user){ 
-      res.render('me_settings',{
-        title: 'User Settings',
-        user: user
-      }); 
-    });
-  });
-
   // Notification Page
   app.get('/notifications/:id', auth.isAuthenticated, function(req,res){
     User.findById(req.params.id, function(error, user){
@@ -408,31 +399,6 @@ module.exports = function(app, passport) {
         if(user) {
           user.pending = false;
           user.verb = req.param('verb');
-
-          //to past tense
-          user.verb_past = "accomplished part of the goal"
-          var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
-          var java_port = 15151;
-          var net = require('net');
-
-          var client = net.connect({port: java_port, host: java_host},
-              function() { //'connect' listener
-            console.log('client connected');
-            client.write('toPastTense ' + req.param('verb') +'\r\n');
-          });
-          client.on('data', function(data) {
-            console.log(data.toString());
-            var past = data.toString();
-            past = past.substring(past.indexOf("]")+2);
-            user.verb_past = past;
-            console.log("verb past: " + user.verb_past);
-            client.end();
-          });
-          client.on('end', function() {
-            console.log('client disconnected');
-          });
-          client.on('error', console.log);
-
           user.frequency = req.param('frequency');
           user.freq_progress = req.param('number');
           //Use frequency to calculate cumulative desired progressonsol
@@ -488,8 +454,13 @@ module.exports = function(app, passport) {
 			}
     });
 	}
+<<<<<<< HEAD
+	
+	app.get('/team/progress/:id', auth.isAuthenticated, function(req,res) {
+=======
 
 	app.get("/team/progress/:id", function(req, res) {
+>>>>>>> 510bdc346c73e9c4ebb33f922e46a446ac5a4811
 	  Team.findCheckins(req.params.id, function(err, team_data) {
 	  	res.render('team_progress', {stylesheet: "../../css/progress.css", team: team_data});
 	  })
@@ -502,8 +473,10 @@ module.exports = function(app, passport) {
 
 var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
 //var python_host = "127.2.40.129";
-//var p = process.env.OPENSHIFT_NODEJS_PORT
-var python_port = 15151;
+var p = process.env.OPENSHIFT_NODEJS_PORT
+p = (p == undefined) ? p : p.substring(0, p.length-4) + 8191 //8767
+var python_port = p || 8191; //8767
+python_port = 15151
 
 var net = require('net');
 var client = net.connect({port: python_port, host: python_host},

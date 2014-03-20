@@ -62,6 +62,7 @@ var mongoose = require('mongoose')
     , users: [{
       user_id: String
       , verb: String
+      , verb_past: String
       , frequency: String
       , freq_progess: Number
       , current_progress: Number
