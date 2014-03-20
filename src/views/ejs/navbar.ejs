@@ -1,5 +1,4 @@
 <ul id = "navbar">
-
   <li id = "homeButton">
     <img src = "../images/icons/home.svg" />
     <a href = "/">home</a>
@@ -7,12 +6,12 @@
 
   <li id = "groupsButton">
     <img src = "../images/icons/teams.svg" />
-    <a href = "/team/hub/<%=user.id%>">teams</a>
+    <a href = "/teams/<%=user.id%>">teams</a>
   </li>
 
   <li id = "notificationsButton">
     <img src = "../images/icons/notification.svg" />
-    <a href = "">notifications</a>
+    <a href = "/notifications/<%= user.id %>">notifications</a>
   </li>
 
   <li id = "meButton">

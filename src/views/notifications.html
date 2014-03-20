@@ -1,0 +1,46 @@
+<% include ejs/header.ejs %>
+  <header>
+    <h1>
+      <%= title %>
+    </h1>
+  </header>
+  
+  <section id = "main">
+    <div class="padding"></div>
+    <script>
+      function addElement () {
+        for (var i = 0; i < 11; i++) {
+          //create a new notification div and give it notification contents
+          var notification = document.createElement("div");
+          notification.className = "notification";
+          //information div
+          var info = document.createElement("div");
+          info.className = "info";
+          name = "name"
+          verb = " verb"
+          obj = " direct object!"
+          info.innerHTML = name + verb + obj;
+          //time div
+          var time = document.createElement("div");
+          time.className = "time";
+          time.innerHTML = Date().toString();
+
+          info.appendChild(time);         //add the time div to the info div
+          notification.appendChild(info); //add the info div to the notification
+
+          // add the newly created element and its content into the DOM
+          notification_section = document.getElementById("main");
+          notification_section.appendChild(notification);
+        }
+      }
+      addElement();
+    </script>
+  </section>
+  <!-- Space between form and footer -->
+  <div class="padding"></div>
+  <footer>
+    <% include ejs/navbar.ejs %>
+    <script type = "text/javascript" src = "../js/navbar.js"></script>
+  </footer>
+</body>
+</html>

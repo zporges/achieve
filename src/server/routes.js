@@ -21,7 +21,8 @@ function mail_confirm_account(user) {
     to: user.email,
     subject: "Confirm your account for Achieve!",
     text: "necessary?",
-    html: user.name + ", thank you for signing up for Achieve! Click the following link to confirm your account. If this is not you, please disregard this email. <br/>" + link
+    html: user.name + ", thank you for signing up for Achieve! Click the following " +
+      "link to confirm your account. If this is not you, please disregard this email. <br/>" + link
 
   }
   smtpTransport.sendMail(mailOptions, function(error, response){
@@ -96,6 +97,31 @@ module.exports = function(app, passport) {
       }
     });
 
+    // list pending team requests:
+    console.log("THIS USER: " + req.user.id);
+    teams_remaining = [];
+    User.findById(req.user.id, function(error, user){
+      all_teams = user.teams;
+      console.log("]]]]] " + all_teams[0]);
+      for (var i = 0; i < all_teams.length; i++) {  // the teams this user is part of
+        console.log(">>> " + i + " " + all_teams[i].team_id); 
+        Team.findById(all_teams[i].team_id, function(error, team) {
+          console.log(team);
+          for (var j = 0; j < team.users.length; j++) { // the users that are part of this team.
+            if (team.users[j].user_id == req.user.id) {
+              if (team.users[j].pending == true) {
+                res.redirect('/goal/new/' + team._id);
+                return;
+                teams_remaining.push(team._id);
+              }              
+            }
+          }
+        });
+      }      
+      
+    });
+
+
 	  Team.findList(req.user.teams,function(err, doc_teams){
 		  if (err){
 			  console.log(err.message);
@@ -111,7 +137,7 @@ module.exports = function(app, passport) {
 				    now.setDate(now.getDate());
 						for (var i = 0; i < doc_teams.length; i++){
 							//figure out if deadline includes the last day
-							doc_teams[i].countdown = Math.floor((doc_teams[i].deadline - now) / 86400000)	
+							doc_teams[i].countdown = Math.floor((doc_teams[i].deadline - now) / 86400000)
 							if (doc_teams[i].deadline < now){
 								doc_teams[i].has_deadline_passed = true;
 								doc_teams[i].save(function(err, team, num) {
@@ -137,7 +163,7 @@ module.exports = function(app, passport) {
 		mail_confirm_account(req.user);
     res.redirect('/');
   });
-	
+
   app.get('/admin/user', auth.isAuthenticated, function(req,res){
     res.render('admin_user',{
       title: 'Admin User Page'
@@ -178,7 +204,7 @@ module.exports = function(app, passport) {
   app.post('/team/new', auth.isAuthenticated, function(req,res){
     req.assert('name', 'Name is required').notEmpty();
     req.assert('deadline', 'Valid deadline required').notEmpty();
-		
+
 	  //Checks to see the number of users and loops through the array and gets inputs based on number of users
 	  var num_user = parseInt(req.param('num_user'),10);
 	  var arr = [];
@@ -192,7 +218,8 @@ module.exports = function(app, passport) {
     obj.errors = errors;
 
 
-		//TODO: Still needs to assert if deadline is after than today, Did not know how to convert "html input date" type into Javascript Date type to compare the dates
+		//TODO: Still needs to assert if deadline is after than today, Did not know how to convert 
+    //"html input date" type into Javascript Date type to compare the dates
     var now = new Date();
     now.setDate(now.getDate());
 		var deadline = new Date();
@@ -255,7 +282,40 @@ module.exports = function(app, passport) {
 	    });
 	  };
   });
-  
+
+  // Teams Page
+  app.get("/teams/:id", auth.isAuthenticated, function(req, res){
+    User.findById(req.params.id, function(error, user){
+      Team.findList(user.teams, function(error, team){
+        res.render('teams_page',{
+          title: 'Teams Page',
+          user: user,
+          teams: team
+        });
+      });
+    });
+  });
+
+  app.get("/user/settings", auth.isAuthenticated, function(req, res){
+    User.findById(req.user.id, function(error, user){ 
+      res.render('me_settings',{
+        title: 'User Settings',
+        user: user
+      }); 
+    });
+  });
+
+  // Notification Page
+  app.get('/notifications/:id', auth.isAuthenticated, function(req,res){
+    User.findById(req.params.id, function(error, user){
+      res.render('notifications',{
+        title: 'Notifications',
+        user: user,
+        stylesheet: 'notifications.css'
+      });
+    });
+  });
+
   // Create a new checkin
   app.post('/checkin/new/:id', auth.isAuthenticated, function(req,res){
 	  Team.checkin({
@@ -314,7 +374,7 @@ module.exports = function(app, passport) {
 
 	    var now = new Date();
 	    now.setDate(now.getDate());
-			team.countdown = Math.floor((team.deadline - now) / 86400000);	
+			team.countdown = Math.floor((team.deadline - now) / 86400000);
       res.render('team_hub',{
 		    title: 'Team Hub',
         team: team
@@ -352,6 +412,31 @@ module.exports = function(app, passport) {
         if(user) {
           user.pending = false;
           user.verb = req.param('verb');
+
+          //to past tense
+          user.verb_past = "accomplished part of the goal"
+          var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
+          var java_port = 15151;
+          var net = require('net');
+
+          var client = net.connect({port: java_port, host: java_host},
+              function() { //'connect' listener
+            console.log('client connected');
+            client.write('toPastTense ' + req.param('verb') +'\r\n');
+          });
+          client.on('data', function(data) {
+            console.log(data.toString());
+            var past = data.toString();
+            past = past.substring(past.indexOf("]")+2);
+            user.verb_past = past;
+            console.log("verb past: " + user.verb_past);
+            client.end();
+          });
+          client.on('end', function() {
+            console.log('client disconnected');
+          });
+          client.on('error', console.log);
+
           user.frequency = req.param('frequency');
           user.freq_progress = req.param('number');
           //Use frequency to calculate cumulative desired progressonsol
@@ -407,28 +492,26 @@ module.exports = function(app, passport) {
 			}
     });
 	}
-	
+
 	app.get("/team/progress/:id", function(req, res) {
 	  Team.findCheckins(req.params.id, function(err, team_data) {
 	  	res.render('team_progress', {stylesheet: "../../css/progress.css", team: team_data});
 	  })
-    //res.render('team_progress', {stylesheet: "../../css/progress.css"});
   });
 
   app.get('/login', function(req, res) {
     res.render('login', {stylesheet: 'login.css'});
 
 
-//var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
-var python_host = "127.2.40.129";
-var p = process.env.OPENSHIFT_NODEJS_PORT
-p = (p == undefined) ? p : p.substring(0, p.length-4) + 8191 //8767
-var python_port = p || 8191; //8767
-python_port = 7959
+
+var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
+//var python_host = "127.2.40.129";
+//var p = process.env.OPENSHIFT_NODEJS_PORT
+var python_port = 15151;
 
 var net = require('net');
-//var client = net.connect({port: python_port, host: python_host},
-var client = net.connect({port: 15555, host: "nlp-groupgoals.rhcloud.com"},
+var client = net.connect({port: python_port, host: python_host},
+//var client = net.connect({port: 15555, host: "nlp-groupgoals.rhcloud.com"},
     function() { //'connect' listener
   console.log('client connected');
   client.write('toPastTense clean my room\r\n');
@@ -441,7 +524,6 @@ client.on('end', function() {
   console.log('client disconnected');
 });
 client.on('error', console.log);
-
 
   });
 
@@ -517,7 +599,7 @@ client.on('error', console.log);
     //Validate passed information
     req.assert('name', 'Name is required').notEmpty();
     req.assert('email', 'Valid email required').notEmpty().isEmail();
-    req.assert('password', 'Password must be at least 6 characters and contain a number and letter').len(6).regex('^.*(?=.*[0-9])(?=.*[A-Za-z]).*$');
+    req.assert('password', 'Password must be at least 6 characters and contain a number and letter').len(6);//.regex('^.*(?=.*[0-9])(?=.*[A-Za-z]).*$');
     req.assert('password2', 'Passwords do not match').equals(req.body.password);
     User.findOne({email : req.body.email}, function(err, user) {
       if (err) {
