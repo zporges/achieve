@@ -104,7 +104,7 @@ module.exports = function(app, passport) {
       all_teams = user.teams;
       console.log("]]]]] " + all_teams[0]);
       for (var i = 0; i < all_teams.length; i++) {  // the teams this user is part of
-        console.log(">>> " + i + " " + all_teams[i].team_id); 
+        console.log(">>> " + i + " " + all_teams[i].team_id);
         Team.findById(all_teams[i].team_id, function(error, team) {
           console.log(team);
           for (var j = 0; j < team.users.length; j++) { // the users that are part of this team.
@@ -113,12 +113,12 @@ module.exports = function(app, passport) {
                 res.redirect('/goal/new/' + team._id);
                 return;
                 teams_remaining.push(team._id);
-              }              
+              }
             }
           }
         });
-      }      
-      
+      }
+
     });
 
 
@@ -200,7 +200,7 @@ module.exports = function(app, passport) {
 	    });
     });
   });
-  
+
   app.post('/team/new', auth.isAuthenticated, function(req,res){
     req.assert('name', 'Name is required').notEmpty();
     req.assert('deadline', 'Valid deadline required').notEmpty();
@@ -218,7 +218,7 @@ module.exports = function(app, passport) {
     obj.errors = errors;
 
 
-		//TODO: Still needs to assert if deadline is after than today, Did not know how to convert 
+		//TODO: Still needs to assert if deadline is after than today, Did not know how to convert
     //"html input date" type into Javascript Date type to compare the dates
     var now = new Date();
     now.setDate(now.getDate());
@@ -297,7 +297,7 @@ module.exports = function(app, passport) {
   });
 
   app.get("/user/settings", auth.isAuthenticated, function(req, res){
-    User.findById(req.user.id, function(error, user){ 
+    User.findById(req.user.id, function(error, user){
       res.render('me_settings',{
         title: 'User Settings',
         user: user

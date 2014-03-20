@@ -5,7 +5,7 @@
     	Pact
     </h1>
   </header>
-  
+
   <section id = "main">
 	  <form method= "post">
 		  <div>
@@ -16,24 +16,24 @@
       <% if (typeof errors != 'undefined' && typeof errors.name != 'undefined') { %>
         <p class = "error"> <%=errors.name.msg%> </p>
       <% } %>
-			
+
 			  <span label ="Wager">
 				<input type="text" name = "wager" placeholder="Enter a wager (Optional)" id="editWager"  <% if (typeof wager != 'undefined'){ %> value = <%=wager%> <% } %>></input>
 			  </span>
-				
+
       <% if (typeof errors != 'undefined' && typeof errors.wager != 'undefined') { %>
         <p class = "error"> <%=errors.wager.msg%> </p>
       <% } %>
-				
+
 			  <span label ="Deadline">
 				<input type="date" name = "deadline" placeholder="Enter a deadline" id="editDeadline"  <% if (typeof deadline != 'undefined') { %> value = <%=deadline%> <% } %>/>
 			  </span>
       <% if (typeof errors != 'undefined' && typeof errors.deadline != 'undefined') { %>
         <p class = "error"> <%=errors.deadline.msg%> </p>
       <% } %>
-				
+
 			 <input type="hidden" name = "num_user" id="numUsers" value="1" />
-			 
+
 		     <span label ="Users" id = "addUser">
 				<input type="text" name = "user1" placeholder="Enter a teammate's email" class="addUser"  <% if (typeof user1 != 'undefined') { %> value = <%=user1%> <% } %> ></input>
 			  </span>
@@ -41,17 +41,19 @@
 	      <% if (typeof errors != 'undefined' && typeof errors.user1 != 'undefined') { %>
 	        <p class = "error"> <%=errors.user1.msg%> </p>
 	      <% } %>
-				
+
 		  	  <a href= "#addUser" onclick = "addUser()">Add new user </a>
-	    
+
 			  <input type="submit" onclick="groupsubmit()" value="Save Team"/>
 		  </div>
 	  </form>
 	  <a href= "/"> Back to Home </a>
   </section>
-  
+
   <footer>
   <% include ejs/navbar.ejs %>
+  <script type = "text/javascript" src = "js/navbar.js"></script>
+
   </footer>
   </div>
 </body>

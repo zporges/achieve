@@ -12,6 +12,9 @@ function highlightPageNav(){
       var buttonName = $(this).attr('id');
       selectHighlightedButton(buttonName);
     }
+    else{
+      selectHighlightedButton("homeButton");
+    }
   });
 }
 
