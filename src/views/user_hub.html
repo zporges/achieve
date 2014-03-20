@@ -1,58 +1,40 @@
 <% include ejs/header.ejs %>
-<!--   <header>
-    <h1>
-    	Settings
-    </h1>
-  </header>
-        <a href="/">Main</a>
-
-  <section id = "groups">
-	  <ul>
-		  <%= title %>
-	  </ul>
-    <ul>
-     Name: <%= user.name %>
-    </ul>
-    <ul>
-     Email: <%= user.email %>
-    </ul>
-    <ul>
-     Created: <%= user.created %>
-    </ul>
-    <ul>
-     Pending: <%= user.pending %>
-    </ul>
-    <ul>
-     Teams: <%= user.teams %>
-    </ul>
-		<%= user %>
-  </section> -->
-  <div id = "content">
+  <div id = "me_mygoals" class= "content">
   <header>
     <h1>Name</h1>
   </header>
   <section id = "main">
     <ul id = "topnav">
-      <li><a href = "me_mygoals.html">My goals</a></li>
-      <li><a href = "me_settings.html">Settings</a></li>
+      <li id= "barleft"><a href = "">My goals</a></li>
+      <li id= "barright"><a href = "/user/settings">Settings</a></li>
     </ul>
     <div id = "info">
       <div id = "profile">
-        <div id= "profilepic"></div>
-        <div id = "userName"></div>
+        <div id= "profilepic"><img src /></div>
+        <div id = "userName">Name</div>
       </div>
       <div id = "goalsInfo">
-        <p class = "goalsInfoTitle">Goals in progress</p>
-        <h3 id = "inProgress">0</h3>
-        <p class = "goalsInfoTitle">Total goals completed</p>
-        <h3 id = "totalCompleted">0</h3>
-        <p class = "goalsInfoTitle">Total check-ins</p>
-        <h3 id = "totalCheckins">0</h3>
+        <ul id = "goalTitles">
+          <li><p class = "goalsInfoTitle">Goals in progress</p>
+          </li>
+          <li><p class = "goalsInfoTitle">Goals completed</p>
+          </li>
+          <li><p class = "goalsInfoTitle">Total checkins</p>
+          </li>
+        </ul>
+        <ul id = "counts">
+          <li><h3 id = "inProgress">0</h3></li>
+          <li><h3 id = "totalCompleted">0</h3></li>
+          <li><h3 id = "totalCheckins">0</h3></li>
+        </ul>
       </div>
     </div>
-    <div id = "dataVis">
-      <h2>Individual goal progress</h2>
-    </div>
+    <div id = "dataVis"></div>
+      <p id = "individualProgress">Individual goal progress</p>
+      <script>
+      </script>
+    
+
    </section>
   <footer>
     <% include ejs/navbar.ejs %>

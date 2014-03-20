@@ -1,13 +1,13 @@
 <% include ejs/header.ejs %>
-  <div id = "content">
+  <div id = "me_settings" class= "content">
     <header>
       <h1>Name</h1>
     </header>
 
     <section id = "main">
 	 	<ul id = "topnav">
-	 		<li><a href = "me_mygoals.html">My goals</a></li>
-	 		<li><a href = "me_settings.html">Settings</a></li>
+	 		<li id= "barleft"><a href = "user_hub.html">My goals</a></li>
+	 		<li id= "barright"><a href = "me_settings.html">Settings</a></li>
 	 	</ul>
 	 	<h3>Profile</h3>
 	 	<div class = "bars"><a href= "edit.html">Edit</a></div>
@@ -20,9 +20,10 @@
 	 	<div class = "bars"><a href= "service.html">Terms of service</a></div>
 
 	</section>
-	<footer>
-      <script type = "text/javascript" src = "js/d3.min.js"></script>
-    </footer>
+  <footer>
+    <% include ejs/navbar.ejs %>
+    <script type = "text/javascript" src = "../js/navbar.js"></script>
+  </footer>
   </div>
 </body>
 </html>
