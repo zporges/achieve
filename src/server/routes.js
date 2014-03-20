@@ -165,12 +165,16 @@ module.exports = function(app, passport) {
     }});
   });
 
-  app.get('/team/new', auth.isAuthenticated, function(req,res){
-	  res.render('team_new',{
-		  title: 'New Team'
-	  });
+  app.get('/team/new/:id', auth.isAuthenticated, function(req,res){
+    User.findById(req.params.id, function(error, user){
+      res.render('team_new',{
+		    title: 'New Team',
+        user: user,
+        stylesheet: "team_new.css"
+	    });
+    });
   });
-
+  
   app.post('/team/new', auth.isAuthenticated, function(req,res){
     req.assert('name', 'Name is required').notEmpty();
     req.assert('deadline', 'Valid deadline required').notEmpty();
