@@ -1,6 +1,22 @@
 $(function() {
-	//console.log(users);
+	console.log('test');
+	console.log(data);
 
+	//the date that the team was created
+	var creationDate = new Date(data.created);
+	
+	//the date of the deadline
+	var deadline = new Date(data.deadline);
+	
+	//the number of days between the creation and deadline
+	var totalDays = Math.ceil((deadline - creationDate) / (1000*60*60*24));
+	
+	//for each user
+	for(var i = 0; i < data.users.length; i++) {
+		//the user's total numeric goal
+		var goal = 0;
+		console.log(data.users[i].checkin);
+	}
 
 	var margin = {top: 30, right: 20, bottom: 30, left: 50},
 	    width = 600 - margin.left - margin.right,

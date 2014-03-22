@@ -16,6 +16,11 @@ var mongoose = require('mongoose')
 		, teams: [{
       team_id: String
       }]
+    , notifications : [{
+        event_id: String
+        , info: String
+        , seen: {type: Boolean, default: false}
+    }]
   });
 
   UserSchema.statics.invite = function(email, callback) {

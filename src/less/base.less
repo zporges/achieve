@@ -8,32 +8,49 @@
 @primary-border: #b4bec6;
 @primary-font-family: 'Open Sans', Helvetica, Arial, sans-serif;
 
-html{
+  html{
   height:100%;
   width:100%;
+  padding:0px;
+  margin:0px;
 }
 
 body {
-  color: @dark-gray;
+  height:100%;
+  width:100%;
+  padding:0px;
+  margin:0px;
+  box-shadow:none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+.content{
+    color: @dark-gray;
   background-color: @light-gray;
   font-family: @primary-font-family;
   margin: 0;
   font-size: 16px;
+  height:100%;
+  width:100%;
+  float:left;
 }
 
 header, #main {
-	padding: 5%;
+  padding: 5%;
 }
 
 h1 {
-	text-align: center;
-	font-weight: 100;
+  text-align: center;
+  font-weight: 100;
 }
 
 li{
-	padding:0px 0px 10px 0px;
+  padding:0px 0px 10px 0px;
 }
 
 .hidden{
   display:none;
 }
+
