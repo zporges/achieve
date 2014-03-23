@@ -1,5 +1,8 @@
 <% include ejs/header.ejs %>
-<div id="team_new" class="content">
+
+<script type = "text/javascript" src = "../js/team_new.js"></script>
+
+<div id="team_new" class="content" onload= "onload()">
   <header>
     <h1>
     	Achieve
@@ -36,15 +39,18 @@
 
 		     <span label ="Users" id = "addUser">
 				<input type="text" name = "user1" placeholder="Enter a teammate's email" class="addUser"  <% if (typeof user1 != 'undefined') { %> value = <%=user1%> <% } %> ></input>
+
+	      
+	       <p class = "error1" name="error1"> <% if (typeof errors != 'undefined' && typeof errors.user1 != 'undefined') {%>  <%=errors.user1.msg%> <%} %> </p>
+	      
+
+
 			  </span>
 
-	      <% if (typeof errors != 'undefined' && typeof errors.user1 != 'undefined') { %>
-	        <p class = "error"> <%=errors.user1.msg%> </p>
-	      <% } %>
 
 		  	  <a href= "#addUser" onclick = "addUser()">Add new user </a>
 
-			  <input type="submit" onclick="groupsubmit()" value="Save Team"/>
+			  <input type="submit" value="Save Team"/>
 		  </div>
 	  </form>
   </section>

@@ -38,6 +38,7 @@
     , "bcrypt" : "latest"
     , "express-validator" : "*"
     , "nodemailer" : "latest"
+    , "node-schedule" : "latest"
   },
   
   "devDependencies": {},
