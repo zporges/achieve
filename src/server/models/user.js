@@ -107,6 +107,62 @@ var mongoose = require('mongoose')
   	  });
   };
   
+  UserSchema.statics.changeName = function(user_id, name, callback) {
+    User.findById(user_id, function(err,user) {
+      if (err) {
+        callback(err);
+      }
+      else {
+        user.name = name;
+        user.save(function(err,user) {
+          callback(err,user);
+        });
+      }
+    });
+  }
+
+  UserSchema.statics.changeEmail = function(user_id, email, callback) {
+    User.findById(user_id, function(err,user) {
+      if (err) {
+        callback(err);
+      }
+      else {
+        user.email = name;
+        user.save(function(err,user) {
+          callback(err,user);
+        });
+      }
+    });
+  }
+
+  UserSchema.statics.changePassword = function(user_id, pw, callback) {
+    User.findById(user_id, function(err,user) {
+      if (err) {
+        callback(err);
+      }
+      else {
+        bcrypt.genSalt(10, function(err, salt) {
+          if (err) {
+            return callback(err);
+          }
+          else {
+            bcrypt.hash(pw, salt, function(err, hash) {
+              if (err) {
+                return callback(err);
+              }
+              else {
+                user.hash = hash;
+                user.save(function(err,user) {
+                  callback(err,user);
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
   UserSchema.statics.signup = function(email, password, name, gender, callback) {
     var self = this;
     bcrypt.genSalt(10, function(err, salt) {

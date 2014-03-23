@@ -191,8 +191,8 @@ module.exports = function(app, passport) {
     }});
   });
 
-  app.get('/team/new/:id', auth.isAuthenticated, function(req,res){
-    User.findById(req.params.id, function(error, user){
+  app.get('/team/new', auth.isAuthenticated, function(req,res){
+    User.findById(req.user.id, function(error, user){
       res.render('team_new',{
 		    title: 'New Team',
         user: user,
@@ -242,6 +242,7 @@ module.exports = function(app, passport) {
           obj.user1 = req.param('user1');
         }
 			obj.title = 'New Team';
+      obj.user = req.user;
       return res.render('team_new', obj);
 		}
 	  for (var i = 0; i < num_user; i++){
@@ -383,7 +384,7 @@ module.exports = function(app, passport) {
   });
 
   app.get('/goal/new/:tid', auth.isAuthenticated, function(req, res) {
-    res.render('goal_new', {team_id: req.params.tid});
+    res.render('goal_new', {team_id: req.params.tid, user: req.user});
   });
 
   app.post('/goal/new/:tid',auth.isAuthenticated,  function(req, res) {
