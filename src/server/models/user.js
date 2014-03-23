@@ -16,6 +16,18 @@ var mongoose = require('mongoose')
 		, teams: [{
       team_id: String
       }]
+    , notifications : [{
+        event_id: String
+        , info: String
+        , seen: {type: Boolean, default: false}
+    }]
+    , num_unread: {type: int, default: 0}
+    /*
+        look into chron jobs   "https://www.npmjs.org/package/node-schedule"
+        checkins + comments and likes.
+        on notification page, when it opens up, all the current notifs should be set as seen. 
+        (loop until seen = true)
+      */  
   });
 
   UserSchema.statics.invite = function(email, callback) {
@@ -102,6 +114,62 @@ var mongoose = require('mongoose')
   	  });
   };
   
+  UserSchema.statics.changeName = function(user_id, name, callback) {
+    User.findById(user_id, function(err,user) {
+      if (err) {
+        callback(err);
+      }
+      else {
+        user.name = name;
+        user.save(function(err,user) {
+          callback(err,user);
+        });
+      }
+    });
+  }
+
+  UserSchema.statics.changeEmail = function(user_id, email, callback) {
+    User.findById(user_id, function(err,user) {
+      if (err) {
+        callback(err);
+      }
+      else {
+        user.email = name;
+        user.save(function(err,user) {
+          callback(err,user);
+        });
+      }
+    });
+  }
+
+  UserSchema.statics.changePassword = function(user_id, pw, callback) {
+    User.findById(user_id, function(err,user) {
+      if (err) {
+        callback(err);
+      }
+      else {
+        bcrypt.genSalt(10, function(err, salt) {
+          if (err) {
+            return callback(err);
+          }
+          else {
+            bcrypt.hash(pw, salt, function(err, hash) {
+              if (err) {
+                return callback(err);
+              }
+              else {
+                user.hash = hash;
+                user.save(function(err,user) {
+                  callback(err,user);
+                });
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
   UserSchema.statics.signup = function(email, password, name, gender, callback) {
     var self = this;
     bcrypt.genSalt(10, function(err, salt) {

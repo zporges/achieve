@@ -1,28 +1,54 @@
 <% include ejs/header.ejs %>
-  <div id = "content">
+  <div id = "me_settings" class= "content">
     <header>
-      <h1>Name</h1>
+      <h1>Settings</h1>
     </header>
+	 	<section id = "main">
+	  <form method= "post">
+		  <div>
+			  <h3><%= title %></h3>
+			  <span label ="Name">
+				<input type="text" name = "name" placeholder="Your name" id="editName"  <% if (typeof name != 'undefined') { %> value = <%=name%> <% } %> ></input>
+			  </span> <br/>
+      <% if (typeof errors != 'undefined' && typeof errors.name != 'undefined') { %>
+        <p class = "error"> <%=errors.name.msg%> </p>
+      <% } %>
+			
+			  <span label ="gender">
+				<select name = "gender" id="editGender"  <% if (typeof wager != 'undefined'){ %> value = <%=wager%> <% } %>>
+					<option value = "N/A">N/A</option>
+					<option value = "Male">Male</option>
+					<option value = "Female">Female</option>
+				</select>
+			  </span><br/>
+				
+      <% if (typeof errors != 'undefined' && typeof errors.gender != 'undefined') { %>
+        <p class = "error"> <%=errors.gender.msg%> </p>
+      <% } %>
+				
+			  <span label ="email">
+				<input type="email" name = "email" placeholder="your email" id="editEmail"  <% if (typeof email != 'undefined') { %> value = <%=email%> <% } %>/>
+			  </span><br/>
+      <% if (typeof errors != 'undefined' && typeof errors.email != 'undefined') { %>
+        <p class = "error"> <%=errors.deadline.msg%> </p>
+      <% } %>	
+			 </input>
+			  </span>
 
-    <section id = "main">
-	 	<ul id = "topnav">
-	 		<li><a href = "me_mygoals.html">My goals</a></li>
-	 		<li><a href = "me_settings.html">Settings</a></li>
-	 	</ul>
-	 	<h3>Profile</h3>
-	 	<div class = "bars"><a href= "edit.html">Edit</a></div>
-	 	<h3>Preferences</h3>
-	 	<div class = "bars"><a href= "setNotification.html">Notification settings</a></div>
-	 	<div class = "bars"><a href= "privacy.html">Privacy settings</a></div>
-	 	<div class = "bars"><a href= "sharing.html">Sharing</a></div>
-	 	<h3>Support</h3>
-	 	<div class = "bars"><a href= "help">Achieve help center</a></div>
-	 	<div class = "bars"><a href= "service.html">Terms of service</a></div>
+			  <input type="submit" onclick="groupsubmit()" value="save changes"/>
 
-	</section>
-	<footer>
-      <script type = "text/javascript" src = "js/d3.min.js"></script>
-    </footer>
+		  <button type="submit" name="logout">Logout</button>
+	  </form>
+	  <?php 
+	  	if(isset($_POST['logout'])) { 
+		unset($_SESSION['user']),$_SESSION['email']);
+		} 
+	  ?>
+  </section>
+  <footer>
+    <% include ejs/navbar.ejs %>
+    <script type = "text/javascript" src = "../js/navbar.js"></script>
+  </footer>
   </div>
 </body>
 </html>

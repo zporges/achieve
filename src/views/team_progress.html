@@ -1,22 +1,21 @@
 <% include ejs/header.ejs %>
 
 <script>
-	console.log("1");
 	var data = <%-JSON.stringify(team)%>;
-	console.log(data);
-	console.log("2");
 </script>
 
   <div id = "content">
     <header>
-      <h1>Group Progress</h1>
+      <h1>Team Progress</h1>
     </header>
 
     <section id = "main">
     </section>
 
     <footer>
-      <script type = "text/javascript" src = "../../js/jquery-2.0.3.min.js"></script>
+      <!--include navbar.ejs here-->
+      
+      <script type = "text/javascript" src = "../../js/navbar.js"></script>
       <script type = "text/javascript" src = "../../js/d3.min.js"></script>
       <script type = "text/javascript" src = "../../js/viz.js"></script>
     </footer>
