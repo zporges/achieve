@@ -21,6 +21,7 @@ var mongoose = require('mongoose')
         , info: String
         , seen: {type: Boolean, default: false}
     }]
+    , num_unread: {type: int, default: 0}
     /*
         look into chron jobs   "https://www.npmjs.org/package/node-schedule"
         checkins + comments and likes.
