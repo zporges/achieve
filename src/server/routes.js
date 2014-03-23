@@ -133,10 +133,9 @@ module.exports = function(app, passport) {
           }
         });
       }
-
     });
 
-
+    // gets information about every team that the user is in and all users in those teams
 	  Team.findList(req.user.teams,function(err, doc_teams){
 		  if (err){
 			  console.log(err.message);
@@ -378,12 +377,59 @@ module.exports = function(app, passport) {
   });
 
   app.get('/user/:id',auth.isAuthenticated, function(req,res){
-    User.findById(req.params.id, function(error, user){
-      res.render('user_hub',{
-		    title: 'My Hub',
-        user: user,
-        stylesheet:"user_hub.css"
-	    });
+
+    User.findById(req.params.id, function(err, user){
+      if (err){
+        console.log(err.message);
+      }
+      else{
+        Team.findList(user.teams,function(err, doc_teams){
+          if (err){
+            console.log(err.message);
+          }
+          else{
+            User.findList(doc_teams,function(err, doc_users){
+              if (err){
+                console.log(err.message);
+              }
+              else{
+                var now = new Date();
+                var completed_teams = 0;
+                var num_checkins = 0;
+                now.setDate(now.getDate());
+                for (var i = 0; i < doc_teams.length; i++){
+                  for (var t = 0; t < doc_teams[i].users.length; t++){
+                    if (doc_teams[i].users[t].user_id == req.params.id){
+                      num_checkins+= doc_teams[i].users[t].checkin.length;
+                    }
+                  }
+                  //figure out if deadline includes the last day
+                  doc_teams[i].countdown = Math.floor((doc_teams[i].deadline - now) / 86400000)
+                  if (doc_teams[i].deadline < now){
+                    completed_teams +=1;
+                    doc_teams[i].has_deadline_passed = true;
+                    doc_teams[i].save(function(err, team, num) {
+                      if(err) {
+                        res.send(err.message);
+                      }
+                    });
+                  }
+                }
+                res.render('user_hub',{
+                  title: 'My Hub',
+                  user: user,
+                  teams: doc_teams,
+                  users: doc_users,
+                  user: user,
+                  completed_teams: completed_teams,
+                  num_checkins: num_checkins,
+                  stylesheet:"user_hub.css"
+                });
+              }
+            });
+          }
+        });
+      }
     });
   });
 
