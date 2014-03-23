@@ -1,11 +1,10 @@
 <% include ejs/header.ejs %>
-  <header>
-    <h1>
-      <%= title %>
-    </h1>
-  </header>
-  
-  <section id = "main">
+  <div id="notification_page" class="content">
+    <header>
+      <h1>
+        <%= title %>
+      </h1>
+    </header>
     <div class="padding"></div>
     <script>
       function addElement () {
@@ -29,18 +28,18 @@
           notification.appendChild(info); //add the info div to the notification
 
           // add the newly created element and its content into the DOM
-          notification_section = document.getElementById("main");
+          notification_section = document.getElementById("notification_page");
           notification_section.appendChild(notification);
         }
       }
       addElement();
     </script>
-  </section>
-  <!-- Space between form and footer -->
-  <div class="padding"></div>
-  <footer>
-    <% include ejs/navbar.ejs %>
-    <script type = "text/javascript" src = "../js/navbar.js"></script>
-  </footer>
+    <!-- Space between form and footer -->
+    <div class="padding"></div>
+    <footer>
+      <% include ejs/navbar.ejs %>
+      <script type = "text/javascript" src = "../js/navbar.js"></script>
+    </footer>
+  </div>
 </body>
 </html>
