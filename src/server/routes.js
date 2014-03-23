@@ -321,6 +321,22 @@ module.exports = function(app, passport) {
     });
   });
 
+  app.post("/user/settings", auth.isAuthenticated, function(req, res) {
+    var data = {user_id : req.user.id};
+    if(req.param('name') != '') {
+      data.name = req.param('name');
+    }
+    if(req.param('email') != '') {
+      data.email = req.param('email');
+    }
+    if(req.param('gender')) {
+      data.gender = req.param('gender');
+    }
+    User.changeProfile(data, function(err, user) {
+      res.redirect('/user/settings');
+    });
+  });
+
   // Notification Page
   app.get('/notifications/:id', auth.isAuthenticated, function(req,res){
     User.findById(req.params.id, function(error, user){
