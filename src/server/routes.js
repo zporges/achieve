@@ -1,4 +1,19 @@
+// for mail
 var nodemailer = require('nodemailer');
+
+// for node-schedule
+var schedule = require('node-schedule');
+
+// view https://www.npmjs.org/package/node-schedule for API
+var rule = new schedule.RecurrenceRule();
+rule.second = 5;
+
+var j = schedule.scheduleJob(rule, function(){
+  // add chronjob here. 
+  // loop through all users and send out emails.
+});
+
+
 var smtpTransport = nodemailer.createTransport("SMTP",{
   service: "Gmail",
   auth: {
