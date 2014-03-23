@@ -119,7 +119,7 @@ module.exports = function(app, passport) {
       all_teams = user.teams;
       console.log("]]]]] " + all_teams[0]);
       for (var i = 0; i < all_teams.length; i++) {  // the teams this user is part of
-        console.log(">>> " + i + " " + all_teams[i].team_id); 
+        console.log(">>> " + i + " " + all_teams[i].team_id);
         Team.findById(all_teams[i].team_id, function(error, team) {
           console.log(team);
           for (var j = 0; j < team.users.length; j++) { // the users that are part of this team.
@@ -128,12 +128,12 @@ module.exports = function(app, passport) {
                 res.redirect('/goal/new/' + team._id);
                 return;
                 teams_remaining.push(team._id);
-              }              
+              }
             }
           }
         });
-      }      
-      
+      }
+
     });
 
 
@@ -206,10 +206,14 @@ module.exports = function(app, passport) {
     }});
   });
 
-  app.get('/team/new', auth.isAuthenticated, function(req,res){
-	  res.render('team_new',{
-		  title: 'New Team'
-	  });
+  app.get('/team/new/:id', auth.isAuthenticated, function(req,res){
+    User.findById(req.params.id, function(error, user){
+      res.render('team_new',{
+		    title: 'New Team',
+        user: user,
+        stylesheet: "team_new.css"
+	    });
+    });
   });
 
   app.post('/team/new', auth.isAuthenticated, function(req,res){
@@ -229,7 +233,7 @@ module.exports = function(app, passport) {
     obj.errors = errors;
 
 
-		//TODO: Still needs to assert if deadline is after than today, Did not know how to convert 
+		//TODO: Still needs to assert if deadline is after than today, Did not know how to convert
     //"html input date" type into Javascript Date type to compare the dates
     var now = new Date();
     now.setDate(now.getDate());
@@ -304,6 +308,15 @@ module.exports = function(app, passport) {
           teams: team
         });
       });
+    });
+  });
+
+  app.get("/user/settings", auth.isAuthenticated, function(req, res){
+    User.findById(req.user.id, function(error, user){
+      res.render('me_settings',{
+        title: 'User Settings',
+        user: user
+      }); 
     });
   });
 
@@ -414,6 +427,31 @@ module.exports = function(app, passport) {
         if(user) {
           user.pending = false;
           user.verb = req.param('verb');
+
+          //to past tense
+          user.verb_past = "accomplished part of the goal"
+          var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
+          var java_port = 15151;
+          var net = require('net');
+
+          var client = net.connect({port: java_port, host: java_host},
+              function() { //'connect' listener
+            console.log('client connected');
+            client.write('toPastTense ' + req.param('verb') +'\r\n');
+          });
+          client.on('data', function(data) {
+            console.log(data.toString());
+            var past = data.toString();
+            past = past.substring(past.indexOf("]")+2);
+            user.verb_past = past;
+            console.log("verb past: " + user.verb_past);
+            client.end();
+          });
+          client.on('end', function() {
+            console.log('client disconnected');
+          });
+          client.on('error', console.log);
+
           user.frequency = req.param('frequency');
           user.freq_progress = req.param('number');
           //Use frequency to calculate cumulative desired progressonsol
@@ -483,10 +521,8 @@ module.exports = function(app, passport) {
 
 var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
 //var python_host = "127.2.40.129";
-var p = process.env.OPENSHIFT_NODEJS_PORT
-p = (p == undefined) ? p : p.substring(0, p.length-4) + 8191 //8767
-var python_port = p || 8191; //8767
-python_port = 15151
+//var p = process.env.OPENSHIFT_NODEJS_PORT
+var python_port = 15151;
 
 var net = require('net');
 var client = net.connect({port: python_port, host: python_host},
