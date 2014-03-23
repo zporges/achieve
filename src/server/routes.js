@@ -315,7 +315,8 @@ module.exports = function(app, passport) {
     User.findById(req.user.id, function(error, user){
       res.render('me_settings',{
         title: 'User Settings',
-        user: user
+        user: user,
+        stylesheet:"me_settings.css"
       }); 
     });
   });
@@ -379,7 +380,8 @@ module.exports = function(app, passport) {
     User.findById(req.params.id, function(error, user){
       res.render('user_hub',{
 		    title: 'My Hub',
-        user: user
+        user: user,
+        stylesheet:"user_hub.css"
 	    });
     });
   });
