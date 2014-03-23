@@ -21,6 +21,13 @@ var mongoose = require('mongoose')
         , info: String
         , seen: {type: Boolean, default: false}
     }]
+    , num_unread: {type: Number, default: 0}
+    /*
+        look into chron jobs   "https://www.npmjs.org/package/node-schedule"
+        checkins + comments and likes.
+        on notification page, when it opens up, all the current notifs should be set as seen. 
+        (loop until seen = true)
+      */  
   });
 
   UserSchema.statics.invite = function(email, callback) {
