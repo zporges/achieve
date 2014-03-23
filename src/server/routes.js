@@ -211,13 +211,13 @@ module.exports = function(app, passport) {
 	  //adds leader into array
 	  arr.push({"user_id": req.user.id, checkin:[]});
 	  for (var i = 0; i < num_user; i++){
-	    req.assert('user'+(i+1), 'Valid Email required').notEmpty().isEmail();
+	    req.assert('user'+(i+1), 'Valid Email required').isEmail();
 		}
     var obj = {}
     , errors = req.validationErrors(true); //Object format
     obj.errors = errors;
 
-
+    console.log(errors);
 		//TODO: Still needs to assert if deadline is after than today, Did not know how to convert
     //"html input date" type into Javascript Date type to compare the dates
     var now = new Date();
