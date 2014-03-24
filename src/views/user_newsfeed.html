@@ -12,12 +12,13 @@
   </section> -->
 
   <section id = "main">
-  	<h2>My Goals</h2>
-	  <ul id = "checkins">
+    <section id = "goals">
+    <h2>My Goals</h2>
+    <ul id = "checkins">
 
 
-			<% for(var i=0; i<teams.length; i++) {%>
-			<li class = "checkin_box">
+      <% for(var i=0; i<teams.length; i++) {%>
+      <li class = "checkin_box">
         <div class = "checkin_header">
           <div class = "checkbox">
             <svg>
@@ -39,7 +40,6 @@
                 else{%>
                   Never
                 <%}
-
                 }
               }
             %>
@@ -53,16 +53,22 @@
           <h5>unit per time period</h5>
           <input type="submit" value="Checkin"/>
         </form>
-		  </li>
-			<% } %>
-	  </ul>
-	<a href="team/new">Create Team</a>
+      </li>
+      <% } %>
+    </ul>
+    </section>
+
+    <section id = "progress">
+      <h2>My Friends' Progress</h2>
+    </section>
   </section>
 
   <footer>
     <% include ejs/navbar.ejs %>
     <script type = "text/javascript" src = "js/navbar.js"></script>
     <script type = "text/javascript" src = "js/homepage.js"></script>
+    <% include ejs/secondary_navbar.ejs %>
+    <script type = "text/javascript" src = "../js/secondary_navbar.js"></script>
   </footer>
   </div>
 </body>
