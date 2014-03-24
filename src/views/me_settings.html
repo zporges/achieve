@@ -4,7 +4,7 @@
       <h1>Settings</h1>
     </header>
 	 	<section id = "main">
-	  <form method= "post">
+	  <form method= "post" action="/user/settings">
 		  <div>
 			  <h3><%= title %></h3>
 			  <span label ="Name">
@@ -48,8 +48,8 @@
 			 </input>
 			  </span>
 
-			  <span label = "notification">
-			  Email notification:
+			  <span label = "notifications">
+			  Email notifications:
 			  <input id ="r1" type="radio" name="daily" value="daily">Daily
 			  <input id ="r2" type="radio" name="weekly" value="weekly">Weekly
 			  <input id ="r3" type="radio" name="monthly" value="monthly">Monthly
@@ -64,6 +64,10 @@
 		unset($_SESSION['name']),$_SESSION['email']);
 		} 
 	  ?>
+			  <input type="submit" value="save changes"/>
+
+		  <button type="submit" name="logout">Logout</button>
+	  </form>
   </section>
   <footer>
     <% include ejs/navbar.ejs %>

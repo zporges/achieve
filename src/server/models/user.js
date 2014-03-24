@@ -21,6 +21,13 @@ var mongoose = require('mongoose')
         , info: String
         , seen: {type: Boolean, default: false}
     }]
+    , num_unread: {type: Number, default: 0}
+    /*
+        look into chron jobs   "https://www.npmjs.org/package/node-schedule"
+        checkins + comments and likes.
+        on notification page, when it opens up, all the current notifs should be set as seen. 
+        (loop until seen = true)
+      */  
   });
 
   UserSchema.statics.invite = function(email, callback) {
@@ -106,7 +113,51 @@ var mongoose = require('mongoose')
         else callback(null, users);
   	  });
   };
-  
+
+  UserSchema.statics.changeProfile = function(data, callback) {
+    User.findById(data.user_id, function(err,user) {
+      if (err) {
+        callback(err);
+      }
+      else {
+        if(data.email) {
+          user.email = data.email;
+        }
+        if (data.name) {
+          user.name = data.name;
+        }
+        if (data.gender) {
+          user.gender = data.gender;
+        }
+        if (data.password) {
+          bcrypt.genSalt(10, function(err, salt) {
+            if (err) {
+              callback(err);
+            }
+            else {
+              bcrypt.hash(data.password, salt, function(err, hash) {
+                if (err) {
+                  callback(err);
+                }
+                else {
+                  user.hash = hash;
+                  user.save(function(err,user) {
+                    callback(err,user);
+                  });
+                }
+              });
+            }
+          });
+        }
+        else {
+          user.save(function(err,user) {
+            callback(err,user);
+          });
+        }
+      }
+    });
+  }
+
   UserSchema.statics.signup = function(email, password, name, gender, callback) {
     var self = this;
     bcrypt.genSalt(10, function(err, salt) {
