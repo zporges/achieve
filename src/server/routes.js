@@ -343,7 +343,7 @@ module.exports = function(app, passport) {
       res.render('notifications',{
         title: 'Notifications',
         user: user,
-        stylesheet: 'notifications.css'
+        stylesheet: 'index.css'
       });
     });
   });
