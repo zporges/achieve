@@ -4,7 +4,7 @@
       <h1>Settings</h1>
     </header>
 	 	<section id = "main">
-	  <form method= "post">
+	  <form method= "post" action="/user/settings">
 		  <div>
 			  <h3><%= title %></h3>
 			  <span label ="Name">
@@ -35,15 +35,10 @@
 			 </input>
 			  </span>
 
-			  <input type="submit" onclick="groupsubmit()" value="save changes"/>
+			  <input type="submit" value="save changes"/>
 
 		  <button type="submit" name="logout">Logout</button>
 	  </form>
-	  <?php 
-	  	if(isset($_POST['logout'])) { 
-		unset($_SESSION['user']),$_SESSION['email']);
-		} 
-	  ?>
   </section>
   <footer>
     <% include ejs/navbar.ejs %>
