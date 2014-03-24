@@ -8,14 +8,17 @@
 		  <div>
 			  <h3><%= title %></h3>
 			  <span label ="Name">
-				<input type="text" name = "name" placeholder="Your name" id="editName"  <% if (typeof name != 'undefined') { %> value = <%=name%> <% } %> ></input>
+			  	Name: 
+				<input type="text" name = "name" placeholder= <%= user.name %> id="editName"  <% if (typeof name != 'undefined') { %> value = <%=name%> <% } %> ></input>
 			  </span> <br/>
       <% if (typeof errors != 'undefined' && typeof errors.name != 'undefined') { %>
         <p class = "error"> <%=errors.name.msg%> </p>
       <% } %>
 			
 			  <span label ="gender">
-				<select name = "gender" id="editGender"  <% if (typeof wager != 'undefined'){ %> value = <%=wager%> <% } %>>
+			  	Gender: 
+				<select name = "gender" id="editGender"  <% if (typeof gender != 'undefined'){ %> value = <%=gender%> <% } %>>
+					<option default><%= user.gender %></option>
 					<option value = "N/A">N/A</option>
 					<option value = "Male">Male</option>
 					<option value = "Female">Female</option>
@@ -27,21 +30,38 @@
       <% } %>
 				
 			  <span label ="email">
-				<input type="email" name = "email" placeholder="your email" id="editEmail"  <% if (typeof email != 'undefined') { %> value = <%=email%> <% } %>/>
+			  	Email: 
+				<input type="email" name = "email" placeholder=<%= user.email %> id="editEmail"  <% if (typeof email != 'undefined') { %> value = <%=email%> <% } %>/>
 			  </span><br/>
       <% if (typeof errors != 'undefined' && typeof errors.email != 'undefined') { %>
         <p class = "error"> <%=errors.deadline.msg%> </p>
       <% } %>	
 			 </input>
+			  </span><br/>
+			  <span label = "password">
+			  New password: 
+				<input type="password" name = "password" placeholder=<%= user.password %> id="changepw"  <% if (typeof password != 'undefined') { %> value = <%=password%> <% } %>/>
+			  </span><br/>
+      <% if (typeof errors != 'undefined' && typeof errors.password != 'undefined') { %>
+        <p class = "error"> <%=errors.deadline.msg%> </p>
+      <% } %>	
+			 </input>
 			  </span>
 
-			  <input type="submit" onclick="groupsubmit()" value="save changes"/>
+			  <span label = "notification">
+			  Email notification:
+			  <input id ="r1" type="radio" name="daily" value="daily">Daily
+			  <input id ="r2" type="radio" name="weekly" value="weekly">Weekly
+			  <input id ="r3" type="radio" name="monthly" value="monthly">Monthly
+
+			  <input type="submit" value="save changes"/>
+			</span>
 
 		  <button type="submit" name="logout">Logout</button>
 	  </form>
 	  <?php 
 	  	if(isset($_POST['logout'])) { 
-		unset($_SESSION['user']),$_SESSION['email']);
+		unset($_SESSION['name']),$_SESSION['email']);
 		} 
 	  ?>
   </section>

@@ -32,57 +32,45 @@ header{
 	background-color: #61CF80;
 	padding: 1%;
 }
-
-#topnav{
-	width: 100%;
-	min-width: 200px;
-	height: 40px;
-	background-color: #333;
-	padding: 10px 10px 0px 10px;
-	margin: 0;
-	
-}
-#topnav li{
-	display: inline-block;
-	text-align: center;
-}
-#barleft{
-	position: relative;
-	margin-left:13%;
-
-}
-#barright{
-	position: relative;
-	float: right;
-	margin-right: 15%;
-}
-
-#topnav a{
-	text-decoration: none;
-	color: white;
-	font-size: 25px;
-	width: 50%;
-}
-#topnav a:hover{
-	border-bottom: 6px solid #61CF80;
-}
-.bars{
+form{
 	text-align: left;
-	font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-	font-size: 25px;
-	font-weight: 100;
-	margin-left: 0px;
-	padding-left: 10px;
-	padding-top: 10px;
-	background-color: #ced6dc;
-	height: 40px;
-	border-top: 1px solid black;
-	border-bottom: 1px solid black;
 }
-.bars a{
-	color: black;
-	position: relative;
-	bottom: 0px;
-	text-decoration: none;
+input, select {
+    margin: 8% auto 2%;
+    width: 75%;
+    font-size: 120%;
+    height: 40px;
+    padding: 0 5%;
+	}
+input[type='submit']{
+    width: 90%;
+    height: 30px;
+	}
+select{
+	width: 75%;
 }
+input[type='submit']:hover {
+    opacity: .5
+	}
+input[type='radio']{
+	display: inline;
+	margin-left: 10%;
+	width: 10px;
+}
+label{
+	float: left;
+	margin-left: 10px;
+}
+button[type='submit']{
+	width: 90%;
+	height: 30px;
+}
+button[type='submit']:hover {
+    opacity: .5
+	}
+.error {
+    color: red;
+    margin: 0;
+    text-align: left
+	}
 }
