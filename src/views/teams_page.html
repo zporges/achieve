@@ -1,12 +1,13 @@
 <% include ejs/header.ejs %>
-    <header>
-      <h1>Name</h1>
-    </header>
+  <div id = "teams_page" class = "content">
+  <header>
+    <h1>Select Team</h1>
+  </header>
 
   <section id = "main">
     <ul>
       <%for (var i=0; i<user.teams.length; i++){%>
-          <li><a href = "/team/progress/<%=user.teams[i].team_id%>">
+          <li><a href = "/team/hub/<%=user.teams[i].team_id%>">
           <%
             var teamName = "";
             for (var j=0; j < teams.length; j++){
@@ -17,6 +18,7 @@
           %>
           </a></li>
       <%}%>
+      <li><a id = "create_team" href="../team/new">Create Team</a></li>
     </ul>
   </section>
 
@@ -24,5 +26,6 @@
     <% include ejs/navbar.ejs %>
     <script type = "text/javascript" src = "../js/navbar.js"></script>
   </footer>
+  </div>
 </body>
 </html>

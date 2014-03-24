@@ -1,5 +1,4 @@
 $(function() {
-	console.log('test');
 	console.log(data);
 
 	//the date that the team was created
@@ -37,7 +36,7 @@ $(function() {
 	    .x(function(d) { return x(d.date); })
 	    .y(function(d) { return y(d.progress); });
 	    
-	var svg = d3.select("body")
+	var svg = d3.select("#viz")
 	    .append("svg")
 	        .attr("width", width + margin.left + margin.right)
 	        .attr("height", height + margin.top + margin.bottom)
@@ -103,4 +102,24 @@ $(function() {
 	svg.append("g")         // Add the Y Axis
 	    .attr("class", "y axis")
 	    .call(yAxis);
+	
+	//add table
+	var content = "<table>";
+	content += '<tr>';
+	content += '<td>Name</td>';
+	content += '<td>Goal</td>';
+	content += '<td>Percent Complete</td>';
+	content += '</tr>';
+	$(data.users).each(function(i) {
+		content += '<tr>';
+		content += '<td>' +data.users[i].user_id + '</td>';
+		content += '<td>' +data.users[i].verb + ' ' + data.users[i].desired_progress + ' ' + data.users[i].unit + '</td>';
+		content += '<td>'+(data.users[i].current_progress/data.users[i].desired_progress).toString() + '%</td>';
+		content += '</tr>';
+	});
+	content += "</table>";
+	
+	$('#leaderboard').append(content);
+	    
+	
 });
