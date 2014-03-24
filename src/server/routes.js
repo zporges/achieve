@@ -450,11 +450,28 @@ module.exports = function(app, passport) {
     Team.findById(req.params.id, function(error, team){
 
 	    var now = new Date();
-	    now.setDate(now.getDate());
 			team.countdown = Math.floor((team.deadline - now) / 86400000);
-      res.render('team_hub',{
+      var allcheckins = [];
+      for (var i=0;i<team.users.length;i++)
+      { 
+        for (var j=0;j<team.users[i].checkin.length;j++)
+        {
+          checkin = JSON.parse(JSON.stringify(team.users[i].checkin[j]));
+          console.log(checkin);
+          checkin.user_id = team.users[i].user_id;
+          allcheckins.push(checkin);
+        }
+      }
+      allcheckins.sort(function(a, b) {
+        a = new Date(a.created);
+        b = new Date(b.created);
+        return a>b ? -1 : a<b ? 1 : 0;
+      });
+      console.log(allcheckins)
+      res.render('team_hub', {
 		    title: 'Team Hub',
-        team: team
+        team: team,
+        checkins: allcheckins
 	    });
     });
   });
