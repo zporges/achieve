@@ -20,6 +20,7 @@ var mongoose = require('mongoose')
         event_id: String
         , info: String
         , seen: {type: Boolean, default: false}
+        , event_type: String
     }]
     , num_unread: {type: Number, default: 0}
     /*
