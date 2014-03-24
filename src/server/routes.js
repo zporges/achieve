@@ -106,18 +106,15 @@ module.exports = function(app, passport) {
       if (err) {
         console.log(err.message);
       }
-      console.log("----> " + is_confirmed);
       if (is_confirmed == false) {
         res.render('account_pending');
       }
     });
 
     // list pending team requests:
-    console.log("THIS USER: " + req.user.id);
     teams_remaining = [];
     User.findById(req.user.id, function(error, user){
       all_teams = user.teams;
-      console.log("]]]]] " + all_teams[0]);
       for (var i = 0; i < all_teams.length; i++) {  // the teams this user is part of
         console.log(">>> " + i + " " + all_teams[i].team_id);
         Team.findById(all_teams[i].team_id, function(error, team) {
