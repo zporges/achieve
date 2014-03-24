@@ -150,6 +150,11 @@ module.exports = function(app, passport) {
 				    var now = new Date();
 				    now.setDate(now.getDate());
 						for (var i = 0; i < doc_teams.length; i++){
+              for (var x = 0; x < doc_teams[i].users.length;x++){
+                for (var t =0; x<doc_teams[i].users[t].checkin.length;t++){
+                  console.log(doc_teams[i].users[t].checkin[t]);
+                }
+              }
 							//figure out if deadline includes the last day
 							doc_teams[i].countdown = Math.floor((doc_teams[i].deadline - now) / 86400000)
 							if (doc_teams[i].deadline < now){
