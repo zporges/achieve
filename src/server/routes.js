@@ -146,7 +146,7 @@ module.exports = function(app, passport) {
 					  console.log(err.message);
 				  }
 				  else{
-
+            var checkinArray = new Array();
 				    var now = new Date();
 				    now.setDate(now.getDate());
 						for (var i = 0; i < doc_teams.length; i++){
@@ -165,7 +165,8 @@ module.exports = function(app, passport) {
 			        title: "Personalized Newsfeed",
 		  		    teams: doc_teams,
 						  users: doc_users,
-		          user: req.user
+		          user: req.user,
+              checkinArray: checkinArray
 			      });
 				  }
 			  });
