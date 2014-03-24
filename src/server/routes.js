@@ -9,7 +9,7 @@ var rule = new schedule.RecurrenceRule();
 rule.second = 5;
 
 var j = schedule.scheduleJob(rule, function(){
-  // add chronjob here. 
+  // add chronjob here.
   // loop through all users and send out emails.
 });
 
@@ -143,7 +143,7 @@ module.exports = function(app, passport) {
 					  console.log(err.message);
 				  }
 				  else{
-
+            var checkinArray = new Array();
 				    var now = new Date();
 				    now.setDate(now.getDate());
 						for (var i = 0; i < doc_teams.length; i++){
@@ -162,7 +162,8 @@ module.exports = function(app, passport) {
 			        title: "Personalized Newsfeed",
 		  		    teams: doc_teams,
 						  users: doc_users,
-		          user: req.user
+		          user: req.user,
+              checkinArray: checkinArray
 			      });
 				  }
 			  });
@@ -340,7 +341,7 @@ module.exports = function(app, passport) {
       res.render('notifications',{
         title: 'Notifications',
         user: user,
-        stylesheet: 'notifications.css'
+        stylesheet: 'index.css'
       });
     });
   });
@@ -472,6 +473,7 @@ module.exports = function(app, passport) {
 		    title: 'Team Hub',
         team: team,
         checkins: allcheckins
+        user: req.user
 	    });
     });
   });

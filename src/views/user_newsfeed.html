@@ -60,6 +60,18 @@
 
     <section id = "progress">
       <h2>My Friends' Progress</h2>
+        <% for(var i=0; i<teams.length; i++) {%>
+          <% for (var x = 0; x < teams[i].users.length; x++){%>
+            <% for (var y = teams[i].users[x].checkin.length -1; y >= 0 ; y--) {%>
+              <li>
+              <a href="/team/<%= teams[i].id %>/checkin/<%= teams[i].users[x].checkin[y]._id %>">Checkin: <%= teams[i].users[x].checkin[y].status %></a> by <%= users[i][x].name %> in 
+              <a href="/team/hub/<%= teams[i].id %>">Team Name: <%= teams[i].name %> </a><br/>
+              <%= teams[i].users[x].checkin[y] %>
+              <a href="/team/<%= teams[i].id %>/checkin/<%= teams[i].users[x].checkin[y]._id %>/delete">Delete</a><br/>
+            <%}%>
+          <%}%>
+        </li>
+        <% } %>
     </section>
   </section>
 
