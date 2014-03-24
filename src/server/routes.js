@@ -9,7 +9,7 @@ var rule = new schedule.RecurrenceRule();
 rule.second = 5;
 
 var j = schedule.scheduleJob(rule, function(){
-  // add chronjob here. 
+  // add chronjob here.
   // loop through all users and send out emails.
 });
 
@@ -457,7 +457,8 @@ module.exports = function(app, passport) {
 			team.countdown = Math.floor((team.deadline - now) / 86400000);
       res.render('team_hub',{
 		    title: 'Team Hub',
-        team: team
+        team: team,
+        user: req.user
 	    });
     });
   });
