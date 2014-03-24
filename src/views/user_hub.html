@@ -3,15 +3,14 @@
   <header>
     <h1>Name</h1>
   </header>
-  <section id = "main">
     <ul id = "topnav">
-      <li id= "barleft"><a href = "">My goals</a></li>
+      <li id= "barleft"><a href = "/user/:id">My goals</a></li>
       <li id= "barright"><a href = "/user/settings">Settings</a></li>
     </ul>
     <div id = "info">
       <div id = "profile">
-        <div id= "profilepic"><img src /></div>
-        <div id = "userName">Name</div>
+        <div id= "profilepic"><img src ="../../public/images/icons/avatar_default.png" /></div>
+        <div id = "userName"><% if (typeof user != 'undefined') { %> <%=user.name%> <% } %> </div>
       </div>
       <div id = "goalsInfo">
         <ul id = "goalTitles">
@@ -23,9 +22,10 @@
           </li>
         </ul>
         <ul id = "counts">
-          <li><h3 id = "inProgress">0</h3></li>
-          <li><h3 id = "totalCompleted">0</h3></li>
-          <li><h3 id = "totalCheckins">0</h3></li>
+          <li><h3 id = "inProgress"><% if (typeof teams != 'undefined' && typeof completed_teams != 'undefined') { %> <%=teams.length - completed_teams %> <% } %> </h3></li>
+          <li><h3 id = "totalCompleted"><% if (typeof completed_teams != 'undefined') { %> <%=completed_teams%> <% } %> </h3></li>
+          <li><h3 id = "totalCheckins"><% if (typeof num_checkins != 'undefined') { %> <%=num_checkins%> <% } %> </h3></li>
+
         </ul>
       </div>
     </div>
@@ -33,9 +33,6 @@
       <p id = "individualProgress">Individual goal progress</p>
       <script>
       </script>
-    
-
-   </section>
   <footer>
     <% include ejs/navbar.ejs %>
     <script type = "text/javascript" src = "../js/navbar.js"></script>

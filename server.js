@@ -94,6 +94,17 @@ var Pact = function() {
     self.app.use(express.bodyParser());
     self.app.use(validate());
     self.app.use(express.session({ secret: 'SECRET' })); //TODO: secret
+    //Remember me functionality
+    self.app.use( function (req, res, next) {
+      if ( req.method == 'POST' && req.url == '/login' ) {
+        if ( req.param('rememberMe') ) {
+          req.session.cookie.maxAge = 24*60*60*1000*30; // 30*24*60*60*1000 = 30 days
+        } else {
+          req.session.cookie.expires = false;
+        }
+      }
+      next();
+    });
     self.app.use(passport.initialize());
     self.app.use(passport.session());
     self.app.use(less({
