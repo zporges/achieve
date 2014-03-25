@@ -29,9 +29,30 @@
     <ul>
 			Wager: <%= team.wager %>
     </ul>
+
+        <% for(var i=0; i<allcheckins.length; i++) {%>
+            <li>
+              <a href="/team/<%= team._id %>/checkin/<%= allcheckins[i]._id %>">Checkin: <%= allcheckins[i].status %></a> by <%= allcheckins[i].user_name %> in <%= team.name %>
+              created on <%= allcheckins[i].created %>
+              <br/>
+              <a href="/team/<%= team._id %>/checkin/<%= allcheckins[i]._id %>/delete">Delete</a>
+              <br/>
+              <% var output = '{';
+                  for (var property in allcheckins[i]) {
+                      output += property + ': ' + allcheckins[i][property]+'; ';
+                  } output+='}'%>
+                  <%=output%><br/>
+          </li>
+        <% } %>
+
+
   </section>
 
   <footer>
+    <% include ejs/navbar.ejs %>
+    <script type = "text/javascript" src = "../js/navbar.js"></script>
+    <% include ejs/secondary_navbar.ejs %>
+    <script type = "text/javascript" src = "../js/secondary_navbar.js"></script>
   </footer>
   </div>
 </body>
