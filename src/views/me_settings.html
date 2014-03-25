@@ -6,7 +6,6 @@
 	 	<section id = "main">
 	  <form method= "post" action="/user/settings">
 		  <div>
-			  <h3><%= title %></h3>
 			  <span label ="Name">
 			  	Name: 
 				<input type="text" name = "name" placeholder= <%= user.name %> id="editName"  <% if (typeof name != 'undefined') { %> value = <%=name%> <% } %> ></input>
@@ -49,7 +48,7 @@
 			  </span>
 
 			  <span label = "notifications">
-			  Email notifications:
+			  Email notifications:<br/>
 			  <input id ="r1" type="radio" name="daily" value="daily">Daily
 			  <input id ="r2" type="radio" name="weekly" value="weekly">Weekly
 			  <input id ="r3" type="radio" name="monthly" value="monthly">Monthly
@@ -58,16 +57,7 @@
 			</span>
 
 		  <button type="submit" name="logout">Logout</button>
-	  </form>
-	  <?php 
-	  	if(isset($_POST['logout'])) { 
-		unset($_SESSION['name']),$_SESSION['email']);
-		} 
-	  ?>
-			  <input type="submit" value="save changes"/>
-
-		  <button type="submit" name="logout">Logout</button>
-	  </form>
+	  </form>	
   </section>
   <footer>
     <% include ejs/navbar.ejs %>
