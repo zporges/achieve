@@ -149,13 +149,15 @@ module.exports = function(app, passport) {
                   checkin = JSON.parse(JSON.stringify(doc_teams[i].users[x].checkin[t]));
                   checkin.user_id = doc_teams[i].users[i].user_id;
                   checkin.team_id = doc_teams[i]._id;
+                  console.log("doc_users");
+                  console.log(doc_users);
                   checkin.user_name = doc_users[i][x].name;
                   checkin.team_name = doc_teams[i].name;
                   allcheckins.push(checkin);
                 }
               }
               var now = new Date();
-              now.setDate(now.getDate());
+              //now.setDate(now.getDate() +1);
 							//figure out if deadline includes the last day
 							doc_teams[i].countdown = Math.floor((doc_teams[i].deadline - now) / 86400000)
 							if (doc_teams[i].deadline < now){
@@ -368,6 +370,14 @@ module.exports = function(app, passport) {
 
   // Create a new checkin
   app.post('/checkin/new/:id', auth.isAuthenticated, function(req,res){
+    req.assert('amount', 'Amount is required').notEmpty();
+    var obj = {};
+    obj.errors = req.validationErrors(true);
+
+    //pass in email and name to html if they aren't problems
+    if (obj.errors) {
+      res.redirect('/');
+    }
 	  Team.checkin({
 		  user_id: req.user.id
 	   	, team_id: req.params.id
