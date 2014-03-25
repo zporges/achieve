@@ -129,6 +129,7 @@ return [1] is the actual array of checkins
     });
   };
 
+
   TeamSchema.statics.addPersonalGoal = function(data, callback){
     var t = Team.findById(data.team_id);
   }
@@ -169,6 +170,8 @@ return [1] is the actual array of checkins
         info = "like";
       }
       team.save();
+
+      // THIS MAY OR MAY NOT WORK
       // User.findById(temp[0]._id, function(user, err) {
       //   user.notifications.push(
       //     { event_id : checkin._id
