@@ -95,7 +95,6 @@ var mongoose = require('mongoose')
 	};
 	
 	UserSchema.statics.is_user_confirmed = function(data, callback) {
-    console.log(data);
     User.findById(data._id, function(err, user) {
       // return user.user_confirmed;
       callback(err, user.user_confirmed);

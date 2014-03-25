@@ -60,6 +60,20 @@
 
     <section id = "progress">
       <h2>My Friends' Progress</h2>
+        <% for(var i=0; i<allcheckins.length; i++) {%>
+            <li>
+              <a href="/team/<%= allcheckins[i].team_id %>/checkin/<%= allcheckins[i]._id %>">Checkin: <%= allcheckins[i].status %></a> by <%= allcheckins[i].user_name %> in <%= allcheckins[i].team_name %>
+              created on <%= allcheckins[i].created %>
+              <br/>
+              <a href="/team/<%= allcheckins[i].team_id %>/checkin/<%= allcheckins[i]._id %>/delete">Delete</a>
+              <br/>
+              <% var output = '{';
+                  for (var property in allcheckins[i]) {
+                      output += property + ': ' + allcheckins[i][property]+'; ';
+                  } output+='}'%>
+                  <%=output%><br/>
+          </li>
+        <% } %>
     </section>
   </section>
 
