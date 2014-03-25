@@ -351,13 +351,19 @@ module.exports = function(app, passport) {
 
   // Notification Page
   app.get('/notifications/:id', auth.isAuthenticated, function(req,res){
-    User.findById(req.params.id, function(error, user){
-      res.render('notifications',{
-        title: 'Notifications',
-        user: user,
-        stylesheet: 'index.css'
+
+    User.load_from_notifications(req.user.id, 10, function(err, arr){
+      console.log("arr:::::: " + arr);
+      User.findById(req.params.id, function(error, user){
+        res.render('notifications',{
+          title: 'Notifications',
+          user: user,
+          stylesheet: 'index.css'
+          , notifs : arr
+        });
       });
     });
+  
   });
 
   // Create a new checkin
@@ -400,6 +406,20 @@ module.exports = function(app, passport) {
       , user_id : req.user.id
       , like : req.param('like')
     }, function(error, docs){
+      //TODO: have the above function return info such as whether it was liked.
+    
+      if (!error) {
+        User.add_notification({
+          comment: req.param('comment')
+          , team_id : req.params.team_id
+          , checkin_id : req.params.checkin_id
+          , user_id : req.user.id
+          , like : req.param('like')
+          , info : docs
+        }, function(error, docs) {
+
+        });
+      }
       res.redirect('/')
     });
   });

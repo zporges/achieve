@@ -148,30 +148,54 @@ return [1] is the actual array of checkins
   }
 
   // Adds a comment and/or like to a checkin
+  // functionality note: data returned in callback have been changed.
   TeamSchema.statics.addToCheckin = function(data, callback) {
-    Team.findById(data.team_id, function(err, team) {
+    Team.findById(data.team_id, function(err, team) {      
       if(err) callback(err);
       temp = findCheckin(team, data.checkin_id);
       checkin = temp[1];      
 
       // variable for 'info' underneath
-      info = "";
+      is_comment = false;
+      is_like = false
 
       // Add the comment if it exists
       if (data.comment != '')
       {
         checkin.comments.push({'text' : data.comment, 'user_id' : data.user_id});
-        info = "comment";
+        is_comment = true;
       }
       // Add the like if it exists and the user hasn't liked it yet
       if (data.like && !isUserInArray(checkin.likes, data.user_id))
-      {
+      {        
         checkin.likes.push({ 'user_id' : data.user_id });
-        info = "like";
+        is_like = true;
       }
       team.save();
 
-      // THIS MAY OR MAY NOT WORK
+      // comment
+      // if (is_comment) {
+      // User.findById(user_id, function(user, err) {
+      //   console.log("------");
+      //   console.log(user);
+      //   console.log("=======");
+      //   console.log(user.notifications);
+      //   user.notifications.push(
+      //     { event_id : checkin._id
+      //       , info : "comment"
+      //       , seen : false
+      //       , event_type : "comment"
+      //        }
+      //     ); 
+      //   user.num_unread = user.num_unread + 1;
+
+      //   user.save();
+
+      //   console.log(user.notifications);
+      // });
+      // }
+
+      // likes
       // User.findById(temp[0]._id, function(user, err) {
       //   user.notifications.push(
       //     { event_id : checkin._id
@@ -183,8 +207,13 @@ return [1] is the actual array of checkins
       //   user.num_unread = user.num_unread + 1;
 
       //   user.save();
+
+      //   console.log(user.notifications);
       // });
-      callback(err, team);
+
+      //callback(err, team);
+      new_callback = [is_like, temp[0]];
+      callback(err, new_callback);
     });
   }
 

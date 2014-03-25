@@ -97,6 +97,42 @@ var mongoose = require('mongoose')
 		}
 	};
 
+//TODO check to see that you don't get a notification from yourself.
+// get the proper data from docs. 
+  UserSchema.statics.add_notification = function (data, callback) {
+    info = data.info;
+    src_user = info[1];
+    user_id = src_user.user_id;
+    console.log("THIs:::::  " + user_id);
+    User.findById(user_id, function(err, user) {    
+      // comment
+      if (data.comment != '') 
+      {
+        user.notifications.push(
+          { event_id : data.checkin_id
+            , info : data.comment
+            , seen : false
+            , event_type : "comment"
+          }); 
+        user.num_unread = user.num_unread + 1;
+        user.save();        
+      }
+
+      // like
+      if (info[0]) 
+      {
+        user.notifications.push(
+          { event_id : data.checkin_id
+            , info : "like"
+            , seen : false
+            , event_type : "like"
+          }); 
+        user.num_unread = user.num_unread + 1;
+        user.save();
+      }            
+    });
+  }
+
 
   /*
   Function will 10 most recent conversations, starting from number x.
@@ -106,9 +142,9 @@ var mongoose = require('mongoose')
 
   Returns [total_num_notifs , [notifications] ]
   */
-  UserSchema.statics.load_from_notifications = function (data, x, total, callback) {
-    User.findById(data._id, function(err, user) {
-      MAX_DIFF = 10;
+  UserSchema.statics.load_from_notifications = function (data, x, callback) {
+    User.findById(data, function(err, user) {
+      MAX_DIFF = x;
       // error handling
       if (err) {
         return [-1, []];
@@ -121,17 +157,29 @@ var mongoose = require('mongoose')
       x_new = 0;
 
       // check to see if there were any new notifications
-      if (total != notifications.length) {
-        x_new = 0;
-      }
+      // if (total != notifications.length) {
+      //   x_new = 0;
+      // }
 
       to_return = [];
-      start_point = notifications.length - 1 - x_new;
+      // start_point = notifications.length - 1 - x_new;
+      start_point = notifications.length - 1;
       for (var i = start_point; start_point-i < MAX_DIFF && i >= 0; i--) {
         cur = notifications[i];
-        to_return.push(cur)
+        to_return.push(cur);
+
+        // check to see if any of these notifications are now seen.
+        if (notifications[i].seen == false) {
+          notifications[i].seen = true;
+          user.num_unread--;
+        }
       }
-      return to_return;
+
+      //save any changes
+      user.save();
+      
+      callback(err, to_return);
+      // return to_return;
 
 
     });
