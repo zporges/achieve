@@ -1,21 +1,8 @@
-<ul id = "navbar">
-  <li id = "homeButton">
-    <img src = "../../images/icons/home.svg" />
-    <a href = "/">home</a>
+<ul id = "secondary_navbar">
+  <li>
+    <a href = "/">Activity</a>
   </li>
-
-  <li id = "groupsButton">
-    <img src = "../../images/icons/teams.svg" />
-    <a href = "/teams/<%=user.id%>">teams</a>
-  </li>
-
-  <li id = "notificationsButton">
-    <img src = "../../images/icons/notification.svg" />
-    <a href = "/notifications/<%= user.id %>">notifications</a>
-  </li>
-
-  <li id = "meButton">
-    <img src = "../../images/icons/me.svg" />
-    <a href = "/user/<%= user.id %>">settings</a>
+  <li>
+    <a href = "/user/<%= user.id %>">Progress</a>
   </li>
 </ul>

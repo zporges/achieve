@@ -451,7 +451,6 @@ module.exports = function(app, passport) {
 
   app.get('/team/hub/:id',auth.isAuthenticated, function(req,res){
     Team.findById(req.params.id, function(error, team){
-
 	    var now = new Date();
 	    now.setDate(now.getDate());
 			team.countdown = Math.floor((team.deadline - now) / 86400000);
