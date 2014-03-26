@@ -23,7 +23,7 @@ var smtpTransport = nodemailer.createTransport("SMTP",{
 });
 
 function mail_confirm_account(user) {
-  link = "http://localhost:8080/confirm_account/" + user._id;
+  link = "http://pact-groupgoals.rhcloud.com/confirm_account/" + user._id;
 
   // NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
   // console.log is necessary to make our code syncronous
@@ -52,9 +52,9 @@ function mail_confirm_account(user) {
 
 // for faster performance, directly pass in the appropriate email link
 function mailSignup(user, leader, groupname) {
-	linkSignup = "http://localhost:8080/signup/" + user._id;
+	linkSignup = "http://pact-groupgoals.rhcloud.com/signup/" + user._id;
 	if (! user.pending){
-		linkSignup = "http://localhost:8080/login/" + user._id;
+		linkSignup = "http://pact-groupgoals.rhcloud.com/login/" + user._id;
 	}
 
 	// NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
