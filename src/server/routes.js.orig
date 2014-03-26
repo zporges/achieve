@@ -1,4 +1,19 @@
+// for mail
 var nodemailer = require('nodemailer');
+
+// for node-schedule
+var schedule = require('node-schedule');
+
+// view https://www.npmjs.org/package/node-schedule for API
+var rule = new schedule.RecurrenceRule();
+rule.second = 5;
+
+var j = schedule.scheduleJob(rule, function(){
+  // add chronjob here.
+  // loop through all users and send out emails.
+});
+
+
 var smtpTransport = nodemailer.createTransport("SMTP",{
   service: "Gmail",
   auth: {
@@ -29,14 +44,14 @@ function mail_confirm_account(user) {
     if (error) {
       console.log(error);
     } else {
-      console.log("Message sent: " + response.message);
+     // console.log("Message sent: " + response.message);
     }
   });
 
 }
 
 // for faster performance, directly pass in the appropriate email link
-function mailSignup(user, leader, groupname, team_id) {
+function mailSignup(user, leader, groupname) {
 	linkSignup = "http://localhost:8080/signup/" + user._id;
 	if (! user.pending){
 		linkSignup = "http://localhost:8080/login/" + user._id;
@@ -61,7 +76,7 @@ function mailSignup(user, leader, groupname, team_id) {
     if (error) {
       console.log(error);
     } else {
-      console.log("Message sent: " + response.message);
+     // console.log("Message sent: " + response.message);
 		}
   });
 }
@@ -71,7 +86,7 @@ function sendMail(){
     if (error) {
       console.log(error);
     } else {
-      console.log("Message sent: " + response.message);
+    //  console.log("Message sent: " + response.message);
     }
   });
 }
@@ -91,37 +106,32 @@ module.exports = function(app, passport) {
       if (err) {
         console.log(err.message);
       }
-      console.log("----> " + is_confirmed);
       if (is_confirmed == false) {
         res.render('account_pending');
       }
     });
 
     // list pending team requests:
-    console.log("THIS USER: " + req.user.id);
     teams_remaining = [];
     User.findById(req.user.id, function(error, user){
       all_teams = user.teams;
-      console.log("]]]]] " + all_teams[0]);
       for (var i = 0; i < all_teams.length; i++) {  // the teams this user is part of
-        console.log(">>> " + i + " " + all_teams[i].team_id); 
+        //console.log(">>> " + i + " " + all_teams[i].team_id);
         Team.findById(all_teams[i].team_id, function(error, team) {
-          console.log(team);
           for (var j = 0; j < team.users.length; j++) { // the users that are part of this team.
             if (team.users[j].user_id == req.user.id) {
               if (team.users[j].pending == true) {
                 res.redirect('/goal/new/' + team._id);
                 return;
                 teams_remaining.push(team._id);
-              }              
+              }
             }
           }
         });
-      }      
-      
+      }
     });
 
-
+    // gets information about every team that the user is in and all users in those teams
 	  Team.findList(req.user.teams,function(err, doc_teams){
 		  if (err){
 			  console.log(err.message);
@@ -132,10 +142,22 @@ module.exports = function(app, passport) {
 					  console.log(err.message);
 				  }
 				  else{
-
-				    var now = new Date();
-				    now.setDate(now.getDate());
+            var allcheckins = [];
 						for (var i = 0; i < doc_teams.length; i++){
+              for (var x = 0; x < doc_teams[i].users.length;x++){
+                for (var t =0; t<doc_teams[i].users[x].checkin.length;t++){
+                  checkin = JSON.parse(JSON.stringify(doc_teams[i].users[x].checkin[t]));
+                  checkin.user_id = doc_teams[i].users[i].user_id;
+                  checkin.team_id = doc_teams[i]._id;
+                  console.log("doc_users");
+                  console.log(doc_users);
+                  checkin.user_name = doc_users[i][x].name;
+                  checkin.team_name = doc_teams[i].name;
+                  allcheckins.push(checkin);
+                }
+              }
+              var now = new Date();
+              //now.setDate(now.getDate() +1);
 							//figure out if deadline includes the last day
 							doc_teams[i].countdown = Math.floor((doc_teams[i].deadline - now) / 86400000)
 							if (doc_teams[i].deadline < now){
@@ -147,11 +169,17 @@ module.exports = function(app, passport) {
 			          });
 							}
 						}
+            allcheckins.sort(function(a, b) {
+              a = new Date(a.created);
+              b = new Date(b.created);
+              return a>b ? -1 : a<b ? 1 : 0;
+            });
 					  res.render('user_newsfeed', {
 			        title: "Personalized Newsfeed",
 		  		    teams: doc_teams,
 						  users: doc_users,
-		          user: req.user
+		          user: req.user,
+              allcheckins: allcheckins
 			      });
 				  }
 			  });
@@ -192,9 +220,13 @@ module.exports = function(app, passport) {
   });
 
   app.get('/team/new', auth.isAuthenticated, function(req,res){
-	  res.render('team_new',{
-		  title: 'New Team'
-	  });
+    User.findById(req.user.id, function(error, user){
+      res.render('team_new',{
+		    title: 'New Team',
+        user: user,
+        stylesheet: "team_new.css"
+	    });
+    });
   });
 
   app.post('/team/new', auth.isAuthenticated, function(req,res){
@@ -207,14 +239,14 @@ module.exports = function(app, passport) {
 	  //adds leader into array
 	  arr.push({"user_id": req.user.id, checkin:[]});
 	  for (var i = 0; i < num_user; i++){
-	    req.assert('user'+(i+1), 'Valid Email required').notEmpty().isEmail();
+	    req.assert('user'+(i+1), 'Valid Email required').isEmail();
 		}
     var obj = {}
     , errors = req.validationErrors(true); //Object format
     obj.errors = errors;
 
-
-		//TODO: Still needs to assert if deadline is after than today, Did not know how to convert 
+    console.log(errors);
+		//TODO: Still needs to assert if deadline is after than today, Did not know how to convert
     //"html input date" type into Javascript Date type to compare the dates
     var now = new Date();
     now.setDate(now.getDate());
@@ -238,6 +270,7 @@ module.exports = function(app, passport) {
           obj.user1 = req.param('user1');
         }
 			obj.title = 'New Team';
+      obj.user = req.user;
       return res.render('team_new', obj);
 		}
 	  for (var i = 0; i < num_user; i++){
@@ -292,19 +325,59 @@ module.exports = function(app, passport) {
     });
   });
 
+  app.get("/user/settings", auth.isAuthenticated, function(req, res){
+    User.findById(req.user.id, function(error, user){
+      res.render('me_settings',{
+        title: 'User Settings',
+        user: user,
+        stylesheet:"me_settings.css"
+      }); 
+    });
+  });
+
+  app.post("/user/settings", auth.isAuthenticated, function(req, res) {
+    var data = {user_id : req.user.id};
+    if(req.param('name') != '') {
+      data.name = req.param('name');
+    }
+    if(req.param('email') != '') {
+      data.email = req.param('email');
+    }
+    if(req.param('gender')) {
+      data.gender = req.param('gender');
+    }
+    User.changeProfile(data, function(err, user) {
+      res.redirect('/user/settings');
+    });
+  });
+
   // Notification Page
   app.get('/notifications/:id', auth.isAuthenticated, function(req,res){
-    User.findById(req.params.id, function(error, user){
-      res.render('notifications',{
-        title: 'Notifications',
-        user: user,
-        stylesheet: 'notifications.css'
+
+    User.load_from_notifications(req.user.id, 10, function(err, arr){
+      // console.log("arr:::::: " + arr);
+      User.findById(req.params.id, function(error, user){
+        res.render('notifications',{
+          title: 'Notifications',
+          user: user,
+          stylesheet: 'index.css'
+          , notifs : arr
+        });
       });
     });
+  
   });
 
   // Create a new checkin
   app.post('/checkin/new/:id', auth.isAuthenticated, function(req,res){
+    req.assert('amount', 'Amount is required').notEmpty();
+    var obj = {};
+    obj.errors = req.validationErrors(true);
+
+    //pass in email and name to html if they aren't problems
+    if (obj.errors) {
+      res.redirect('/');
+    }
 	  Team.checkin({
 		  user_id: req.user.id
 	   	, team_id: req.params.id
@@ -343,34 +416,132 @@ module.exports = function(app, passport) {
       , user_id : req.user.id
       , like : req.param('like')
     }, function(error, docs){
+      //TODO: have the above function return info such as whether it was liked.
+    
+      if (!error) {
+        User.add_notification({
+          comment: req.param('comment')
+          , team_id : req.params.team_id
+          , checkin_id : req.params.checkin_id
+          , user_id : req.user.id
+          , like : req.param('like')
+          , info : docs
+        }, function(error, docs) {
+
+        });
+      }
       res.redirect('/')
     });
   });
 
   app.get('/user/:id',auth.isAuthenticated, function(req,res){
-    User.findById(req.params.id, function(error, user){
-      res.render('user_hub',{
-		    title: 'My Hub',
-        user: user
-	    });
+    User.findById(req.params.id, function(err, user){
+      if (err){
+        console.log(err.message);
+      }
+      else{
+        Team.findList(user.teams,function(err, doc_teams){
+          if (err){
+            console.log(err.message);
+          }
+          else{
+            User.findList(doc_teams,function(err, doc_users){
+              if (err){
+                console.log(err.message);
+              }
+              else{
+                var now = new Date();
+                var completed_teams = 0;
+                var num_checkins = 0;
+                now.setDate(now.getDate());
+                for (var i = 0; i < doc_teams.length; i++){
+                  for (var t = 0; t < doc_teams[i].users.length; t++){
+                    if (doc_teams[i].users[t].user_id == req.params.id){
+                      num_checkins+= doc_teams[i].users[t].checkin.length;
+                    }
+                  }
+                  //figure out if deadline includes the last day
+                  doc_teams[i].countdown = Math.floor((doc_teams[i].deadline - now) / 86400000)
+                  if (doc_teams[i].deadline < now){
+                    completed_teams +=1;
+                    doc_teams[i].has_deadline_passed = true;
+                    doc_teams[i].save(function(err, team, num) {
+                      if(err) {
+                        res.send(err.message);
+                      }
+                    });
+                  }
+                }
+                res.render('user_hub',{
+                  title: 'My Hub',
+                  user: user,
+                  teams: doc_teams,
+                  users: doc_users,
+                  user: user,
+                  completed_teams: completed_teams,
+                  num_checkins: num_checkins,
+                  stylesheet:"user_hub.css"
+                });
+              }
+            });
+          }
+        });
+      }
     });
   });
 
   app.get('/team/hub/:id',auth.isAuthenticated, function(req,res){
     Team.findById(req.params.id, function(error, team){
-
+<<<<<<< HEAD
 	    var now = new Date();
 	    now.setDate(now.getDate());
 			team.countdown = Math.floor((team.deadline - now) / 86400000);
       res.render('team_hub',{
 		    title: 'Team Hub',
-        team: team
+        team: team,
+        user: req.user
 	    });
+=======
+      var teamArray = [];
+      teamArray.push(team);
+      //added user names to checkins -- Brian 
+      User.findList(teamArray,function(err, doc_users){
+        if (err){
+            console.log(err.message);
+        }
+        else{
+          var now = new Date();
+          team.countdown = Math.floor((team.deadline - now) / 86400000);
+          var allcheckins = [];
+          for (var i=0;i<team.users.length;i++)
+          { 
+            for (var j=0;j<team.users[i].checkin.length;j++)
+            {
+              checkin = JSON.parse(JSON.stringify(team.users[i].checkin[j]));
+              checkin.user_id = team.users[i].user_id;
+              checkin.user_name = doc_users[0][i].name;
+              allcheckins.push(checkin);
+            }
+          }
+          allcheckins.sort(function(a, b) {
+            a = new Date(a.created);
+            b = new Date(b.created);
+            return a>b ? -1 : a<b ? 1 : 0;
+          });
+          res.render('team_hub', {
+            title: 'Team Hub',
+            team: team,
+            allcheckins: allcheckins,
+            user: req.user
+          });
+        }
+      });
+>>>>>>> aff282eab15da6eb4cb4a0c72dd01a21b3986f85
     });
   });
 
   app.get('/goal/new/:tid', auth.isAuthenticated, function(req, res) {
-    res.render('goal_new', {team_id: req.params.tid});
+    res.render('goal_new', {team_id: req.params.tid, user: req.user});
   });
 
   app.post('/goal/new/:tid',auth.isAuthenticated,  function(req, res) {
@@ -399,6 +570,31 @@ module.exports = function(app, passport) {
         if(user) {
           user.pending = false;
           user.verb = req.param('verb');
+
+          //to past tense
+          user.verb_past = "accomplished part of the goal"
+          var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
+          var java_port = 15151;
+          var net = require('net');
+
+          var client = net.connect({port: java_port, host: java_host},
+              function() { //'connect' listener
+            console.log('client connected');
+            client.write('toPastTense ' + req.param('verb') +'\r\n');
+          });
+          client.on('data', function(data) {
+            console.log(data.toString());
+            var past = data.toString();
+            past = past.substring(past.indexOf("]")+2);
+            user.verb_past = past;
+            console.log("verb past: " + user.verb_past);
+            client.end();
+          });
+          client.on('end', function() {
+            console.log('client disconnected');
+          });
+          client.on('error', console.log);
+
           user.frequency = req.param('frequency');
           user.freq_progress = req.param('number');
           //Use frequency to calculate cumulative desired progressonsol
@@ -454,13 +650,8 @@ module.exports = function(app, passport) {
 			}
     });
 	}
-<<<<<<< HEAD
-	
-	app.get('/team/progress/:id', auth.isAuthenticated, function(req,res) {
-=======
 
 	app.get("/team/progress/:id", function(req, res) {
->>>>>>> 510bdc346c73e9c4ebb33f922e46a446ac5a4811
 	  Team.findCheckins(req.params.id, function(err, team_data) {
 	  	res.render('team_progress', {stylesheet: "../../css/progress.css", team: team_data});
 	  })
@@ -473,10 +664,8 @@ module.exports = function(app, passport) {
 
 var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
 //var python_host = "127.2.40.129";
-var p = process.env.OPENSHIFT_NODEJS_PORT
-p = (p == undefined) ? p : p.substring(0, p.length-4) + 8191 //8767
-var python_port = p || 8191; //8767
-python_port = 15151
+//var p = process.env.OPENSHIFT_NODEJS_PORT
+var python_port = 15151;
 
 var net = require('net');
 var client = net.connect({port: python_port, host: python_host},
@@ -544,7 +733,6 @@ client.on('error', console.log);
         if (err) {
           console.log(err.message);
         }
-        console.log("----> " + is_confirmed);
       });
       return res.redirect("/");
     });

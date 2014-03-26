@@ -44,7 +44,7 @@ function mail_confirm_account(user) {
     if (error) {
       console.log(error);
     } else {
-      console.log("Message sent: " + response.message);
+     // console.log("Message sent: " + response.message);
     }
   });
 
@@ -76,7 +76,7 @@ function mailSignup(user, leader, groupname) {
     if (error) {
       console.log(error);
     } else {
-      console.log("Message sent: " + response.message);
+     // console.log("Message sent: " + response.message);
 		}
   });
 }
@@ -86,7 +86,7 @@ function sendMail(){
     if (error) {
       console.log(error);
     } else {
-      console.log("Message sent: " + response.message);
+    //  console.log("Message sent: " + response.message);
     }
   });
 }
@@ -106,22 +106,18 @@ module.exports = function(app, passport) {
       if (err) {
         console.log(err.message);
       }
-      console.log("----> " + is_confirmed);
       if (is_confirmed == false) {
         res.render('account_pending');
       }
     });
 
     // list pending team requests:
-    console.log("THIS USER: " + req.user.id);
     teams_remaining = [];
     User.findById(req.user.id, function(error, user){
       all_teams = user.teams;
-      console.log("]]]]] " + all_teams[0]);
       for (var i = 0; i < all_teams.length; i++) {  // the teams this user is part of
-        console.log(">>> " + i + " " + all_teams[i].team_id);
+        //console.log(">>> " + i + " " + all_teams[i].team_id);
         Team.findById(all_teams[i].team_id, function(error, team) {
-          console.log(team);
           for (var j = 0; j < team.users.length; j++) { // the users that are part of this team.
             if (team.users[j].user_id == req.user.id) {
               if (team.users[j].pending == true) {
@@ -146,10 +142,21 @@ module.exports = function(app, passport) {
 					  console.log(err.message);
 				  }
 				  else{
-
-				    var now = new Date();
-				    now.setDate(now.getDate());
+            var allcheckins = [];
 						for (var i = 0; i < doc_teams.length; i++){
+              for (var x = 0; x < doc_teams[i].users.length;x++){
+                for (var t =0; t<doc_teams[i].users[x].checkin.length;t++){
+                  checkin = JSON.parse(JSON.stringify(doc_teams[i].users[x].checkin[t]));
+                  checkin.user_id = doc_teams[i].users[i].user_id;
+                  checkin.team_id = doc_teams[i]._id;
+                  checkin.user_name = doc_users[i][x].name;
+                  checkin.team_name = doc_teams[i].name;
+                  checkin.unit = doc_teams[i].users[x].unit;
+                  allcheckins.push(checkin);
+                }
+              }
+              var now = new Date();
+              //now.setDate(now.getDate() +1);
 							//figure out if deadline includes the last day
 							doc_teams[i].countdown = Math.floor((doc_teams[i].deadline - now) / 86400000)
 							if (doc_teams[i].deadline < now){
@@ -161,11 +168,17 @@ module.exports = function(app, passport) {
 			          });
 							}
 						}
+            allcheckins.sort(function(a, b) {
+              a = new Date(a.created);
+              b = new Date(b.created);
+              return a>b ? -1 : a<b ? 1 : 0;
+            });
 					  res.render('user_newsfeed', {
 			        title: "Personalized Newsfeed",
 		  		    teams: doc_teams,
 						  users: doc_users,
-		          user: req.user
+		          user: req.user,
+              allcheckins: allcheckins
 			      });
 				  }
 			  });
@@ -339,17 +352,31 @@ module.exports = function(app, passport) {
 
   // Notification Page
   app.get('/notifications/:id', auth.isAuthenticated, function(req,res){
-    User.findById(req.params.id, function(error, user){
-      res.render('notifications',{
-        title: 'Notifications',
-        user: user,
-        stylesheet: 'index.css'
+
+    User.load_from_notifications(req.user.id, 10, function(err, arr){
+      // console.log("arr:::::: " + arr);
+      User.findById(req.params.id, function(error, user){
+        res.render('notifications',{
+          title: 'Notifications',
+          user: user,
+          stylesheet: 'index.css'
+          , notifs : arr
+        });
       });
     });
+
   });
 
   // Create a new checkin
   app.post('/checkin/new/:id', auth.isAuthenticated, function(req,res){
+    req.assert('amount', 'Amount is required').notEmpty();
+    var obj = {};
+    obj.errors = req.validationErrors(true);
+
+    //pass in email and name to html if they aren't problems
+    if (obj.errors) {
+      res.redirect('/');
+    }
 	  Team.checkin({
 		  user_id: req.user.id
 	   	, team_id: req.params.id
@@ -388,12 +415,25 @@ module.exports = function(app, passport) {
       , user_id : req.user.id
       , like : req.param('like')
     }, function(error, docs){
+      //TODO: have the above function return info such as whether it was liked.
+
+      if (!error) {
+        User.add_notification({
+          comment: req.param('comment')
+          , team_id : req.params.team_id
+          , checkin_id : req.params.checkin_id
+          , user_id : req.user.id
+          , like : req.param('like')
+          , info : docs
+        }, function(error, docs) {
+
+        });
+      }
       res.redirect('/')
     });
   });
 
   app.get('/user/:id',auth.isAuthenticated, function(req,res){
-
     User.findById(req.params.id, function(err, user){
       if (err){
         console.log(err.message);
@@ -451,14 +491,40 @@ module.exports = function(app, passport) {
 
   app.get('/team/hub/:id',auth.isAuthenticated, function(req,res){
     Team.findById(req.params.id, function(error, team){
-	    var now = new Date();
-	    now.setDate(now.getDate());
-			team.countdown = Math.floor((team.deadline - now) / 86400000);
-      res.render('team_hub',{
-		    title: 'Team Hub',
-        team: team,
-        user: req.user
-	    });
+      var teamArray = [];
+      teamArray.push(team);
+      //added user names to checkins -- Brian
+      User.findList(teamArray,function(err, doc_users){
+        if (err){
+            console.log(err.message);
+        }
+        else{
+          var now = new Date();
+          team.countdown = Math.floor((team.deadline - now) / 86400000);
+          var allcheckins = [];
+          for (var i=0;i<team.users.length;i++)
+          {
+            for (var j=0;j<team.users[i].checkin.length;j++)
+            {
+              checkin = JSON.parse(JSON.stringify(team.users[i].checkin[j]));
+              checkin.user_id = team.users[i].user_id;
+              checkin.user_name = doc_users[0][i].name;
+              allcheckins.push(checkin);
+            }
+          }
+          allcheckins.sort(function(a, b) {
+            a = new Date(a.created);
+            b = new Date(b.created);
+            return a>b ? -1 : a<b ? 1 : 0;
+          });
+          res.render('team_hub', {
+            title: 'Team Hub',
+            team: team,
+            allcheckins: allcheckins,
+            user: req.user
+          });
+        }
+      });
     });
   });
 
@@ -655,7 +721,6 @@ client.on('error', console.log);
         if (err) {
           console.log(err.message);
         }
-        console.log("----> " + is_confirmed);
       });
       return res.redirect("/");
     });
