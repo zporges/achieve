@@ -69,6 +69,8 @@ function expandBox(element, event){
 
 function reformatDate(element, checkin_status){
   var date = element.text().toString();
+  console.log(date);
+  console.log(date.replace(/\s+/g,""));
   var split = date.split("Z");
   var passedDate = new Date(split[0]);
   var currentDate = new Date();
@@ -82,11 +84,7 @@ function reformatDate(element, checkin_status){
     }
   }
 
-  else{
-
-  }
-
-  if (difference < 1000){
+  else if (difference < 1000){
     element.text("1 second ago ");
   }
   else if (difference < 60000){
@@ -107,8 +105,11 @@ function reformatDate(element, checkin_status){
   else if (difference < 86400000 * 2){
     element.text("1 day ");
   }
-  else{
+  else if (difference > 86400000 * 2){
     element.text(Math.round(difference/86400000) + " days ago ");
+  }
+  else{
+    element.text("Never");
   }
 
 }

@@ -7,7 +7,7 @@
   </header>
 
   <section id = "groups">
-        <a href="/">Main</a>
+ <!--        <a href="/">Main</a>
 	  <ul>
 			<%= title %>
 	  </ul>
@@ -28,21 +28,36 @@
     </ul>
     <ul>
 			Wager: <%= team.wager %>
-    </ul>
+    </ul> -->
 
-        <% for(var i=0; i<allcheckins.length; i++) {%>
-            <li>
-              <a href="/team/<%= team._id %>/checkin/<%= allcheckins[i]._id %>">Checkin: <%= allcheckins[i].status %></a> by <%= allcheckins[i].user_name %> in <%= team.name %>
-              created on <%= allcheckins[i].created %>
-              <br/>
-              <a href="/team/<%= team._id %>/checkin/<%= allcheckins[i]._id %>/delete">Delete</a>
-              <br/>
-              <% var output = '{';
-                  for (var property in allcheckins[i]) {
-                      output += property + ': ' + allcheckins[i][property]+'; ';
-                  } output+='}'%>
-                  <%=output%><br/>
-          </li>
+        <% for(var i=0; i<allcheckins.length; i++) {
+          var time = allcheckins[i].created;
+            var commentSize = allcheckins[i].comments.length;
+            var likeSize = allcheckins[i].likes.length;
+          %>
+            <div class = "progress_box">
+            <div class = "main_progress">
+              <h3><span class = "name"><%=allcheckins[i].user_name%></span> completed <span class = "amount"><%= allcheckins[i].amount%> <%= allcheckins[i].unit %></span> of their goal.</h3>
+              <p>"<%=allcheckins[i].status%>"</p>
+              <h4><span><%=time%> </span> <%=commentSize%> comments <%=likeSize%> likes</h4>
+            </div>
+            <%for(var k = 0; k<allcheckins[i].comments.length; k++){%>
+              <div class = "progress_comment">
+                <h4>"<%= allcheckins[i].comments[k].text %>"</h4>
+                <p><span class = "name"><%= allcheckins[i].comments[k].name %></span> commented <span class = "time"><%= allcheckins[i].comments[k].created %></span></p>
+              </div>
+            <%}%>
+              <div class = "progress_comment add_comment">
+                <form method= "post" action="/team/<%= allcheckins[i].team_id %>/checkin/comment/<%= allcheckins[i]._id %>">
+                  <div class = "comment_box">
+                    <textarea rows="1" cols="50" name="comment" placeholder="Add Comment..."></textarea><br>
+                  </div>
+                  <div class = "comment_submit">
+                    <input type="submit" value="Submit"/>
+                  </div>
+                </form>
+              </div>
+          </div>
         <% } %>
 
 
@@ -52,7 +67,7 @@
     <% include ejs/navbar.ejs %>
     <script type = "text/javascript" src = "../js/navbar.js"></script>
     <% include ejs/secondary_navbar2.ejs %>
-    <script type = "text/javascript" src = "../js/secondary_navbar.js"></script>
+    <script type = "text/javascript" src = "js/homepage.js"></script>
   </footer>
   </div>
 </body>
