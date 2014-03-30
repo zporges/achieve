@@ -10,15 +10,23 @@
     </header>
     <div class="padding"></div>
 
-    <div>
+    <p> load number of::: <%= load_num %></p>
 
-      <input type="hidden" name="cur_num" id="curNum" value ="10" />
+    <div>
+      
       <% for(var i = 0; i < notifs.length; i++) {%>
         <p> <%= notifs[i].event_type %> </p>
         <p> <%= notifs[i].info %> </p>
         <p> <%= notifs[i].event_id %> </p>
         <br/>
       <% } %>
+      
+      <form method="post">
+        <input type="hidden" name="cur_num" id="curNum" value=<%=load_num%> />
+        <input type="submit" value="Load More Notifs"/>
+      </form>
+
+      
 
       <!-- <a href= "getNotfis" onclick = "get_notifs()">Load More Notifications</a> -->
     </div>

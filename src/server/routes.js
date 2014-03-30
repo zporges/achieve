@@ -37,7 +37,8 @@ function mail_confirm_account(user) {
     subject: "Confirm your account for Achieve!",
     text: "necessary?",
     html: user.name + ", thank you for signing up for Achieve! Click the following " +
-      "link to confirm your account. If this is not you, please disregard this email. <br/>" + link
+      "link to confirm your account. If this is not you, please disregard this email. <br/>" + 
+      link
 
   }
   smtpTransport.sendMail(mailOptions, function(error, response){
@@ -68,7 +69,8 @@ function mailSignup(user, leader, groupname) {
     to: user.email,
     subject: "Sign up for Achieve!",
     text: "necessary?",
-    html: leader + " has signed you up for the Achieve team:" + groupname +". Click the following link to sign up for Pact: <br/>" + linkSignup
+    html: leader + " has signed you up for the Achieve team:" + groupname +
+    ". Click the following link to sign up for Pact: <br/>" + linkSignup
   }
   //TODO: uncomment this out to send email!
 
@@ -232,7 +234,8 @@ module.exports = function(app, passport) {
     req.assert('name', 'Name is required').notEmpty();
     req.assert('deadline', 'Valid deadline required').notEmpty();
 
-	  //Checks to see the number of users and loops through the array and gets inputs based on number of users
+	  //Checks to see the number of users and loops through the array 
+    //and gets inputs based on number of users
 	  var num_user = parseInt(req.param('num_user'),10);
 	  var arr = [];
 	  //adds leader into array
@@ -361,6 +364,26 @@ module.exports = function(app, passport) {
           user: user,
           stylesheet: 'index.css'
           , notifs : arr
+          , load_num : 10
+        });
+      });
+    });
+
+  });
+
+  // Notification Page after more notifications are requested
+  app.post('/notifications/:id', auth.isAuthenticated, function(req,res){
+    load_num = parseInt(req.param('cur_num'),10) + 10;
+    console.log("======== " + load_num.toString());    
+    User.load_from_notifications(req.user.id, load_num, function(err, arr){
+      // console.log("arr:::::: " + arr);
+      User.findById(req.params.id, function(error, user){
+        res.render('notifications',{
+          title: 'Notifications',
+          user: user,
+          stylesheet: 'index.css'
+          , notifs : arr
+          , load_num : load_num
         });
       });
     });
@@ -744,7 +767,9 @@ client.on('error', console.log);
     //Validate passed information
     req.assert('name', 'Name is required').notEmpty();
     req.assert('email', 'Valid email required').notEmpty().isEmail();
-    req.assert('password', 'Password must be at least 6 characters and contain a number and letter').len(6);//.regex('^.*(?=.*[0-9])(?=.*[A-Za-z]).*$');
+    req.assert('password', 
+      'Password must be at least 6 characters and contain a number and letter').len(6);
+      //.regex('^.*(?=.*[0-9])(?=.*[A-Za-z]).*$');
     req.assert('password2', 'Passwords do not match').equals(req.body.password);
     User.findOne({email : req.body.email}, function(err, user) {
       if (err) {
