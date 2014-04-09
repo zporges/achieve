@@ -168,8 +168,7 @@ pact.start();
 
 var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
 var p = process.env.OPENSHIFT_NODEJS_PORT
-//p = (p == undefined) ? p : p.substring(0, p.length-4) + 8191 
-var java_port = p || 15151;
+var java_port = p || 15155;
 var exec = require('child_process').exec;
 var child;
 

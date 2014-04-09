@@ -615,9 +615,8 @@ module.exports = function(app, passport) {
           }
 
           //to past tense
-          //user.verb_past = "accomplished part of the goal:"
           var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
-          var java_port = 15151;
+          var java_port = 15155;
           var net = require('net');
 
           var client = net.connect({port: java_port, host: java_host},
