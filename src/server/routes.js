@@ -672,7 +672,7 @@ module.exports = function(app, passport) {
     res.render('login', {stylesheet: 'login.css'});
 
 
-
+/*
 var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
 //var python_host = "127.2.40.129";
 //var p = process.env.OPENSHIFT_NODEJS_PORT
@@ -693,7 +693,7 @@ client.on('end', function() {
   console.log('client disconnected');
 });
 client.on('error', console.log);
-
+*/
   });
 
   app.get("/login/:id", function(req, res) {
