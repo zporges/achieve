@@ -41,12 +41,20 @@ public class Server {
 					while ((inputLine = in.readLine()) != null) {
 
 						String result = "[ERROR]";
-						String[] arr =  inputLine.split(" ");
+						String[] arr =  inputLine.split(";");
 
+						//input: "toPastTense;verb sentence to conjugate;gender"
 						if (arr.length > 1 && arr[0].equals("toPastTense")) {
-							String val = VerbTense.toPastTense("I " + inputLine.substring(12));
+							String gender = arr[2].toLowerCase();
+							String val = VerbTense.toPastTense("I " + arr[1], gender);
 //							String val = "01234hello world";
-							val = val.substring(5);
+							int start = 5;
+							if (gender.equals("male")) {
+								start = 3;
+							} else if (gender.equals("female")) {
+								start = 4;
+							}
+							val = val.substring(start).trim();
 							result = "[JAVA-SUCCESS-" + ++i + "] " + val;
 							
 						}

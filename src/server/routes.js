@@ -149,11 +149,13 @@ module.exports = function(app, passport) {
               for (var x = 0; x < doc_teams[i].users.length;x++){
                 for (var t =0; t<doc_teams[i].users[x].checkin.length;t++){
                   checkin = JSON.parse(JSON.stringify(doc_teams[i].users[x].checkin[t]));
-                  checkin.user_id = doc_teams[i].users[i].user_id;
+                  //Changed below from i to x - was causing login errors - Tre'
+                  checkin.user_id = doc_teams[i].users[x].user_id;
                   checkin.team_id = doc_teams[i]._id;
                   checkin.user_name = doc_users[i][x].name;
                   checkin.team_name = doc_teams[i].name;
                   checkin.unit = doc_teams[i].users[x].unit;
+                  checkin.verb = doc_teams[i].users[x].verb_past
                   allcheckins.push(checkin);
                 }
               }
@@ -582,8 +584,38 @@ module.exports = function(app, passport) {
           user.pending = false;
           user.verb = req.param('verb');
 
+          function finishloading() {
+            user.frequency = req.param('frequency');
+            user.freq_progress = req.param('number');
+            //Use frequency to calculate cumulative desired progressonsol
+            var diff = team.deadline - Date.now()
+              , one_day = 60*60*24*1000
+              , one_week = one_day*7
+              ;
+            if(user.frequency == "daily") {
+              user.desired_progress = req.param('number')*Math.round(diff / one_day);
+            }
+            else if (user.frequency == "weekly") {
+              user.desired_progress = req.param('number')*Math.round(diff / one_week);
+            }
+            else {
+              user.desired_progress = req.param('number');
+            }
+            user.current_progress = 0;
+            user.unit = req.param('unit');
+            team.save(function(err, team, num) {
+              if(err) {
+                res.send(err.message);
+              }
+              else
+              {
+                return res.redirect('/team/hub/'+team_id);
+              }
+            });
+          }
+
           //to past tense
-          user.verb_past = "accomplished part of the goal"
+          //user.verb_past = "accomplished part of the goal:"
           var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
           var java_port = 15151;
           var net = require('net');
@@ -591,47 +623,29 @@ module.exports = function(app, passport) {
           var client = net.connect({port: java_port, host: java_host},
               function() { //'connect' listener
             console.log('client connected');
-            client.write('toPastTense ' + req.param('verb') +'\r\n');
+            client.write('toPastTense;' + req.param('verb') +';' + req.user.gender + ';\r\n');
           });
+
           client.on('data', function(data) {
             console.log(data.toString());
             var past = data.toString();
             past = past.substring(past.indexOf("]")+2);
             user.verb_past = past;
-            console.log("verb past: " + user.verb_past);
+            console.log("res: " + user.verb_past);
+            finishloading();
             client.end();
           });
+
           client.on('end', function() {
             console.log('client disconnected');
+            if (!user.verb_past) user.verb_past = "accomplished part of the goal:";
+            finishloading();
           });
-          client.on('error', console.log);
 
-          user.frequency = req.param('frequency');
-          user.freq_progress = req.param('number');
-          //Use frequency to calculate cumulative desired progressonsol
-          var diff = team.deadline - Date.now()
-            , one_day = 60*60*24*1000
-            , one_week = one_day*7
-            ;
-          if(user.frequency == "daily") {
-            user.desired_progress = req.param('number')*Math.round(diff / one_day);
-          }
-          else if (user.frequency == "weekly") {
-            user.desired_progress = req.param('number')*Math.round(diff / one_week);
-          }
-          else {
-            user.desired_progress = req.param('number');
-          }
-          user.current_progress = 0;
-          user.unit = req.param('unit');
-          team.save(function(err, team, num) {
-            if(err) {
-              res.send(err.message);
-            }
-            else
-            {
-              return res.redirect('/team/hub/'+team_id);
-            }
+          client.on('error', function() {
+            console.log(data.toString());
+            if (!user.verb_past) user.verb_past = "accomplished part of the goal:";
+            finishloading();
           });
         }
       }
