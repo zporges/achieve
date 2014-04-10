@@ -1,5 +1,5 @@
 $(function() {
-	//console.log(user);
+	//console.log(users);
 	console.log(data);
 
 	//the date that the team was created
@@ -108,14 +108,14 @@ $(function() {
 	var content = "<table>";
 	content += '<tr>';
 	content += '<td>Name</td>';
-	content += '<td>Goal</td>';
+	//content += '<td>Goal</td>';
 	content += '<td>Percent Complete</td>';
 	content += '</tr>';
 	$(data.users).each(function(i) {
 		content += '<tr>';
 		content += '<td>' +data.users[i].user_id + '</td>';
-		content += '<td>' +data.users[i].verb + ' ' + data.users[i].desired_progress + ' ' + data.users[i].unit + '</td>';
-		content += '<td>'+(data.users[i].current_progress/data.users[i].desired_progress).toString() + '%</td>';
+		//content += '<td>' +data.users[i].verb + ' ' + data.users[i].desired_progress + ' ' + data.users[i].unit + '</td>';
+		content += '<td>' + +((data.users[i].current_progress/data.users[i].desired_progress)*100).toFixed(2) + '%</td>';
 		content += '</tr>';
 	});
 	content += "</table>";
