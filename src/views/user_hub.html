@@ -1,17 +1,13 @@
 <% include ejs/header.ejs %>
   <div id = "me_mygoals" class= "content">
   <header>
-    <h1>Name</h1>
+    <h1><%= user.name %></h1>
   </header>
     <ul id = "topnav">
       <li id= "barleft"><a href = "/user/:id">My goals</a></li>
       <li id= "barright"><a href = "/user/settings">Settings</a></li>
     </ul>
     <div id = "info">
-      <div id = "profile">
-        <div id= "profilepic"><img src ="../../public/images/icons/avatar_default.png" /></div>
-        <div id = "userName"><% if (typeof user != 'undefined') { %> <%=user.name%> <% } %> </div>
-      </div>
       <div id = "goalsInfo">
         <ul id = "goalTitles">
           <li><p class = "goalsInfoTitle">Goals in progress</p>

@@ -29,6 +29,10 @@ header{
 	padding: 1%;
 }
 
+form{
+	text-align: left;
+}
+
 #topnav{
 	width: 100%;
 	min-width: 200px;
@@ -59,26 +63,40 @@ header{
 	font-size: 25px;
 	width: 50%;
 }
-#topnav a:hover{
-	border-bottom: 6px solid #61CF80;
+input, select {
+    margin: 8% auto 2%;
+    width: 70%;
+    font-size: 120%;
+    height: 30px;
+    padding: 0 5%;
+	}
+input[type='submit']{
+    width: 90%;
+    height: 30px;
+    margin: 8% auto 2%;
+	}
+select{
+	width: 75%;
 }
-.bars{
-	text-align: left;
-	font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-	font-size: 25px;
-	font-weight: 100;
-	margin-left: 0px;
-	padding-left: 10px;
-	padding-top: 10px;
-	background-color: #ced6dc;
-	height: 40px;
-	border-top: 1px solid black;
-	border-bottom: 1px solid black;
+input[type='submit']:hover {
+    opacity: .5
+	}
+input[type='radio']{
+	display: inline;
+	margin-left: 6%;
+	width: 10px;
 }
-.bars a{
-	color: black;
-	position: relative;
-	bottom: 0px;
-	text-decoration: none;
+button[type='submit']{
+	width: 90%;
+	height: 30px;
+	margin: 8% auto 2%;
 }
+button[type='submit']:hover {
+    opacity: .5
+	}
+.error {
+    color: red;
+    margin: 0;
+    text-align: left
+	}
 }
