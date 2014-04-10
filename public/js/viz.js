@@ -1,4 +1,5 @@
 $(function() {
+	console.log(user);
 	console.log(data);
 
 	//the date that the team was created
