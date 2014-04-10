@@ -166,21 +166,20 @@ pact.start();
 
 
 
-var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
+var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
 var p = process.env.OPENSHIFT_NODEJS_PORT
-p = (p == undefined) ? p : p.substring(0, p.length-4) + 8191 //8767
-var python_port = p || 15151;//8191; //8767
+var java_port = p || 15155;
 var exec = require('child_process').exec;
 var child;
 
-//child = exec("python python-server.py -h " + python_host + " -p " + python_port,
 java_command = "java -cp "
 java_command += "NLPj/stanford-parser-3.3.1-models.jar:"
 java_command += "NLPj/stanford-parser.jar:"
 java_command += "NLPj/stanford-postagger-3.3.1.jar:"
 java_command += "NLPj/simplenlg-v4.4.2.jar:"
 java_command += "NLPj Server "
-java_command += python_host + " " + python_port
+java_command += java_host + " " + java_port
+
 child = exec(java_command,
    function (error, stdout, stderr) {
       console.log('stdout: ' + stdout);
@@ -190,56 +189,42 @@ child = exec(java_command,
       }
    });
 
-/*
-child = exec("sudo easy_install pip",
-   function (error, stdout, stderr) {
-      console.log('stdout: ' + stdout);
-      console.log('stderr: ' + stderr);
-      if (error !== null) {
-          console.log('exec error: ' + error);
-      }
-   });
-*/
+//Calls toPastTense so that Java libraries can load
+setTimeout(function() {
+  var net = require('net');
+
+  var client = net.connect({port: java_port, host: java_host},
+    function() {
+    console.log('client connected');
+    client.write('toPastTense;test past tense verbs;male;\r\n');
+  });
+  client.on('data', function(data) {
+    console.log(data.toString());
+    client.end();
+  });
+  client.on('end', function() {
+    console.log('client disconnected');
+  });
+  client.on('error', function() {
+    setTimeout(function() {
+      var net = require('net');
+
+      var client = net.connect({port: java_port, host: java_host},
+        function() {
+        console.log('client connected');
+        client.write('toPastTense;test past tense verbs;male;\r\n');
+      });
+      client.on('data', function(data) {
+        console.log(data.toString());
+        client.end();
+      });
+      client.on('end', function() {
+        console.log('client disconnected');
+      });
+      client.on('error', console.log);
+    }, 4000);
+  });
+}, 1000);
 
 
-/*
 
-var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
-var python_port = process.env.OPENSHIFT_NODEJS_PORT || 8081;
-
-var net = require('net');
-var client = net.connect({port: python_port, host: python_host},
-    function() { //'connect' listener
-  console.log('client connected');
-  client.write('toPastTense clean my room\r\n');
-});
-client.on('data', function(data) {
-  console.log(data.toString());
-  client.end();
-});
-client.on('end', function() {
-  console.log('client disconnected');
-});
-
-*/
-
-
-/*
-//Creates a socket to communicate with Python server
-var socket = require('net').Socket();
-socket.connect(8766);
-
-//Listener for when data is received
-socket.on('data', function(data) {
-        console.log('DATA ' + socket.remoteAddress + ': ' + data);
-        //Process data here
-});
-
-//Listener for when server is closed
-socket.on('close', function(data) {
-        console.log('Socket connection closed... ');
-});
-
-socket.write("toPastTense clean my room");
-socket.end();
-*/

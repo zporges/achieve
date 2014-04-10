@@ -13,9 +13,17 @@ var mongoose = require('mongoose')
       {
         return arr[i];
       }
+      else{
+        return 0;
+      }
     }
   }
 
+/*
+Function modified so that it return[0] is the user and
+return [1] is the actual array of checkins
+
+*/
   var findCheckin = function(team, id) {
     for (var i = 0; i < team.users.length; i++)
     {
@@ -23,7 +31,15 @@ var mongoose = require('mongoose')
       {
         if (team.users[i].checkin[j]._id == id)
         {
-          return team.users[i].checkin[j];
+          lst = team.users[i].checkin[j];
+          user_var = team.users[i];
+          toReturn = [user_var, lst];
+          /*
+          console.log("$$$$$$$$$");
+          console.log(toReturn[0].name);
+          console.log(str(toReturn[1][0].amount));
+          */
+          return toReturn;
         }
       }
     }
@@ -73,20 +89,20 @@ var mongoose = require('mongoose')
         created: {type: Date, default: Date.now}
         , amount: Number
         , status: String
-        , comments: [{text: String, user_id: String, created: {type: Date, default: Date.now}}]
-        , likes: [{user_id: String, created: {type: Date, default: Date.now}}]
+        , comments: [{text: String, user_id: String, name: String, created: {type: Date, default: Date.now}}]
+        , likes: [{user_id: String, name: String, created: {type: Date, default: Date.now}}]
       }]
 
     }]
   });
-  
+
   TeamSchema.statics.findAll = function(callback){
     Team.find({}, function (err, teams) {
         if (err) return handleError(err);
         else callback(null, teams);
       });
   };
-  
+
   TeamSchema.statics.findList = function(team_ids,callback){
 		team_ids = team_ids.map(function(id) {return id.team_id; });
 		Team.find({_id: {$in: team_ids}},function(err, teams){
@@ -94,7 +110,7 @@ var mongoose = require('mongoose')
       else callback(null, teams);
     });
 	};
-	
+
   TeamSchema.statics.save = function(data, callback) {
     var formatted_data;
     Team = mongoose.model('Team', TeamSchema);
@@ -104,7 +120,7 @@ var mongoose = require('mongoose')
     else {
       for ( var i =0;i< teams.length;i++ ) {
         formatted_data = data[i];
-      } 
+      }
     }
     var team = new Team (formatted_data);
     team.save(function (err) {
@@ -115,6 +131,7 @@ var mongoose = require('mongoose')
       });
     });
   };
+
 
   TeamSchema.statics.addPersonalGoal = function(data, callback){
     var t = Team.findById(data.team_id);
@@ -128,29 +145,82 @@ var mongoose = require('mongoose')
       user.current_progress += parseFloat(data.amount);
       team.save();
       callback(err, team);
-    })  
-      
+    })
+
     // Add a new checkin with the posted information
   }
 
   // Adds a comment and/or like to a checkin
+  // functionality note: data returned in callback have been changed.
   TeamSchema.statics.addToCheckin = function(data, callback) {
     Team.findById(data.team_id, function(err, team) {
+      User.findList([team], function(err,users){
       if(err) callback(err);
-      checkin = findCheckin(team, data.checkin_id);
+      temp = findCheckin(team, data.checkin_id);
+      checkin = temp[1];
+
+      // variable for 'info' underneath
+      is_comment = false;
+      is_like = false;
+
+      var newName = findUserById(users[0],data.user_id).name;
       // Add the comment if it exists
       if (data.comment != '')
       {
-        checkin.comments.push({'text' : data.comment, 'user_id' : data.user_id});
+        checkin.comments.push({'text' : data.comment, 'user_id' : data.user_id, 'name' : newName});
+        is_comment = true;
       }
       // Add the like if it exists and the user hasn't liked it yet
       if (data.like && !isUserInArray(checkin.likes, data.user_id))
       {
-        checkin.likes.push({ 'user_id' : data.user_id });
+        checkin.likes.push({ 'user_id' : data.user_id, "name" : newName });
+        is_like = true;
       }
       team.save();
-      callback(err, team);
+
+      // comment
+      // if (is_comment) {
+      // User.findById(user_id, function(user, err) {
+      //   console.log("------");
+      //   console.log(user);
+      //   console.log("=======");
+      //   console.log(user.notifications);
+      //   user.notifications.push(
+      //     { event_id : checkin._id
+      //       , info : "comment"
+      //       , seen : false
+      //       , event_type : "comment"
+      //        }
+      //     );
+      //   user.num_unread = user.num_unread + 1;
+
+      //   user.save();
+
+      //   console.log(user.notifications);
+      // });
+      // }
+
+      // likes
+      // User.findById(temp[0]._id, function(user, err) {
+      //   user.notifications.push(
+      //     { event_id : checkin._id
+      //       , info : info
+      //       , seen : false
+      //       , event_type : info
+      //        }
+      //     );
+      //   user.num_unread = user.num_unread + 1;
+
+      //   user.save();
+
+      //   console.log(user.notifications);
+      // });
+
+      //callback(err, team);
+      new_callback = [is_like, temp[0]];
+      callback(err, new_callback);
     });
+  });
   }
 
   TeamSchema.statics.deleteCheckin = function(data, callback) {
@@ -197,8 +267,8 @@ var mongoose = require('mongoose')
       }
 
     });
-    
+
   }
-  
+
   var Team = mongoose.model('Team', TeamSchema);
   exports.Team = Team;

@@ -46,6 +46,7 @@ public class VerbTense {
 		put("jam","jammed"); put("jog","jogged");
 		put("knot","knotted"); put("mine","mined");
 		put("mug","mugged"); put("occur","occurred");
+		put("pet", "petted");
 		put("program","programmed"); put("rot","rotted");
 		put("scrub","srubbed"); put("sin","sinned");
 		put("skip","skipped"); put("strap","strapped");

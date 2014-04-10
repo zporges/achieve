@@ -23,7 +23,7 @@ var smtpTransport = nodemailer.createTransport("SMTP",{
 });
 
 function mail_confirm_account(user) {
-  link = "http://localhost:8080/confirm_account/" + user._id;
+  link = "http://pact-groupgoals.rhcloud.com/confirm_account/" + user._id;
 
   // NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
   // console.log is necessary to make our code syncronous
@@ -37,7 +37,8 @@ function mail_confirm_account(user) {
     subject: "Confirm your account for Achieve!",
     text: "necessary?",
     html: user.name + ", thank you for signing up for Achieve! Click the following " +
-      "link to confirm your account. If this is not you, please disregard this email. <br/>" + link
+      "link to confirm your account. If this is not you, please disregard this email. <br/>" + 
+      link
 
   }
   smtpTransport.sendMail(mailOptions, function(error, response){
@@ -52,9 +53,9 @@ function mail_confirm_account(user) {
 
 // for faster performance, directly pass in the appropriate email link
 function mailSignup(user, leader, groupname) {
-	linkSignup = "http://localhost:8080/signup/" + user._id;
+	linkSignup = "http://pact-groupgoals.rhcloud.com/signup/" + user._id;
 	if (! user.pending){
-		linkSignup = "http://localhost:8080/login/" + user._id;
+		linkSignup = "http://pact-groupgoals.rhcloud.com/login/" + user._id;
 	}
 
 	// NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
@@ -68,7 +69,8 @@ function mailSignup(user, leader, groupname) {
     to: user.email,
     subject: "Sign up for Achieve!",
     text: "necessary?",
-    html: leader + " has signed you up for the Achieve team:" + groupname +". Click the following link to sign up for Pact: <br/>" + linkSignup
+    html: leader + " has signed you up for the Achieve team:" + groupname +
+    ". Click the following link to sign up for Pact: <br/>" + linkSignup
   }
   //TODO: uncomment this out to send email!
 
@@ -147,12 +149,13 @@ module.exports = function(app, passport) {
               for (var x = 0; x < doc_teams[i].users.length;x++){
                 for (var t =0; t<doc_teams[i].users[x].checkin.length;t++){
                   checkin = JSON.parse(JSON.stringify(doc_teams[i].users[x].checkin[t]));
-                  checkin.user_id = doc_teams[i].users[i].user_id;
+                  //Changed below from i to x - was causing login errors - Tre'
+                  checkin.user_id = doc_teams[i].users[x].user_id;
                   checkin.team_id = doc_teams[i]._id;
-                  console.log("doc_users");
-                  console.log(doc_users);
                   checkin.user_name = doc_users[i][x].name;
                   checkin.team_name = doc_teams[i].name;
+                  checkin.unit = doc_teams[i].users[x].unit;
+                  checkin.verb = doc_teams[i].users[x].verb_past
                   allcheckins.push(checkin);
                 }
               }
@@ -233,7 +236,8 @@ module.exports = function(app, passport) {
     req.assert('name', 'Name is required').notEmpty();
     req.assert('deadline', 'Valid deadline required').notEmpty();
 
-	  //Checks to see the number of users and loops through the array and gets inputs based on number of users
+	  //Checks to see the number of users and loops through the array 
+    //and gets inputs based on number of users
 	  var num_user = parseInt(req.param('num_user'),10);
 	  var arr = [];
 	  //adds leader into array
@@ -353,13 +357,39 @@ module.exports = function(app, passport) {
 
   // Notification Page
   app.get('/notifications/:id', auth.isAuthenticated, function(req,res){
-    User.findById(req.params.id, function(error, user){
-      res.render('notifications',{
-        title: 'Notifications',
-        user: user,
-        stylesheet: 'index.css'
+
+    User.load_from_notifications(req.user.id, 10, function(err, arr){
+      // console.log("arr:::::: " + arr);
+      User.findById(req.params.id, function(error, user){
+        res.render('notifications',{
+          title: 'Notifications',
+          user: user,
+          stylesheet: 'index.css'
+          , notifs : arr
+          , load_num : 10
+        });
       });
     });
+
+  });
+
+  // Notification Page after more notifications are requested
+  app.post('/notifications/:id', auth.isAuthenticated, function(req,res){
+    load_num = parseInt(req.param('cur_num'),10) + 10;
+    console.log("======== " + load_num.toString());    
+    User.load_from_notifications(req.user.id, load_num, function(err, arr){
+      // console.log("arr:::::: " + arr);
+      User.findById(req.params.id, function(error, user){
+        res.render('notifications',{
+          title: 'Notifications',
+          user: user,
+          stylesheet: 'index.css'
+          , notifs : arr
+          , load_num : load_num
+        });
+      });
+    });
+
   });
 
   // Create a new checkin
@@ -410,6 +440,20 @@ module.exports = function(app, passport) {
       , user_id : req.user.id
       , like : req.param('like')
     }, function(error, docs){
+      //TODO: have the above function return info such as whether it was liked.
+
+      if (!error) {
+        User.add_notification({
+          comment: req.param('comment')
+          , team_id : req.params.team_id
+          , checkin_id : req.params.checkin_id
+          , user_id : req.user.id
+          , like : req.param('like')
+          , info : docs
+        }, function(error, docs) {
+
+        });
+      }
       res.redirect('/')
     });
   });
@@ -474,7 +518,7 @@ module.exports = function(app, passport) {
     Team.findById(req.params.id, function(error, team){
       var teamArray = [];
       teamArray.push(team);
-      //added user names to checkins -- Brian 
+      //added user names to checkins -- Brian
       User.findList(teamArray,function(err, doc_users){
         if (err){
             console.log(err.message);
@@ -484,7 +528,7 @@ module.exports = function(app, passport) {
           team.countdown = Math.floor((team.deadline - now) / 86400000);
           var allcheckins = [];
           for (var i=0;i<team.users.length;i++)
-          { 
+          {
             for (var j=0;j<team.users[i].checkin.length;j++)
             {
               checkin = JSON.parse(JSON.stringify(team.users[i].checkin[j]));
@@ -540,56 +584,67 @@ module.exports = function(app, passport) {
           user.pending = false;
           user.verb = req.param('verb');
 
+          function finishloading() {
+            user.frequency = req.param('frequency');
+            user.freq_progress = req.param('number');
+            //Use frequency to calculate cumulative desired progressonsol
+            var diff = team.deadline - Date.now()
+              , one_day = 60*60*24*1000
+              , one_week = one_day*7
+              ;
+            if(user.frequency == "daily") {
+              user.desired_progress = req.param('number')*Math.round(diff / one_day);
+            }
+            else if (user.frequency == "weekly") {
+              user.desired_progress = req.param('number')*Math.round(diff / one_week);
+            }
+            else {
+              user.desired_progress = req.param('number');
+            }
+            user.current_progress = 0;
+            user.unit = req.param('unit');
+            team.save(function(err, team, num) {
+              if(err) {
+                res.send(err.message);
+              }
+              else
+              {
+                return res.redirect('/team/hub/'+team_id);
+              }
+            });
+          }
+
           //to past tense
-          user.verb_past = "accomplished part of the goal"
           var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
-          var java_port = 15151;
+          var java_port = 15155;
           var net = require('net');
 
           var client = net.connect({port: java_port, host: java_host},
               function() { //'connect' listener
             console.log('client connected');
-            client.write('toPastTense ' + req.param('verb') +'\r\n');
+            client.write('toPastTense;' + req.param('verb') +';' + req.user.gender + ';\r\n');
           });
+
           client.on('data', function(data) {
             console.log(data.toString());
             var past = data.toString();
             past = past.substring(past.indexOf("]")+2);
             user.verb_past = past;
-            console.log("verb past: " + user.verb_past);
+            console.log("res: " + user.verb_past);
+            finishloading();
             client.end();
           });
+
           client.on('end', function() {
             console.log('client disconnected');
+            if (!user.verb_past) user.verb_past = "accomplished part of the goal:";
+            finishloading();
           });
-          client.on('error', console.log);
 
-          user.frequency = req.param('frequency');
-          user.freq_progress = req.param('number');
-          //Use frequency to calculate cumulative desired progressonsol
-          var diff = team.deadline - Date.now()
-            , one_day = 60*60*24*1000
-            , one_week = one_day*7
-            ;
-          if(user.frequency == "daily") {
-            user.desired_progress = req.param('number')*Math.round(diff / one_day);
-          }
-          else if (user.frequency == "weekly") {
-            user.desired_progress = req.param('number')*Math.round(diff / one_week);
-          }
-          else {
-            user.desired_progress = req.param('number');
-          }
-          user.current_progress = 0;
-          user.unit = req.param('unit');
-          team.save(function(err, team, num) {
-            if(err) {
-              res.send(err.message);
-            }
-            else
-            {
-              return res.redirect('/team/hub/'+team_id);
-            }
+          client.on('error', function() {
+            console.log(data.toString());
+            if (!user.verb_past) user.verb_past = "accomplished part of the goal:";
+            finishloading();
           });
         }
       }
@@ -630,7 +685,7 @@ module.exports = function(app, passport) {
     res.render('login', {stylesheet: 'login.css'});
 
 
-
+/*
 var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
 //var python_host = "127.2.40.129";
 //var p = process.env.OPENSHIFT_NODEJS_PORT
@@ -651,7 +706,7 @@ client.on('end', function() {
   console.log('client disconnected');
 });
 client.on('error', console.log);
-
+*/
   });
 
   app.get("/login/:id", function(req, res) {
@@ -725,7 +780,9 @@ client.on('error', console.log);
     //Validate passed information
     req.assert('name', 'Name is required').notEmpty();
     req.assert('email', 'Valid email required').notEmpty().isEmail();
-    req.assert('password', 'Password must be at least 6 characters and contain a number and letter').len(6);//.regex('^.*(?=.*[0-9])(?=.*[A-Za-z]).*$');
+    req.assert('password', 
+      'Password must be at least 6 characters and contain a number and letter').len(6);
+      //.regex('^.*(?=.*[0-9])(?=.*[A-Za-z]).*$');
     req.assert('password2', 'Passwords do not match').equals(req.body.password);
     User.findOne({email : req.body.email}, function(err, user) {
       if (err) {
