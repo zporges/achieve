@@ -642,7 +642,6 @@ module.exports = function(app, passport) {
           });
 
           client.on('error', function() {
-            console.log(data.toString());
             if (!user.verb_past) user.verb_past = "accomplished part of the goal:";
             finishloading();
           });
