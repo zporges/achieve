@@ -146,6 +146,8 @@ module.exports = function(app, passport, debug) {
 					  console.log(err.message);
 				  }
 				  else{
+            console.log(doc_users);
+            console.log('------------------');
             var allcheckins = [];
 						for (var i = 0; i < doc_teams.length; i++){
               for (var x = 0; x < doc_teams[i].users.length;x++){
@@ -157,7 +159,19 @@ module.exports = function(app, passport, debug) {
                   checkin.user_name = doc_users[i][x].name;
                   checkin.team_name = doc_teams[i].name;
                   checkin.unit = doc_teams[i].users[x].unit;
-                  checkin.verb = doc_teams[i].users[x].verb_past
+                  checkin.verb = doc_teams[i].users[x].verb_past;
+                  checkin.allcomments = [];
+                  for (var k = 0; k < checkin.comments.length; k++) {
+                    comment = JSON.parse(JSON.stringify(checkin.comments[k]));
+                    for (var j = 0; j < doc_users[i].length; j++) {
+                      if(String(doc_users[i][j]._id) === checkin.comments[k].user_id)
+                      {
+                        comment.name = doc_users[i][j].name;
+                      }
+                    }
+                    checkin.allcomments.push(comment);
+                  }
+                  checkin.allcomments.reverse();
                   allcheckins.push(checkin);
                 }
               }
@@ -536,6 +550,19 @@ module.exports = function(app, passport, debug) {
               checkin = JSON.parse(JSON.stringify(team.users[i].checkin[j]));
               checkin.user_id = team.users[i].user_id;
               checkin.user_name = doc_users[0][i].name;
+              checkin.allcomments = [];
+              for (var k = 0; k < checkin.comments.length; k++) {
+                comment = JSON.parse(JSON.stringify(checkin.comments[k]));
+                for (var j = 0; j < doc_users[0].length; j++) {
+                  if(String(doc_users[0][j]._id) === checkin.comments[k].user_id)
+                  {
+                    comment.name = doc_users[0][j].name;
+                  }
+                }
+                checkin.allcomments.push(comment);
+              }
+              checkin.allcomments.reverse();
+              allcheckins.push(checkin);
               allcheckins.push(checkin);
             }
           }
