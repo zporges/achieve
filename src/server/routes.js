@@ -70,7 +70,7 @@ function mailSignup(user, leader, groupname) {
     subject: "Sign up for Achieve!",
     text: "necessary?",
     html: leader + " has signed you up for the Achieve team:" + groupname +
-    ". Click the following link to sign up for Pact: <br/>" + linkSignup
+    ". Click the following link to sign up for Achieve: <br/>" + linkSignup
   }
   //TODO: uncomment this out to send email!
 
@@ -400,16 +400,19 @@ module.exports = function(app, passport) {
 
     //pass in email and name to html if they aren't problems
     if (obj.errors) {
+      console.log(obj.errors);
       res.redirect('/');
     }
-	  Team.checkin({
-		  user_id: req.user.id
-	   	, team_id: req.params.id
-      , amount: req.param('amount')
-      , status: req.param('status')
-	  }, function(error, docs){
-		  res.redirect('/')
-	  });
+    else{
+  	  Team.checkin({
+  		  user_id: req.user.id
+  	   	, team_id: req.params.id
+        , amount: req.param('amount')
+        , status: req.param('status')
+  	  }, function(error, docs){
+  		  res.redirect('/')
+  	  });
+    }
   });
 
   // Page for adding a comment/like to a checkin, will be removed
