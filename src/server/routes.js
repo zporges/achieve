@@ -1,6 +1,6 @@
 // for mail
 var nodemailer = require('nodemailer');
-
+''
 // for node-schedule
 var schedule = require('node-schedule');
 
@@ -14,6 +14,8 @@ var j = schedule.scheduleJob(rule, function(){
 });
 
 
+var host;
+
 var smtpTransport = nodemailer.createTransport("SMTP",{
   service: "Gmail",
   auth: {
@@ -23,7 +25,7 @@ var smtpTransport = nodemailer.createTransport("SMTP",{
 });
 
 function mail_confirm_account(user) {
-  link = "http://pact-groupgoals.rhcloud.com/confirm_account/" + user._id;
+  link = host + "confirm_account/" + user._id;
 
   // NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
   // console.log is necessary to make our code syncronous
@@ -53,9 +55,9 @@ function mail_confirm_account(user) {
 
 // for faster performance, directly pass in the appropriate email link
 function mailSignup(user, leader, groupname) {
-	linkSignup = "http://pact-groupgoals.rhcloud.com/signup/" + user._id;
+	linkSignup = host + "signup/" + user._id;
 	if (! user.pending){
-		linkSignup = "http://pact-groupgoals.rhcloud.com/login/" + user._id;
+		linkSignup = host + "login/" + user._id;
 	}
 
 	// NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
@@ -100,9 +102,9 @@ var mongoose = require('mongoose')
   , auth
   ;
 
-module.exports = function(app, passport) {
+module.exports = function(app, passport, debug) {
   auth = require('./auth')(passport);
-
+  host = debug ? 'localhost:8080/' : 'pact-groupgoals.rhcloud.com/';
   app.get('/', auth.isAuthenticated, function(req, res) {
     User.is_user_confirmed(req.user, function(err, is_confirmed) {
       if (err) {

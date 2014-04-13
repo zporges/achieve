@@ -9,7 +9,7 @@ var mongoose = require('mongoose')
   var findUserById = function(arr, id) {
     for (var i = 0; i < arr.length; i++)
     {
-      if(arr[i].user_id = id)
+      if(arr[i].user_id === id)
       {
         return arr[i];
       }
