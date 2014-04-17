@@ -1,7 +1,9 @@
 <% include ejs/header.ejs %>
 
 <script>
-	var data = <%-JSON.stringify(team)%>;
+	var data = <%-JSON.stringify(checkins)%>;
+
+	console.log(data);
 	
 </script>
 
@@ -17,6 +19,7 @@
 
     <footer>
       <!--include navbar.ejs here-->
+      <% include ejs/navbar.ejs %>
       
       
       <script type = "text/javascript" src = "../../js/navbar.js"></script>

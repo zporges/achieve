@@ -684,13 +684,54 @@ module.exports = function(app, passport) {
   });
   */
   
-  app.get("/team/progress/:id", function(req, res) {
-	  Team.findCheckins(req.params.id, function(err, team_data) {
-	  	//User.findAll(function(err, user_data) {
-		  	res.render('team_progress', {stylesheet: "../../css/progress.css", team: team_data});
-		  	//res.render('team_progress', {stylesheet: "../../css/progress.css", team: team_data, users: user_data});
-	  	//})
-	  })
+  app.get("/team/progress/:id", auth.isAuthenticated, function(req, res) {
+	User.findById(req.user.id, function(err,user){
+	console.log(user);
+  	if (err){
+	  	console.log(err.message);
+  	}
+  	else{
+	  	Team.findCheckins(req.params.id, function(err, checkin_data) {
+	  		console.log(checkin_data);
+	  		Team.findById(req.params.id, function(err,team){
+	  			var teamArray = [];
+	  			teamArray.push(team);
+	  			
+	  			User.findList(teamArray, function(err, doc_users){
+	  				if (err){
+		  				console.log(err.message);
+	  				}
+	  				else{
+	  					var allcheckins = [];
+	  					for(var i=0; i < team.users.length; i++){
+		  					for(var j=0; j<team.users[i].checkin.length; j++){
+			  					checkin = JSON.parse(JSON.stringify(team.users[i].checkin[j]));
+			  					checkin.user_name = doc_users[0][i].name;
+			  					checkin.user_id = team.users[i].user_id;
+			  					checkin.current_progress = team.users[i].current_progress;
+			  					checkin.desired_progress = team.users[i].desired_progress;
+			  					checkin.frequency = team.users[i].frequency;
+			  					checkin.unit = team.users[i].unit;
+			  					checkin.verb = team.users[i].verb;
+			  					checkin.verb_past = team.users[i].verb_past;
+			  					allcheckins.push(checkin);
+		  					}	  					
+		  				}
+			  			console.log(req.params.id);
+			  			console.log(team);
+					  	res.render('team_progress', {
+					  		title: "Team Progress",
+							stylesheet: "../../css/progress.css", 
+							checkins: allcheckins, 
+							user: user, 
+							//users: doc_users
+					    });
+	  				}	
+	  			});
+  			});
+		});		  		
+	}
+	});
   });
 
   app.get('/login', function(req, res) {

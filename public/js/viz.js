@@ -18,8 +18,8 @@ $(function() {
 		console.log(data.users[i].checkin);
 	}
 
-	var margin = {top: 30, right: 20, bottom: 30, left: 50},
-	    width = 600 - margin.left - margin.right,
+	var margin = {top: 30, right: 0, bottom: 30, left: 30},
+	    width = 400 - margin.left - margin.right,
 	    height = 270 - margin.top - margin.bottom;
 	
 	var parseDate = d3.time.format("%d-%b-%y").parse;
@@ -43,6 +43,15 @@ $(function() {
 	        .attr("height", height + margin.top + margin.bottom)
 	    .append("g")
 	        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+	
+	var checkins = new Array();
+	$(data.users).each(function(i) {
+		$(data.users[i].checkin).each(function(n) {
+			checkins[i] = new Array();
+			checkins[i][n] = data.users[i].checkin[n];
+		});
+	});
+	console.log(checkins);
 	
 	// Get the data
 	var dataP1 = [ 
@@ -107,12 +116,14 @@ $(function() {
 	//add table
 	var content = "<table>";
 	content += '<tr>';
+	content += '<td>Visible</td>';
 	content += '<td>Name</td>';
 	//content += '<td>Goal</td>';
-	content += '<td>Percent Complete</td>';
+	content += '<td>Completion</td>';
 	content += '</tr>';
 	$(data.users).each(function(i) {
 		content += '<tr>';
+		content += '<td><input type = "checkbox" checked></td>';
 		content += '<td>' +data.users[i].user_id + '</td>';
 		//content += '<td>' +data.users[i].verb + ' ' + data.users[i].desired_progress + ' ' + data.users[i].unit + '</td>';
 		content += '<td>' + +((data.users[i].current_progress/data.users[i].desired_progress)*100).toFixed(2) + '%</td>';
