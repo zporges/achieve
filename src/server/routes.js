@@ -727,6 +727,8 @@ module.exports = function(app, passport, debug) {
 	  					if(doc_users[0][i] != null && doc_users[0][i].pending == false) {
 		  						var user = JSON.parse(JSON.stringify(team.users[i]));
 			  					user.user_name = doc_users[0][i].name;
+			  					user.team_start_date = teamArray[0].created;
+			  					user.team_end_date = teamArray[0].deadline;
 			  					allcheckins[i] = user;	  	
 		  					}				
 		  				}
