@@ -12,12 +12,13 @@ $(function() {
 	var totalDays = Math.ceil((deadline - creationDate) / (1000*60*60*24));
 	
 	//for each user
-	for(var i = 0; i < data.users.length; i++) {
+	/*
+	for(var i = 0; i < data.length; i++) {
 		//the user's total numeric goal
 		var goal = 0;
-		console.log(data.users[i].checkin);
+		console.log(data[i].checkin);
 	}
-
+	*/
 	var margin = {top: 30, right: 0, bottom: 30, left: 30},
 	    width = 400 - margin.left - margin.right,
 	    height = 270 - margin.top - margin.bottom;
@@ -121,12 +122,12 @@ $(function() {
 	//content += '<td>Goal</td>';
 	content += '<td>Completion</td>';
 	content += '</tr>';
-	$(data.users).each(function(i) {
+	$(data).each(function(i) {
 		content += '<tr>';
 		content += '<td><input type = "checkbox" checked></td>';
-		content += '<td>' +data.users[i].user_id + '</td>';
+		content += '<td>' +data[i][0].user_name + '</td>';
 		//content += '<td>' +data.users[i].verb + ' ' + data.users[i].desired_progress + ' ' + data.users[i].unit + '</td>';
-		content += '<td>' + +((data.users[i].current_progress/data.users[i].desired_progress)*100).toFixed(2) + '%</td>';
+		content += '<td>' + +((data[i][0].current_progress/data[i][0].desired_progress)*100).toFixed(2) + '%</td>';
 		content += '</tr>';
 	});
 	content += "</table>";

@@ -702,15 +702,6 @@ module.exports = function(app, passport, debug) {
 			}
     });
 	}
-
-	/*
-	app.get("/team/progress/:id", function(req, res) {
-	  Team.findCheckins(req.params.id, function(err, team_data) {
-	  	res.render('team_progress', {stylesheet: "../../css/progress.css", team: team_data});
-	  	//res.render('team_progress', {stylesheet: "../../css/progress.css", team: team_data, user: req.user});
-	  })
-  });
-  */
   
   app.get("/team/progress/:id", auth.isAuthenticated, function(req, res) {
 	User.findById(req.user.id, function(err,user){
@@ -718,9 +709,10 @@ module.exports = function(app, passport, debug) {
   	if (err){
 	  	console.log(err.message);
   	}
-  	else{
+	
+	else{
 	  	Team.findCheckins(req.params.id, function(err, checkin_data) {
-	  		console.log(checkin_data);
+	  		//console.log(checkin_data);
 	  		Team.findById(req.params.id, function(err,team){
 	  			var teamArray = [];
 	  			teamArray.push(team);
@@ -732,18 +724,11 @@ module.exports = function(app, passport, debug) {
 	  				else{
 	  					var allcheckins = [];
 	  					for(var i=0; i < team.users.length; i++){
-		  					for(var j=0; j<team.users[i].checkin.length; j++){
-			  					checkin = JSON.parse(JSON.stringify(team.users[i].checkin[j]));
-			  					checkin.user_name = doc_users[0][i].name;
-			  					checkin.user_id = team.users[i].user_id;
-			  					checkin.current_progress = team.users[i].current_progress;
-			  					checkin.desired_progress = team.users[i].desired_progress;
-			  					checkin.frequency = team.users[i].frequency;
-			  					checkin.unit = team.users[i].unit;
-			  					checkin.verb = team.users[i].verb;
-			  					checkin.verb_past = team.users[i].verb_past;
-			  					allcheckins.push(checkin);
-		  					}	  					
+	  					if(doc_users[0][i] != null && doc_users[0][i].pending == false) {
+		  						var user = JSON.parse(JSON.stringify(team.users[i]));
+			  					user.user_name = doc_users[0][i].name;
+			  					allcheckins[i] = user;	  	
+		  					}				
 		  				}
 			  			console.log(req.params.id);
 			  			console.log(team);
@@ -751,14 +736,14 @@ module.exports = function(app, passport, debug) {
 					  		title: "Team Progress",
 							stylesheet: "../../css/progress.css", 
 							checkins: allcheckins, 
-							user: user, 
-							//users: doc_users
+							user: user
 					    });
 	  				}	
 	  			});
   			});
 		});		  		
 	}
+	
 	});
   });
 
