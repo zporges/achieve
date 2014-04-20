@@ -1,6 +1,6 @@
 // for mail
 var nodemailer = require('nodemailer');
-
+''
 // for node-schedule
 var schedule = require('node-schedule');
 
@@ -14,6 +14,8 @@ var j = schedule.scheduleJob(rule, function(){
 });
 
 
+var host;
+
 var smtpTransport = nodemailer.createTransport("SMTP",{
   service: "Gmail",
   auth: {
@@ -23,7 +25,7 @@ var smtpTransport = nodemailer.createTransport("SMTP",{
 });
 
 function mail_confirm_account(user) {
-  link = "http://pact-groupgoals.rhcloud.com/confirm_account/" + user._id;
+  link = host + "confirm_account/" + user._id;
 
   // NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
   // console.log is necessary to make our code syncronous
@@ -53,9 +55,9 @@ function mail_confirm_account(user) {
 
 // for faster performance, directly pass in the appropriate email link
 function mailSignup(user, leader, groupname) {
-	linkSignup = "http://pact-groupgoals.rhcloud.com/signup/" + user._id;
+	linkSignup = host + "signup/" + user._id;
 	if (! user.pending){
-		linkSignup = "http://pact-groupgoals.rhcloud.com/login/" + user._id;
+		linkSignup = host + "login/" + user._id;
 	}
 
 	// NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
@@ -100,9 +102,9 @@ var mongoose = require('mongoose')
   , auth
   ;
 
-module.exports = function(app, passport) {
+module.exports = function(app, passport, debug) {
   auth = require('./auth')(passport);
-
+  host = debug ? 'localhost:8080/' : 'pact-groupgoals.rhcloud.com/';
   app.get('/', auth.isAuthenticated, function(req, res) {
     User.is_user_confirmed(req.user, function(err, is_confirmed) {
       if (err) {
@@ -243,7 +245,9 @@ module.exports = function(app, passport) {
 	  //adds leader into array
 	  arr.push({"user_id": req.user.id, checkin:[]});
 	  for (var i = 0; i < num_user; i++){
-	    req.assert('user'+(i+1), 'Valid Email required').isEmail();
+	     if (req.param('user'+(i+1)) !== '') {
+         req.assert('user'+(i+1), 'Valid Email required').isEmail();
+       }
 		}
     var obj = {}
     , errors = req.validationErrors(true); //Object format
@@ -776,6 +780,60 @@ client.on('error', console.log);
     });
   });
 
+  app.get("/forgot_password/:id", function(req, res) {
+    set_user_confirmed(req.params.id);
+    User.findById(req.params.id, function(error, user){
+      res.render('forgot_password',{stylesheet: "/css/signup.css/",
+        email : user.email,
+        name : user.name,
+      });
+    });
+  });
+
+  app.post('/forgot_password', function(req, res) {
+    req.assert('password', 
+      'Password must be at least 6 characters and contain a number and letter').len(6);
+    req.assert('password2', 'Passwords do not match').equals(req.body.password);
+    User.findOne({email : req.body.email}, function(err, user) {
+      if (err) {
+        throw err;
+      }
+
+      //object for handlebars
+      var obj = {}
+      , errors = req.validationErrors(true); //Object format
+      obj.errors = errors;
+
+      //pass in email and name to html if they aren't problems
+      if (errors) {
+        obj.stylesheet= "signup.css";
+        return res.render('forgot_password', obj);
+      }
+
+      //No errors, try to sign up!
+      else {
+        console.log(user);
+        User.signup(user.email, req.body.password, user.name, user.gender,
+          function(err, user){
+            //Success, log in and move on.
+            req.login(user, function(err){
+              User.is_user_confirmed(req.user, function(err, is_confirmed) {
+                if (err) {
+                  console.log(err.message);
+                }
+                if (is_confirmed == false) {
+                  mail_confirm_account(user);
+                }
+              });
+              return res.redirect("/");
+            });
+          });
+        }
+      });
+    });
+
+
+
   app.get("/signup/:id", function(req, res) {
     set_user_confirmed(req.params.id);
     User.findById(req.params.id, function(error, user){
@@ -865,7 +923,5 @@ client.on('error', console.log);
           });
       }
     });
-
-
   });
 }

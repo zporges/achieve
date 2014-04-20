@@ -80,7 +80,7 @@ var Pact = function() {
    *  the handlers.
    */
   self.initializeServer = function() {
-    require('./src/server/routes')(self.app, passport);
+    require('./src/server/routes')(self.app, passport, debug);
   };
 
   /**
@@ -160,7 +160,7 @@ var Pact = function() {
  *  main():  Main code.
  */
 var pact = new Pact();
-var debug = (process.execArgv.indexOf('--debug') >= 0);
+var debug = (process.argv.indexOf('--debug') >= 0);
 pact.initialize();
 pact.start();
 

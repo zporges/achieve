@@ -1,14 +1,8 @@
 function addUser(){
-	var prevEmail = $("[name=user"+parseInt($("#numUsers").attr("value"),10)+"]");
-	if (validateEmail(prevEmail.val())){
 	  $("[name=error"+parseInt($("#numUsers").attr("value"),10)+"]").html("");
 	  $("#numUsers").attr("value", parseInt($("#numUsers").attr("value"),10) + 1);
 	  $("#addUser").append( '<input type="text" name = "user'+$("#numUsers").attr("value")+'" placeholder="Enter a teammates\'s email" class= "addUser" />');
 	  $("#addUser").append( '<p class ="error" name= "error'+$("#numUsers").attr("value")+'"></p>');
-	}
-	else{
-		$("[name=error"+parseInt($("#numUsers").attr("value"),10)+"]").html("Not a valid email");
-	}
 }
 
 function validateEmail(email){
