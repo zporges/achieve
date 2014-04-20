@@ -42,7 +42,7 @@ function reminder_emails() {
             time_now = new Date();
             if (time_now - most_recent > 86400000) {
               // send a reminder email.
-              console.log("email sent for: " + users[k].user_id);
+              //console.log("email sent for: " + users[k].user_id);
               User.findById(users[k].user_id, function(error, user){                
                 mailReminder(user);
               });
@@ -52,7 +52,7 @@ function reminder_emails() {
           }
           else {
             // no checkins yet
-            console.log("email sent for: " + users[k].user_id);
+            //console.log("email sent for: " + users[k].user_id);
             User.findById(users[k].user_id, function(error, user){                
                 mailReminder(user);
               });            
