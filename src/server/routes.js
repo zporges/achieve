@@ -6,12 +6,63 @@ var schedule = require('node-schedule');
 
 // view https://www.npmjs.org/package/node-schedule for API
 var rule = new schedule.RecurrenceRule();
-rule.second = 5;
+
+// script will execute everyday at 8:00 PM
+rule.hour = 20;   // 8PM
+rule.minute = 0;  // :00 
+
 
 var j = schedule.scheduleJob(rule, function(){
-  // add chronjob here.
-  // loop through all users and send out emails.
+  reminder_emails();
 });
+
+function reminder_emails() {
+  Team.findAll(function(err, teams) {
+    if (err) {
+      console.log("findall from chronjob failed...");
+      return;    
+    }
+    // var that stores which users have received an email today
+    ob = [];
+  
+    for (var i = 0; i < teams.length; i++) {
+      // go through ever user, check to see if they checked in today
+      users = teams[i].users;
+      
+      for (var k = 0; k < users.length; k++) {
+        
+        if (ob.indexOf(users[k].user_id) == -1) {          
+          
+          // check to see if they checked in today
+          checkins = users[k].checkin;
+
+          // there are prior checkins 
+          if (checkins.length > 0) {
+            most_recent = checkins[checkins.length - 1].created;
+            time_now = new Date();
+            if (time_now - most_recent > 86400000) {
+              // send a reminder email.
+              console.log("email sent for: " + users[k].user_id);
+              User.findById(users[k].user_id, function(error, user){                
+                mailReminder(user);
+              });
+              
+              ob.push(users[k].user_id);
+            }
+          }
+          else {
+            // no checkins yet
+            console.log("email sent for: " + users[k].user_id);
+            User.findById(users[k].user_id, function(error, user){                
+                mailReminder(user);
+              });            
+            ob.push(users[k].user_id);
+          }
+        }
+      }
+    }
+  });
+}
 
 
 var host;
@@ -85,6 +136,38 @@ function mailSignup(user, leader, groupname) {
   });
 }
 
+// for faster performance, directly pass in the appropriate email link
+function mailReminder(user) {
+  linkSignup = host
+
+  // NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
+  // console.log is necessary to make our code syncronous
+  // Mail experiences some asyncronous functionality if there isn't a console.log
+  console.log(user);
+  // NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
+
+  mailOptions = {
+    from: "Achieve ✔ <apppact@gmail.com>",
+    to: user.email,
+    subject: "Check In Today for Achieve!",
+    text: "necessary?",
+    html: "We noticed that you have not checked in for one of the teams you are in."+
+    " Click the following link to check in your progress: <br/>" + linkSignup
+  }
+  //TODO: uncomment this out to send email!
+
+
+  smtpTransport.sendMail(mailOptions, function(error, response){
+    if (error) {
+      console.log(error);
+    } else {
+     // console.log("Message sent: " + response.message);
+    }
+  });
+
+}
+
+
 function sendMail(){
   smtpTransport.sendMail(mailOptions, function(error, response){
     if (error) {
@@ -105,7 +188,7 @@ var mongoose = require('mongoose')
 module.exports = function(app, passport, debug) {
   auth = require('./auth')(passport);
   host = debug ? 'localhost:8080/' : 'pact-groupgoals.rhcloud.com/';
-  app.get('/', auth.isAuthenticated, function(req, res) {
+  app.get('/', auth.isAuthenticated, function(req, res) {    
     User.is_user_confirmed(req.user, function(err, is_confirmed) {
       if (err) {
         console.log(err.message);
