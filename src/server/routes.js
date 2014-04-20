@@ -449,6 +449,13 @@ module.exports = function(app, passport, debug) {
     if(req.param('gender')) {
       data.gender = req.param('gender');
     }
+    if(req.param('password') != '') {
+      data.password = req.param('password');
+    }
+    if(req.param('password2') != '') {
+      data.password2 = req.param('password');
+    }
+    if(req.param(''))
     User.changeProfile(data, function(err, user) {
       res.redirect('/user/settings');
     });
