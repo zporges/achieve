@@ -39,7 +39,11 @@
 			  </span><br/>
 			  <span label = "password">
 			  New password: 
-				<input type="password" name = "password" placeholder=<%= user.password %> id="changepw"  <% if (typeof password != 'undefined') { %> value = <%=password%> <% } %>/>
+				<input type="password" name = "password" placeholder = "enter your new password here" id="changepw"  <% if (typeof password != 'undefined') { %> value = <%=password%> <% } %>/>
+			  </span><br/>
+			  <span label = "password">
+			  Re-enter new password: 
+				<input type="password" name = "password2" placeholder = "enter your new password here" id="changepw"  <% if (typeof password != 'undefined') { %> value = <%=password%> <% } %>/>
 			  </span><br/>
       <% if (typeof errors != 'undefined' && typeof errors.password != 'undefined') { %>
         <p class = "error"> <%=errors.deadline.msg%> </p>
@@ -58,7 +62,7 @@
 
     </form>
     <form method="get" action="/logout">
-		  <button type="submit" name="logout">Logout</button>
+		   <input type="submit" value="logout"/>
 	  </form>	
   </section>
   <footer>
