@@ -3,10 +3,10 @@ $(function() {
 	console.log(data);
 
 	//the date that the team was created
-	var creationDate = new Date(data.created);
+	var creationDate = new Date(data[0].team_start_date);
 	
 	//the date of the deadline
-	var deadline = new Date(data.deadline);
+	var deadline = new Date(data[0].team_end_date);
 	
 	//the number of days between the creation and deadline
 	var totalDays = Math.ceil((deadline - creationDate) / (1000*60*60*24));
@@ -46,10 +46,11 @@ $(function() {
 	        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 	
 	var checkins = new Array();
-	$(data.users).each(function(i) {
-		$(data.users[i].checkin).each(function(n) {
-			checkins[i] = new Array();
-			checkins[i][n] = data.users[i].checkin[n];
+	$.each(data, function(i) {
+		$.each(data[i].checkin, function(j) {
+			checkins[i] = {};
+			checkins[i].date = data[i].checkin[j].created;
+			checkins[i].date = data[i].checkin[j].amount;
 		});
 	});
 	console.log(checkins);
@@ -125,9 +126,9 @@ $(function() {
 	$(data).each(function(i) {
 		content += '<tr>';
 		content += '<td><input type = "checkbox" checked></td>';
-		content += '<td>' +data[i][0].user_name + '</td>';
+		//content += '<td>' +data[i][0].user_name + '</td>';
 		//content += '<td>' +data.users[i].verb + ' ' + data.users[i].desired_progress + ' ' + data.users[i].unit + '</td>';
-		content += '<td>' + +((data[i][0].current_progress/data[i][0].desired_progress)*100).toFixed(2) + '%</td>';
+		//content += '<td>' + +((data[i][0].current_progress/data[i][0].desired_progress)*100).toFixed(2) + '%</td>';
 		content += '</tr>';
 	});
 	content += "</table>";

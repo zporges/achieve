@@ -517,7 +517,6 @@ module.exports = function(app, passport, debug) {
                   user: user,
                   teams: doc_teams,
                   users: doc_users,
-                  user: user,
                   completed_teams: completed_teams,
                   num_checkins: num_checkins,
                   stylesheet:"user_hub.css"
