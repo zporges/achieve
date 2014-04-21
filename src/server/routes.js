@@ -409,6 +409,7 @@ module.exports = function(app, passport, debug) {
       obj.user = req.user;
       return res.render('team_new', obj);
 		}
+    var blanks = 0;
 	  for (var i = 0; i < num_user; i++){
 	    var x = i;
       User.invite(req.param('user'+(x+1)), function(err, user){
@@ -418,9 +419,16 @@ module.exports = function(app, passport, debug) {
           return res.render('team_new', obj);
 		    }
 		    else{
-          mailSignup(user, req.user.name, req.param('name'));
-		      arr.push({"user_id": user._id, checkin:[]});
-		      if (arr.length-1 == (num_user)){
+
+          if (req.param('user'+(i+1)) !== '') {
+            mailSignup(user, req.user.name, req.param('name'));
+            arr.push({"user_id": user._id, checkin:[]});
+          }
+          else{
+            blanks ++;
+          }
+
+		      if (arr.length-1-blanks == (num_user)){
 	  	      Team.save({
               deadline: req.param('deadline'),
               wager: req.param('wager'),
