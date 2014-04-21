@@ -410,49 +410,75 @@ module.exports = function(app, passport, debug) {
       return res.render('team_new', obj);
 		}
     var blanks = 0;
+    for (var i = 0; i < num_user; i++){
+      if (req.param('user'+(i+1)) === '') {
+        blanks ++;
+      }
+    }
 	  for (var i = 0; i < num_user; i++){
 	    var x = i;
-      User.invite(req.param('user'+(x+1)), function(err, user){
-		    if (err){
-  	      console.log(err);
-					obj.title = 'New Team';
-          return res.render('team_new', obj);
-		    }
-		    else{
-
-          if (req.param('user'+(i+1)) !== '') {
+      if (req.param('user'+(i+1)) !== '') {
+        User.invite(req.param('user'+(x+1)), function(err, user){
+  		    if (err){
+    	      console.log(err);
+  					obj.title = 'New Team';
+            return res.render('team_new', obj);
+  		    }
+  		    else{
             mailSignup(user, req.user.name, req.param('name'));
             arr.push({"user_id": user._id, checkin:[]});
-          }
-          else{
-            blanks ++;
-          }
+            console.log(blanks);
+            console.log(arr);
 
-		      if (arr.length-1-blanks == (num_user)){
-	  	      Team.save({
-              deadline: req.param('deadline'),
-              wager: req.param('wager'),
-		  	      name: req.param('name'),
-		  	      leader_id: req.user.id,
-		  	      users: arr
-		  	    }, function(error,docs){
+  		      if (arr.length-1+blanks == (num_user)){
+  	  	      Team.save({
+                deadline: req.param('deadline'),
+                wager: req.param('wager'),
+  		  	      name: req.param('name'),
+  		  	      leader_id: req.user.id,
+  		  	      users: arr
+  		  	    }, function(error,docs){
 
-	            // uh oh, log the error, pass into handlebars
-	            if(err) {
-	              console.log(err);
-								obj.title = 'New Team';
-      					return res.render('team_new', obj);
-	            }
-              else if (!docs) {
-                res.redirect('/')
-              }
-              else {
-               res.redirect('/goal/new/' + docs._id);
-              }
-		  	    });
-		      }
-		    }
-	    });
+  	            // uh oh, log the error, pass into handlebars
+  	            if(error) {
+  	              console.log(error);
+  								obj.title = 'New Team';
+        					return res.render('team_new', obj);
+  	            }
+                else if (!docs) {
+                  res.redirect('/')
+                }
+                else {
+                 res.redirect('/goal/new/' + docs._id);
+                }
+  		  	    });
+  		      }
+  		    }
+  	    });
+      }
+      else if(arr.length-1+blanks == num_user){
+        Team.save({
+          deadline: req.param('deadline'),
+          wager: req.param('wager'),
+          name: req.param('name'),
+          leader_id: req.user.id,
+          users: arr
+        }, function(error,docs){
+
+          // uh oh, log the error, pass into handlebars
+          if(error) {
+            console.log(error);
+            obj.title = 'New Team';
+            return res.render('team_new', obj);
+          }
+          else if (!docs) {
+            res.redirect('/')
+          }
+          else {
+           res.redirect('/goal/new/' + docs._id);
+          }
+        });
+      }
 	  };
   });
 
