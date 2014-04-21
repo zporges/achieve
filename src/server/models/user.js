@@ -270,7 +270,7 @@ var mongoose = require('mongoose')
         if (data.gender) {
           user.gender = data.gender;
         }
-        if (data.password) {
+        if(data.password && data.password2 && data.password === data.password2) {
           bcrypt.genSalt(10, function(err, salt) {
             if (err) {
               callback(err);
