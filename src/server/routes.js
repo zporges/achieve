@@ -410,6 +410,7 @@ module.exports = function(app, passport, debug) {
       return res.render('team_new', obj);
 		}
     var blanks = 0;
+
     for (var i = 0; i < num_user; i++){
       if (req.param('user'+(i+1)) === '') {
         blanks ++;
@@ -710,6 +711,9 @@ module.exports = function(app, passport, debug) {
               checkin.user_id = team.users[i].user_id;
               checkin.user_name = doc_users[0][i].name;
               checkin.allcomments = [];
+              checkin.team_name = team.name;
+              checkin.unit = team.users[i].unit;
+              checkin.verb = team.users[i].verb_past;
               for (var k = 0; k < checkin.comments.length; k++) {
                 comment = JSON.parse(JSON.stringify(checkin.comments[k]));
                 for (var j = 0; j < doc_users[0].length; j++) {
@@ -721,7 +725,6 @@ module.exports = function(app, passport, debug) {
                 checkin.allcomments.push(comment);
               }
               checkin.allcomments.reverse();
-              allcheckins.push(checkin);
               allcheckins.push(checkin);
             }
           }
@@ -871,7 +874,6 @@ module.exports = function(app, passport, debug) {
 	
 	else{
 	  	Team.findCheckins(req.params.id, function(err, checkin_data) {
-	  		//console.log(checkin_data);
 	  		Team.findById(req.params.id, function(err,team){
 	  			var teamArray = [];
 	  			teamArray.push(team);
@@ -1077,7 +1079,6 @@ client.on('error', console.log);
   });
 
   app.post('/signup', function(req, res) {
-    //Validate passed information
     req.assert('name', 'Name is required').notEmpty();
     req.assert('email', 'Valid email required').notEmpty().isEmail();
     req.assert('password', 
