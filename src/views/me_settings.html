@@ -8,10 +8,10 @@
 		  <div>
 			  <span label ="Name">
 			  	Name: 
-				<input type="text" name = "name" placeholder= <%= user.name %> id="editName"  <% if (typeof name != 'undefined') { %> value = <%=name%> <% } %> ></input>
+				<input type="text" name = "name" placeholder= <% if (typeof user.name != 'undefined') {%><%= user.name %><% } %> id="editName"  <% if (typeof name != 'undefined') { %> value = <%=name%> <% } %> ></input>
 			  </span> <br/>
       <% if (typeof errors != 'undefined' && typeof errors.name != 'undefined') { %>
-        <p class = "error"> <%=errors.name.msg%> </p>
+        <p class = "error"> <%=errors.name%> </p>
       <% } %>
 			
 			  <span label ="gender">

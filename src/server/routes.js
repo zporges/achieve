@@ -53,6 +53,37 @@ function mail_confirm_account(user) {
 
 }
 
+function forgot_password(user) {
+  link = host + "reset_password/" + user._id;
+
+  // NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
+  // console.log is necessary to make our code syncronous
+  // Mail experiences some asyncronous functionality if there isn't a console.log
+  console.log(user);
+  // NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
+
+  mailOptions = {
+    from: "Achieve ✔ <apppact@gmail.com>",
+    to: user.email,
+    subject: "Reset password for Achieve!",
+    text: "necessary?",
+    html: user.name + ", click the following " +
+      "link to reset your password. If this is not you, please disregard this email. <br/>" + 
+      link
+
+  }
+  smtpTransport.sendMail(mailOptions, function(error, response){
+    if (error) {
+      console.log(error);
+    } else {
+     // console.log("Message sent: " + response.message);
+    }
+  });
+
+}
+
+
+
 // for faster performance, directly pass in the appropriate email link
 function mailSignup(user, leader, groupname) {
 	linkSignup = host + "signup/" + user._id;
@@ -849,58 +880,65 @@ client.on('error', console.log);
     });
   });
 
-  app.get("/forgot_password/:id", function(req, res) {
-    set_user_confirmed(req.params.id);
+  app.get("/forgot_password", function(req, res) {
     User.findById(req.params.id, function(error, user){
-      res.render('forgot_password',{stylesheet: "/css/signup.css/",
-        email : user.email,
-        name : user.name,
+      res.render('forgot_password',{stylesheet: "/css/signup.css/"
       });
     });
   });
 
   app.post('/forgot_password', function(req, res) {
-    req.assert('password', 
-      'Password must be at least 6 characters and contain a number and letter').len(6);
-    req.assert('password2', 'Passwords do not match').equals(req.body.password);
-    User.findOne({email : req.body.email}, function(err, user) {
-      if (err) {
-        throw err;
+    User.findByEmail(req.param('email'), function(error, user){
+      if (error === "no user"){
+        errors = {};
+        errors.email = "Email not found in database";
+        return res.render('forgot_password', errors);
       }
-
-      //object for handlebars
-      var obj = {}
-      , errors = req.validationErrors(true); //Object format
-      obj.errors = errors;
-
-      //pass in email and name to html if they aren't problems
-      if (errors) {
-        obj.stylesheet= "signup.css";
-        return res.render('forgot_password', obj);
+      else{
+        forgot_password(user);
+        return res.redirect("/");
       }
+    });
+  });
 
-      //No errors, try to sign up!
-      else {
-        console.log(user);
-        User.signup(user.email, req.body.password, user.name, user.gender,
-          function(err, user){
-            //Success, log in and move on.
-            req.login(user, function(err){
-              User.is_user_confirmed(req.user, function(err, is_confirmed) {
-                if (err) {
-                  console.log(err.message);
-                }
-                if (is_confirmed == false) {
-                  mail_confirm_account(user);
-                }
-              });
-              return res.redirect("/");
-            });
-          });
-        }
+  app.get("/reset_password/:id", function(req, res) {
+    set_user_confirmed(req.params.id);
+    User.findById(req.params.id, function(error, user){
+      res.render('reset_password',{stylesheet: "/css/signup.css/",
+        email : user.email,
+        name : user.name,
+        user_id: user.id
       });
     });
+  });
 
+  app.post('/reset_password', function(req, res) {
+    req.assert('password', 
+      'Password must be at least 6 characters').len(6);
+    req.assert('password2', 'Passwords do not match').equals(req.body.password);
+    errors = req.validationErrors(true); //Object format
+    console.log(errors);
+    if (errors) {
+      res.render('reset_password/'+ req.param('user_id'),{stylesheet: "/css/signup.css/", errors:errors
+      });
+    }
+    else{
+      User.findById(req.param('user_id'), function(err, user) {
+        data = {};
+        data.password = req.param('password');
+        data.user_id = req.param('user_id');
+        User.changePassword(data, function(error, user){
+          if (error){
+            res.render('reset_password/'+ req.param('user_id'),{stylesheet: "/css/signup.css/"
+            });
+          }
+          else{
+            return res.redirect("/");
+          }
+        });
+      });
+    }
+  });
 
 
   app.get("/signup/:id", function(req, res) {

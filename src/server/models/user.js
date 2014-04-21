@@ -32,6 +32,57 @@ var mongoose = require('mongoose')
       */  
   });
 
+  UserSchema.statics.changePassword = function(data, callback) {
+    User.findById(data.user_id, function(err,user) {
+      if (err) {
+        callback(err);
+      }
+      else {
+        if (data.password) {
+          bcrypt.genSalt(10, function(err, salt) {
+            if (err) {
+              callback(err);
+            }
+            else {
+              bcrypt.hash(data.password, salt, function(err, hash) {
+                if (err) {
+                  callback(err);
+                }
+                else {
+                  user.hash = hash;
+                  user.save(function(err,user) {
+                    callback(err,user);
+                  });
+                }
+              });
+            }
+          });
+        }
+        else {
+          user.save(function(err,user) {
+            callback(err,user);
+          });
+        }
+      }
+    });
+  }
+
+  UserSchema.statics.findByEmail = function(email, callback) {
+    var self = this;
+    self.findOne({email : email}, function(err, u) {
+      if (err) {
+        return callback(err)
+      }
+      else if (!u) {
+        console.log(err);
+        return callback("no user");
+      }
+      else{
+        callback(null, u);
+      }
+    }) 
+  };
+
   UserSchema.statics.invite = function(email, callback) {
     var self = this;
     self.findOne({email : email}, function(err, u) {
