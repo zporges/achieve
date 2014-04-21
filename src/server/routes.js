@@ -381,7 +381,6 @@ module.exports = function(app, passport, debug) {
     , errors = req.validationErrors(true); //Object format
     obj.errors = errors;
 
-    console.log(errors);
 		//TODO: Still needs to assert if deadline is after than today, Did not know how to convert
     //"html input date" type into Javascript Date type to compare the dates
     var now = new Date();
@@ -409,55 +408,22 @@ module.exports = function(app, passport, debug) {
       obj.user = req.user;
       return res.render('team_new', obj);
 		}
-    var blanks = 0;
 
-    for (var i = 0; i < num_user; i++){
-      if (req.param('user'+(i+1)) === '') {
-        blanks ++;
+
+    //remove dupes and blanks from the array
+    var arrResult = {};
+    var email_array = [];
+    for (var i = 0; i < num_user; i++) {
+      if (req.param('user'+(i+1)) !== '') {
+        arrResult[req.param('user'+(i+1))] = req.param('user'+(i+1));
       }
     }
-	  for (var i = 0; i < num_user; i++){
-	    var x = i;
-      if (req.param('user'+(i+1)) !== '') {
-        User.invite(req.param('user'+(x+1)), function(err, user){
-  		    if (err){
-    	      console.log(err);
-  					obj.title = 'New Team';
-            return res.render('team_new', obj);
-  		    }
-  		    else{
-            mailSignup(user, req.user.name, req.param('name'));
-            arr.push({"user_id": user._id, checkin:[]});
-            console.log(blanks);
-            console.log(arr);
+    var y = 0;    
+    for(var item in arrResult) {
+        email_array[y++] = arrResult[item];
+    }
 
-  		      if (arr.length-1+blanks == (num_user)){
-  	  	      Team.save({
-                deadline: req.param('deadline'),
-                wager: req.param('wager'),
-  		  	      name: req.param('name'),
-  		  	      leader_id: req.user.id,
-  		  	      users: arr
-  		  	    }, function(error,docs){
-
-  	            // uh oh, log the error, pass into handlebars
-  	            if(error) {
-  	              console.log(error);
-  								obj.title = 'New Team';
-        					return res.render('team_new', obj);
-  	            }
-                else if (!docs) {
-                  res.redirect('/')
-                }
-                else {
-                 res.redirect('/goal/new/' + docs._id);
-                }
-  		  	    });
-  		      }
-  		    }
-  	    });
-      }
-      else if(arr.length-1+blanks == num_user){
+    if(email_array.length == 0){
         Team.save({
           deadline: req.param('deadline'),
           wager: req.param('wager'),
@@ -479,8 +445,48 @@ module.exports = function(app, passport, debug) {
            res.redirect('/goal/new/' + docs._id);
           }
         });
+    }
+    else{
+      for (var i = 0; i < email_array.length; i++){
+        var x = i;
+        console.log(email_array[i]);
+        User.invite(email_array[x], function(err, user){
+          if (err){
+            console.log(err);
+            obj.title = 'New Team';
+            return res.render('team_new', obj);
+          }
+          else{
+            mailSignup(user, req.user.name, req.param('name'));
+            arr.push({"user_id": user._id, checkin:[]});
+
+            if (arr.length-1 == email_array.length){
+              Team.save({
+                deadline: req.param('deadline'),
+                wager: req.param('wager'),
+                name: req.param('name'),
+                leader_id: req.user.id,
+                users: arr
+              }, function(error,docs){
+
+                // uh oh, log the error, pass into handlebars
+                if(error) {
+                  console.log(error);
+                  obj.title = 'New Team';
+                  return res.render('team_new', obj);
+                }
+                else if (!docs) {
+                  res.redirect('/')
+                }
+                else {
+                 res.redirect('/goal/new/' + docs._id);
+                }
+              });
+            }
+          }
+        });
       }
-	  };
+    }
   });
 
   // Teams Page

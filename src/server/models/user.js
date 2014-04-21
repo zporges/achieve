@@ -91,15 +91,16 @@ var mongoose = require('mongoose')
       }
       else if (!u) {
 	    self.create({
-	      email : email
+	       email : email
 	      , pending: true
 	    }, function(err, user) {
         if (callback) {
-	      if(err) {
-	        callback(err);
-	      }
-	      else {
-	        callback(null, user);
+	         if(err) {
+            console.log("error" + err);
+	           callback(err);
+  	       }
+  	      else {
+  	        callback(null, user);
           }
         }
 	    });
