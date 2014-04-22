@@ -40,7 +40,6 @@ function reminder_emails() {
           if (checkins.length > 0) {
             most_recent = checkins[checkins.length - 1].created;
             time_now = new Date();
-            console.log("hello");
             if (time_now - most_recent > 86400000) {
               // send a reminder email.
               //console.log("email sent for: " + users[k].user_id);
@@ -171,7 +170,7 @@ function mailSignup(user, leader, groupname) {
 
 // for faster performance, directly pass in the appropriate email link
 function mailReminder(user) {
-  linkSignup = host
+  linkSignup = host + "login/"
 
   // NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
   // console.log is necessary to make our code syncronous
@@ -187,7 +186,8 @@ function mailReminder(user) {
     html: "We noticed that you have not checked in for one of the teams you are in."+
     " Click the following link to check in your progress: <br/>" + linkSignup+
     "<br/><br/><br/><br/>"+
-    "If you want to opt-out of emails, sign in and set your reminder status as never"
+    "If you want to opt-out of emails, sign in and go into settings. Then
+    set your reminder status as never"
   }
   //TODO: uncomment this out to send email!
 
