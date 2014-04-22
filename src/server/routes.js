@@ -260,8 +260,6 @@ module.exports = function(app, passport, debug) {
 					  console.log(err.message);
 				  }
 				  else{
-            console.log(doc_users);
-            console.log('------------------');
             var allcheckins = [];
 						for (var i = 0; i < doc_teams.length; i++){
               for (var x = 0; x < doc_teams[i].users.length;x++){
@@ -384,24 +382,34 @@ module.exports = function(app, passport, debug) {
 		//TODO: Still needs to assert if deadline is after than today, Did not know how to convert
     //"html input date" type into Javascript Date type to compare the dates
     var now = new Date();
-    now.setDate(now.getDate());
-		var deadline = new Date();
-		if (req.param('deadline') > now){
-			obj.errors.deadline.param = "deadline";
-			obj.errors.deadline.msg = "Valid deadline is required";
-			obj.errors.deadline.value= '';
+    var deadline = new Date(req.param('deadline'));
+		if (deadline < now){
+      if (obj.errors == null){
+        obj.errors = {};
+      }
+      var deadline_error = {
+            param: "deadline"
+          , msg : "Deadline must be in the future"
+          , value : req.param('deadline')
+        };
+
+      obj.errors.deadline = deadline_error;
+
+      console.log(obj);
+      console.log(obj.errors);
 		}
-		if(errors){
-        if (!errors.name) {
+		if(obj.errors){
+      console.log()
+        if (!obj.errors.name) {
           obj.name = req.param('name');
         }
-        if (!errors.deadline) {
+        if (!obj.errors.deadline) {
           obj.deadline = req.param('deadline');
         }
         if (req.param('wager') != null || req.param('wager') != "") {
           obj.wager = req.param('wager');
         }
-        if (!errors.user1) {
+        if (!obj.errors.user1) {
           obj.user1 = req.param('user1');
         }
 			obj.title = 'New Team';
@@ -580,8 +588,14 @@ module.exports = function(app, passport, debug) {
 
     //pass in email and name to html if they aren't problems
     if (obj.errors) {
-      console.log(obj.errors);
-      res.redirect('/');
+      Team.checkin({
+        user_id: req.user.id
+        , team_id: req.params.id
+        , amount: 0
+        , status: req.param('status')
+      }, function(error, docs){
+        res.redirect('/')
+      });
     }
     else{
   	  Team.checkin({
@@ -901,7 +915,7 @@ module.exports = function(app, passport, debug) {
 		  				}
 			  			console.log(req.params.id);
 			  			console.log(team);
-					  	res.render('team_progress', {
+				      res.render('team_progress', {
 					  		title: "Team Progress",
 							stylesheet: "../../css/progress.css", 
 							checkins: allcheckins, 
