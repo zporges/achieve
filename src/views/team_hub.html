@@ -44,7 +44,8 @@
             <%for(var k = 0; k<allcheckins[i].allcomments.length; k++){%>
               <div class = "progress_comment">
                 <h4>"<%= allcheckins[i].allcomments[k].text %>"</h4>
-                <p><span class = "name"><%= allcheckins[i].allcomments[k].name %></span> commented <span class = "time"><%= allcheckins[i].allcomments[k].created %></span></p>
+                <p><span class = "name"><%= allcheckins[i].allcomments[k].name %></span> commented <span class = "time">
+                  <%= allcheckins[i].allcomments[k].created %></span></p>
               </div>
             <%}%>
               <div class = "progress_comment add_comment">
