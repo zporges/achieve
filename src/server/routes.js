@@ -40,13 +40,15 @@ function reminder_emails() {
           if (checkins.length > 0) {
             most_recent = checkins[checkins.length - 1].created;
             time_now = new Date();
+            console.log("hello");
             if (time_now - most_recent > 86400000) {
               // send a reminder email.
               //console.log("email sent for: " + users[k].user_id);
-              User.findById(users[k].user_id, function(error, user){                
-                mailReminder(user);
+              User.findById(users[k].user_id, function(error, user){     
+                if (user.opt_out_emails !== "never"){
+                    mailReminder(user);
+                }           
               });
-              
               ob.push(users[k].user_id);
             }
           }
@@ -248,7 +250,6 @@ module.exports = function(app, passport, debug) {
         });
       }
     });
-
     // gets information about every team that the user is in and all users in those teams
 	  Team.findList(req.user.teams,function(err, doc_teams){
 		  if (err){
@@ -537,7 +538,12 @@ module.exports = function(app, passport, debug) {
     if(req.param('password2') != '') {
       data.password2 = req.param('password');
     }
-    if(req.param(''))
+    if(req.param('never') == "never") {
+      data.opt_out_emails = req.param('never');
+    }
+    else{
+      data.opt_out_emails = "daily";
+    }
     User.changeProfile(data, function(err, user) {
       res.redirect('/user/settings');
     });
