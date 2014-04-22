@@ -185,7 +185,9 @@ function mailReminder(user) {
     subject: "Check In Today for Achieve!",
     text: "necessary?",
     html: "We noticed that you have not checked in for one of the teams you are in."+
-    " Click the following link to check in your progress: <br/>" + linkSignup
+    " Click the following link to check in your progress: <br/>" + linkSignup+
+    "<br/><br/><br/><br/>"+
+    "If you want to opt-out of emails, sign in and set your reminder status as never"
   }
   //TODO: uncomment this out to send email!
 
