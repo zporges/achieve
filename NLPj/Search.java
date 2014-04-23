@@ -1,5 +1,6 @@
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -18,7 +19,7 @@ public class Search {
 		else return false;
 	}
 
-	public static void search(Crawler crawler, String mainQuery, String subQuery) {
+	public static List<Tuple> search(Crawler crawler, String mainQuery, String subQuery) {
 		System.out.println(shouldSearch(subQuery));
 		HashSet<String> mainQuerySet = new HashSet<String>();
 		HashSet<String> subQuerySet = new HashSet<String>();
@@ -111,22 +112,24 @@ public class Search {
 			if (score >= threshold) {
 				if (pq.size() < numResults) {
 					pq.add(new Tuple(senId, score));
-				} else if ((double) pq.peek().item2 < score) {
+				} else if ((Double) pq.peek().item2 < score) {
 					pq.poll();
 					pq.add(new Tuple(senId, score));
 				}
 			}
 		}
+		LinkedList<Tuple> results = new LinkedList<Tuple>();
 		while (!pq.isEmpty()) {
 			Tuple t = pq.poll();
 			String senId = t.item1.toString();
 			String sentence = crawler.senStore.map.get(senId).text;
 			String docId = senId.substring(0, senId.lastIndexOf('_'));
-			//String url = crawler.docStore.map.get(docId).url;
+			String url = crawler.docStore.map.get(docId).url;
 			System.out.println((pq.size()+1) + ": " + sentence + " || " + docId + " || " + t.item2);
+			results.addFirst(new Tuple(sentence, url));
 		}
 		System.out.println();
-
+		return results;
 	}
 
 

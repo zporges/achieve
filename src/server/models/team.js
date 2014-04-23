@@ -141,8 +141,48 @@ return [1] is the actual array of checkins
       user = findUserById(team.users, data.user_id);
       user.checkin.push({'amount' : data.amount, 'status' : data.status});
       user.current_progress += parseFloat(data.amount);
-      team.save();
-      callback(err, team);
+      //
+      function finishloading() {
+        team.save();
+        callback(err, team);
+      }
+
+      //Finds advice
+      var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
+      var java_port = 15157;
+      var net = require('net');
+
+      var client = net.connect({port: java_port, host: java_host},
+        function() {
+          console.log('client connected');
+          client.write('getAdvice;' + user.verb + ';' + data.status + ';\r\n');
+      });
+
+      client.on('data', function(data) {
+        client.end();
+        console.log(data.toString());
+        var res = data.toString();
+        if (res.substring(0, 13) == "[JAVA-SUCCESS") {
+            res = res.substring(res.indexOf(']') + 2);
+            var idx = res.indexOf('\n');
+            var sen = res.substring(0, idx);
+            var url = res.substring(idx + 1);
+            var msg = '"' + sen + '" - See more at: ' + url;
+            var newcheckin = user.checkin[user.checkin.length-1];
+            newcheckin.comments.push({'text' : msg, 'user_id' : 1, 'name' : 'AdviceBot'});
+        }
+        finishloading();
+      });
+
+      client.on('end', function() {
+        console.log('client disconnected');
+        finishloading();
+      });
+
+      client.on('error', function() {
+        console.log("error in getting advice");
+        finishloading();
+      });
     })
 
     // Add a new checkin with the posted information
