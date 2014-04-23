@@ -12,6 +12,7 @@ var mongoose = require('mongoose')
     , hash: String
     , created: {type: Date, default: Date.now}
     , pending: {type: Boolean, default: false }
+    , opt_out_emails: String
     , user_confirmed: {type: Boolean, default: false}  // is account confirmed via email
 		, teams: [{
       team_id: String
@@ -21,6 +22,8 @@ var mongoose = require('mongoose')
         , info: String
         , seen: {type: Boolean, default: false}
         , event_type: String
+        , user_name: String
+        , created: {type: Date, default: Date.now}
     }]
     , num_unread: {type: Number, default: 0}
     /*
@@ -91,15 +94,16 @@ var mongoose = require('mongoose')
       }
       else if (!u) {
 	    self.create({
-	      email : email
+	       email : email
 	      , pending: true
 	    }, function(err, user) {
         if (callback) {
-	      if(err) {
-	        callback(err);
-	      }
-	      else {
-	        callback(null, user);
+	         if(err) {
+            console.log("error" + err);
+	           callback(err);
+  	       }
+  	      else {
+  	        callback(null, user);
           }
         }
 	    });
@@ -154,34 +158,41 @@ var mongoose = require('mongoose')
     info = data.info;
     src_user = info[1];
     user_id = src_user.user_id;
-    console.log("THIs:::::  " + user_id);
-    User.findById(user_id, function(err, user) {    
-      // comment
-      if (data.comment != '') 
-      {
-        user.notifications.push(
-          { event_id : data.checkin_id
-            , info : data.comment
-            , seen : false
-            , event_type : "comment"
-          }); 
-        user.num_unread = user.num_unread + 1;
-        user.save();        
-      }
+    //console.log("THIs:::::  " + user_id);
 
-      // like
-      if (info[0]) 
-      {
-        user.notifications.push(
-          { event_id : data.checkin_id
-            , info : "like"
-            , seen : false
-            , event_type : "like"
-          }); 
-        user.num_unread = user.num_unread + 1;
-        user.save();
-      }            
+    User.findById(data.user_id, function(err, user_orig){
+      User.findById(user_id, function(err, user) {    
+        // comment
+        if (data.comment != '') 
+        {
+          user.notifications.push(
+            { event_id : data.checkin_id
+              , info : data.comment
+              , seen : false
+              , event_type : "comment"
+              , user_name : user_orig.name
+            }); 
+          user.num_unread = user.num_unread + 1;
+          user.save();        
+        }
+
+        // like
+        if (info[0]) 
+        {
+          user.notifications.push(
+            { event_id : data.checkin_id
+              , info : "like"
+              , seen : false
+              , event_type : "like"
+              , user_name : user_orig.name
+            }); 
+          user.num_unread = user.num_unread + 1;
+          user.save();
+        }            
+      });
     });
+
+    
   }
 
 
@@ -215,8 +226,11 @@ var mongoose = require('mongoose')
       to_return = [];
       // start_point = notifications.length - 1 - x_new;
       start_point = notifications.length - 1;
+      //console.log("remove the next line");
       for (var i = start_point; start_point-i < MAX_DIFF && i >= 0; i--) {
         cur = notifications[i];
+
+        //console.log(cur);
         to_return.push(cur);
 
         // check to see if any of these notifications are now seen.
@@ -269,6 +283,9 @@ var mongoose = require('mongoose')
         }
         if (data.gender) {
           user.gender = data.gender;
+        }
+        if(data.opt_out_emails ){
+          user.opt_out_emails = data.opt_out_emails;
         }
         if(data.password && data.password2 && data.password === data.password2) {
           bcrypt.genSalt(10, function(err, salt) {

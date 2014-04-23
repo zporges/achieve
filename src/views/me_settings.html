@@ -5,6 +5,8 @@
     </header>
 	 	<section id = "main">
 	  <form method= "post" action="/user/settings">
+<%= user %>
+
 		  <div>
 			  <span label ="Name">
 			  	Name: 
@@ -56,6 +58,7 @@
 			  <input id ="r1" type="radio" name="daily" value="daily">Daily
 			  <input id ="r2" type="radio" name="weekly" value="weekly">Weekly
 			  <input id ="r3" type="radio" name="monthly" value="monthly">Monthly
+			  <input id ="r3" type="radio" name="never" value="never">Never
 
 			  <input type="submit" value="save changes"/>
 			</span>
