@@ -89,7 +89,7 @@ function mail_confirm_account(user) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Confirm your account for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: user.name + ", thank you for signing up for Achieve! Click the following " +
       "link to confirm your account. If this is not you, please disregard this email. <br/>" + 
       link
@@ -118,7 +118,7 @@ function forgot_password(user) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Reset password for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: user.name + ", click the following " +
       "link to reset your password. If this is not you, please disregard this email. <br/>" + 
       link
@@ -153,7 +153,7 @@ function mailSignup(user, leader, groupname) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Sign up for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: leader + " has signed you up for the Achieve team:" + groupname +
     ". Click the following link to sign up for Achieve: <br/>" + linkSignup
   }
@@ -182,7 +182,7 @@ function mailReminder(user) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Check In Today for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: "We noticed that you have not checked in for one of the teams you are in."+
     " Click the following link to check in your progress: <br/>" + linkSignup+
     "<br/><br/><br/><br/>"+
