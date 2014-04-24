@@ -37,7 +37,10 @@
           %>
             <div class = "progress_box">
             <div class = "main_progress">
-              <h3><span class = "name"><%=allcheckins[i].user_name%></span> completed <span class = "amount"><%= allcheckins[i].amount%> <%= allcheckins[i].unit %></span> of their goal.</h3>
+              <h3>
+                <span class = "name"><%=allcheckins[i].user_name%></span> 
+                completed <span class = "amount"><%= allcheckins[i].amount%> <%= allcheckins[i].unit %></span> of their goal.
+              </h3>
               <p>"<%=allcheckins[i].status%>"</p>
               <h4><span><%=time%> </span> <%=commentSize%> comments <%=likeSize%> likes</h4>
             </div>
