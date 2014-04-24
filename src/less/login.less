@@ -2,11 +2,55 @@
 @import "main.less";
 @import "form.less";
 @import "signup_login.less";
+#login{
+	form{
+  		margin-top:-20px;
+	}
 
-form{
-  margin-top:-20px;
-}
+	.formfield input[type="submit"]{
+  		margin-top:0px;
+	}	
+	#content{
+		min-width:240px;
+		min-height:320px;
+		overflow:hidden;
+	}
+	#content_format{
+		width:100%;
+		min-height:320px;
+		height:80%;
+		overflow:hidden;
+		position:absolute;
+		top:50%;
+		margin-top:-160px;
+	}
+	#logo{
+  		margin-top: -50px;
+  		margin-left: 13%;
+  		width: 70%;
+  		height: auto;
+  		padding:0px;
+	}
+	#main{
+		margin-top:0px;
+	}
+	#main #forgot{
+		margin-left:0px;
+		width:100%;
+	}
+	#main #forgot a{
+		margin-top:-20px;
+		text-align:center;
+		margin-left:0px;
+	}
 
-.formfield input[type="submit"]{
-  margin-top:0px;
+	#main #account{
+		margin-left:0px;
+		width:100%;
+	}
+	#main #account a{
+		margin-top:-0px;
+		margin-left:0px;
+		text-align:center;
+	}
 }

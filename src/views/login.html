@@ -1,14 +1,15 @@
 <% include ejs/header.ejs %>
   <div id = "login">
   <div id = "content">
-         <img id = "logo" src = "../../images/icons/loginLogo.svg" alt = "logo" />
+  <div id = "content_format">
+    <img id = "logo" src = "../../images/icons/loginLogo.svg" alt = "logo" />
     <section id = "main">
   	  <form action='/login' method='post'>
   	    <div class = "formfield">
   	      <input type='email' name='email' <% if (typeof email != 'undefined') { %> value = <%=email%> <% }else{ %> value = "" <%} %>> </input>
           <div class = "form_label">
+            <img class = "userIcon" src = "../../images/icons/login-user.svg" alt = "user" />
             <svg class = "form_icon">
-              <circle cx = "50%" cy = "50%" r = "12px"/>
               <line x1 = "96%" x2 = "96%" y1 = "8px" y2 = "32px" />
             </svg>
             <h4>Email</h4>
@@ -17,8 +18,8 @@
   	    <div class = "formfield">
   	      <input type='password' name='password' value = ""></input>
           <div class = "form_label">
+            <img class = "userIcon" src = "../../images/icons/login-password.svg" alt = "user" />
             <svg class = "form_icon">
-              <circle cx = "50%" cy = "50%" r = "12px"/>
               <line x1 = "96%" x2 = "96%" y1 = "8px" y2 = "32px" />
             </svg>
             <h4>Password</h4>
@@ -31,13 +32,14 @@
           <label for = "rememberMe">Remember Password </label><input type="checkbox" name = "rememberMe" />
         </div>
   	  </form>
-      <p><a href="/forgot_password">Forgot your password?</a></p>
-      <p><a href="/signup">Need an account?</a></p>
+      <p id = "forgot"><a href="/forgot_password">Forgot your password?</a></p>
+      <p id ="account"><a href="/signup">Need an account?</a></p>
     </section>
 
     <footer>
       <script type = "text/javascript" src = "js/placeholders.js"></script>
     </footer>
+  </div>
   </div>
   </div>
 </body>
