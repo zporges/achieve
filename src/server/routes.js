@@ -40,7 +40,6 @@ function reminder_emails() {
           if (checkins.length > 0) {
             most_recent = checkins[checkins.length - 1].created;
             time_now = new Date();
-            console.log("hello");
             if (time_now - most_recent > 86400000) {
               // send a reminder email.
               //console.log("email sent for: " + users[k].user_id);
@@ -90,7 +89,7 @@ function mail_confirm_account(user) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Confirm your account for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: user.name + ", thank you for signing up for Achieve! Click the following " +
       "link to confirm your account. If this is not you, please disregard this email. <br/>" + 
       link
@@ -119,7 +118,7 @@ function forgot_password(user) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Reset password for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: user.name + ", click the following " +
       "link to reset your password. If this is not you, please disregard this email. <br/>" + 
       link
@@ -154,7 +153,7 @@ function mailSignup(user, leader, groupname) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Sign up for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: leader + " has signed you up for the Achieve team:" + groupname +
     ". Click the following link to sign up for Achieve: <br/>" + linkSignup
   }
@@ -171,7 +170,7 @@ function mailSignup(user, leader, groupname) {
 
 // for faster performance, directly pass in the appropriate email link
 function mailReminder(user) {
-  linkSignup = host
+  linkSignup = host + "login/"
 
   // NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
   // console.log is necessary to make our code syncronous
@@ -183,12 +182,12 @@ function mailReminder(user) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Check In Today for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: "We noticed that you have not checked in for one of the teams you are in."+
     " Click the following link to check in your progress: <br/>" + linkSignup+
     "<br/><br/><br/><br/>"+
-    "If you want to opt-out of emails, sign in and set your reminder status as never"
-  }
+    "If you want to opt-out of emails, sign in and go into settings. Then set your reminder status as never"
+  };
   //TODO: uncomment this out to send email!
 
 
@@ -222,7 +221,7 @@ var mongoose = require('mongoose')
 
 module.exports = function(app, passport, debug) {
   auth = require('./auth')(passport);
-  host = debug ? 'localhost:8080/' : 'pact-groupgoals.rhcloud.com/';
+  host = debug ? 'localhost:8080/' : 'achieve-cornell.rhcloud.com/';
   app.get('/', auth.isAuthenticated, function(req, res) {    
     User.is_user_confirmed(req.user, function(err, is_confirmed) {
       if (err) {
@@ -740,6 +739,7 @@ module.exports = function(app, passport, debug) {
               checkin.user_name = doc_users[0][i].name;
               checkin.allcomments = [];
               checkin.team_name = team.name;
+              checkin.team_id = team.id;
               checkin.unit = team.users[i].unit;
               checkin.verb = team.users[i].verb_past;
               for (var k = 0; k < checkin.comments.length; k++) {

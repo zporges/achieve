@@ -7,15 +7,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
-
-import jnisvmlight.LabeledFeatureVector;
-
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import edu.stanford.nlp.ling.HasWord;
 
@@ -97,6 +89,7 @@ public class Crawler implements Serializable {
 	}
 
 	private void searchAndStore(String query) {
+		/*
 		Document doc;
 		try{
 			String url = "http://www.google.com/search?q=";
@@ -132,6 +125,7 @@ public class Crawler implements Serializable {
 		} catch (IllegalArgumentException e2) {
 			e2.printStackTrace();
 		}
+		*/
 	}
 
 	private void processUrl(String url, String title) {
@@ -146,6 +140,7 @@ public class Crawler implements Serializable {
 
 	private int processPage(String url, String docId) {
 		int numGoodSentences = 1;
+		/*
 		try {
 			Document page = Jsoup.connect(url).userAgent("Mozilla").ignoreHttpErrors(true).timeout(0).get();
 			String pageText = page.text();
@@ -181,6 +176,7 @@ public class Crawler implements Serializable {
 		} catch (IOException e2) {
 			e2.printStackTrace();
 		}
+		*/
 		return numGoodSentences;
 	}
 

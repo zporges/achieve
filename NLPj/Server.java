@@ -12,7 +12,7 @@ public class Server {
 	private final int maxThreads = 32;
 
 	public static void main(String[] args) {
-		int port = 15155;
+		int port = 15157;
 		String host = "localhost";
 
 		if (args.length >= 2) {
