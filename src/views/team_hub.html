@@ -44,7 +44,7 @@
               <p>"<%=allcheckins[i].status%>"</p>
               <h4><span><%=time%> </span> <%=commentSize%> comments <%=likeSize%> likes</h4>
             </div>
-            <%for(var k = 0; k<allcheckins[i].allcomments.length; k++){%>
+            <%for(var k = allcheckins[i].allcomments.length - 1; k>= 0; k--){%>
               <div class = "progress_comment">
                 <h4>"<%= allcheckins[i].allcomments[k].text %>"</h4>
                 <p><span class = "name"><%= allcheckins[i].allcomments[k].name %></span> commented <span class = "time">

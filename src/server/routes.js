@@ -553,10 +553,10 @@ module.exports = function(app, passport, debug) {
 
   // Notification Page
   app.get('/notifications/:id', auth.isAuthenticated, function(req,res){
-
     User.load_from_notifications(req.user.id, 10, function(err, arr){
-      // console.log("arr:::::: " + arr);
+      console.log("arr:::::: " + arr);
       User.findById(req.params.id, function(error, user){
+        console.log("test");
         res.render('notifications',{
           title: 'Notifications',
           user: user,
