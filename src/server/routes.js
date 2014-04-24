@@ -921,14 +921,17 @@ module.exports = function(app, passport, debug) {
 			  					allcheckins[i] = user;	  	
 		  					}				
 		  				}
-			  			console.log(req.params.id);
-			  			console.log(team);
+			  			//console.log(req.params.id);
+			  			//console.log(team);
+              console.log(user);
+              console.log(user.id);
+
 				      res.render('team_progress', {
 					  		title: "Team Progress",
 							stylesheet: "../../css/progress.css", 
 							checkins: allcheckins, 
               team: team,
-							user: user
+							user: req.user
 					    });
 	  				}	
 	  			});
