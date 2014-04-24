@@ -2,5 +2,4 @@ node_modules/
 public/css
 .DS_store
 *.jar
-nlp/
 public/images
