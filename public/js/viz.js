@@ -14,7 +14,9 @@ $(function() {
 	var totalDays = Math.ceil((deadline - creationDate) / (1000*60*60*24));
 	
 	var margin = {top: 30, right: 0, bottom: 30, left: 50},
-	    width = 400 - margin.left - margin.right,
+	    //width = 400 - margin.left - margin.right,
+	    width = parseInt(d3.select('#viz').style('width'), 10),
+	    width = width - margin.left - margin.right,
 	    height = 270 - margin.top - margin.bottom;
 
 	var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S.%LZ").parse;
