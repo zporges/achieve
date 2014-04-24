@@ -927,6 +927,7 @@ module.exports = function(app, passport, debug) {
 					  		title: "Team Progress",
 							stylesheet: "../../css/progress.css", 
 							checkins: allcheckins, 
+              team: team,
 							user: user
 					    });
 	  				}	

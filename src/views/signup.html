@@ -1,6 +1,7 @@
 <% include ejs/header.ejs %>
 <div id = "login">
 <div id = "content">
+<div id = "signup_format">
     <img id = "logo" src = "../../images/icons/loginLogo.svg" alt = "logo" />
   <section id = "main">
 
@@ -8,8 +9,8 @@
 	   <div class = "formfield">
       <input type='text' name='name' <% if (typeof name != 'undefined') { %> value = <%=name%> <% } %> ></input>
         <div class = "form_label">
+            <img class = "userIcon" src = "../../images/icons/login-user.svg" alt = "user" />
             <svg class = "form_icon">
-              <circle cx = "50%" cy = "50%" r = "12px"/>
               <line x1 = "96%" x2 = "96%" y1 = "8px" y2 = "32px" />
             </svg>
             <h4>Name</h4>
@@ -20,10 +21,14 @@
       <% } %>
 
     <div class = "formfield">
-      <input type='text' name='gender' <% if (typeof gender != 'undefined') { %> value = <%=gender%> <% } %> ></input>
+      <select name = "gender" <% if (typeof gender != 'undefined') { %> value = <%=gender%> <% } %>>
+        <option></option>
+        <option>Male</option>
+        <option>Female</option>
+      </select>
         <div class = "form_label">
+            <img class = "userIcon" src = "../../images/icons/login-user.svg" alt = "user" />
             <svg class = "form_icon">
-              <circle cx = "50%" cy = "50%" r = "12px"/>
               <line x1 = "96%" x2 = "96%" y1 = "8px" y2 = "32px" />
             </svg>
             <h4>Gender</h4>
@@ -36,8 +41,8 @@
     <div class = "formfield">
 	    <input type='email' name='email' <% if (typeof email != 'undefined') { %> value = <%=email%> <% } %> ></input>
       <div class = "form_label">
+            <img class = "userIcon" src = "../../images/icons/login-user.svg" alt = "user" />
             <svg class = "form_icon">
-              <circle cx = "50%" cy = "50%" r = "12px"/>
               <line x1 = "96%" x2 = "96%" y1 = "8px" y2 = "32px" />
             </svg>
             <h4>Email</h4>
@@ -50,10 +55,10 @@
 	  <div class = "formfield">
 	  	<input type='password' name='password' ></input>
         <div class = "form_label">
-              <svg class = "form_icon">
-                <circle cx = "50%" cy = "50%" r = "12px"/>
-                <line x1 = "96%" x2 = "96%" y1 = "8px" y2 = "32px" />
-              </svg>
+              <img class = "userIcon" src = "../../images/icons/login-password.svg" alt = "user" />
+            <svg class = "form_icon">
+              <line x1 = "96%" x2 = "96%" y1 = "8px" y2 = "32px" />
+            </svg>
               <h4>Password</h4>
             </div>
   	  </div>
@@ -64,8 +69,8 @@
       <div class = "formfield">
         <input type='password' name='password2' ></input>
         <div class = "form_label">
+            <img class = "userIcon" src = "../../images/icons/login-password.svg" alt = "user" />
             <svg class = "form_icon">
-              <circle cx = "50%" cy = "50%" r = "12px"/>
               <line x1 = "96%" x2 = "96%" y1 = "8px" y2 = "32px" />
             </svg>
             <h4>Re-enter PW</h4>
@@ -87,6 +92,7 @@
   <footer>
     <script type = "text/javascript" src = "../js/placeholders.js"></script>
   </footer>
+  </div>
   </div>
   </div>
 </body>
