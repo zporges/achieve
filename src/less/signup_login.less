@@ -1,22 +1,38 @@
+html{
+  height:100%;
+  width:100%;
+  margin:0;
+  padding:0;
+}
+
+body{
+  height:100%;
+  width:100%;
+  margin:0;
+  padding:0;
+}
+
 
 #login{
     background-color:@primary-color;
     width: 100%;
     height: 100%;
-    float:left;
-    width:100%;
-    margin:auto;
+    margin:0;
+    padding:0;
+    top:0;
+    left:0;
     color:@placeholder-gray;
     fill:white;
-    margin-top:0px;
+    position:relative;
 
 #content{
-  margin: 60px auto;
-  
   width: 80%;
   height:86%;
+  position:relative;
+  margin:0 auto;
   background-color: #c2d8c5;
   border-radius: 1px;
+  box-style:border-box;
 }
 
 #content img{
@@ -30,11 +46,12 @@ form{
   margin: 0;
   position: relative;
   top:-40px;
+  width:100%;
 }
 
 .formfield{
   position:relative;
-  width: 85%;
+  width: 100%;
   height: 40px;
   margin: 0px auto;
   margin-top: 5%;
@@ -118,9 +135,7 @@ form{
   margin-top:10px;
   width:100%;
 }
-#main{
-  margin: 50px 50px 80px 50px;
-}
+
 #main a{
   text-decoration:none;
   color: #2b673d;

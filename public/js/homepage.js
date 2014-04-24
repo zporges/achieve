@@ -1,4 +1,5 @@
 $(document).ready(function(){
+  console.log("loaded");
   $(".checkin_box form").addClass("hidden");
 
   $(".main_progress h4 span").each(function(index,element){
