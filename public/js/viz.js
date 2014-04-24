@@ -1,5 +1,5 @@
 $(function() {
-	var colors = new Array("#ff0000", "#ffa200", "#ffd300", "#aef100", "#00cc00", "#104ba9", "#3914af", "#c30083");
+	var colors = new Array("#ff0000", "#ffa200", "#00cc00", "#104ba9", "#3914af", "#c30083");
 
 	//console.log(users);
 	console.log(data);
@@ -16,8 +16,7 @@ $(function() {
 	var margin = {top: 30, right: 0, bottom: 30, left: 50},
 	    width = 400 - margin.left - margin.right,
 	    height = 270 - margin.top - margin.bottom;
-	
-	//var parseDate = d3.time.format("%d-%b-%y").parse;
+
 	var parseDate = d3.time.format("%Y-%m-%dT%H:%M:%S.%LZ").parse;
 	
 	var x = d3.time.scale().range([0, width]);
@@ -45,20 +44,26 @@ $(function() {
 		checkins[i] = {};
 		checkins[i].user_id = data[i].user_id;
 		checkins[i].data = [];
+		//set the first checkin to progress 0 at the start
+		var checkin = {}
+		checkin.date = parseDate(data[0].team_start_date);
+		checkin.progress = 0;
+		checkins[i].data.push(checkin);
 		$.each(data[i].checkin, function(j) {
+			//add all of the actual checkins
 			var checkin = {};
 			checkin.date = parseDate(data[i].checkin[j].created);
-			if(j == 0) {
-				checkin.progress = ((+data[i].checkin[j].amount) / data[i].desired_progress)*100;
-			}
-			else {
-				checkin.progress = ((+data[i].checkin[j].amount / data[i].desired_progress))*100 + checkins[i].data[j-1].progress;
-			}
+			//if(j == 0) {
+			//	checkin.progress = ((+data[i].checkin[j].amount) / data[i].desired_progress)*100;
+			//}
+			//else {
+				checkin.progress = ((+data[i].checkin[j].amount / data[i].desired_progress))*100 + checkins[i].data[j].progress;
+			//}
 			checkins[i].data.push(checkin);
 		});
 	});
 
-	// Scale the range of the data
+	//// Scale the range of the data
 	var minDate = parseDate(data[0].team_start_date);
 	//var maxDate = parseDate(data[0].team_end_date);
 	var maxDate = new Date();
@@ -69,7 +74,7 @@ $(function() {
 		svg.append("path")      // Add the valueline path.
 	    .attr("d", valueline(d.data))
 	    .attr("user_id", d.user_id)
-	    .attr("stroke", colors[i%8]);
+	    .attr("stroke", colors[i%6]);
 	});
 
 	svg.append("g")         // Add the X Axis
@@ -95,7 +100,7 @@ $(function() {
 		content += '<tr>';
 		content += '<td><input type = "checkbox" checked ';
 		content += 'user_id = '+data[i].user_id +'></td>';
-		content += '<td style = "color:'+colors[i%8]+'">' +data[i].user_name + '</td>';
+		content += '<td style = "color:'+colors[i%6]+'">' +data[i].user_name + '</td>';
 		content += '<td>' +data[i].verb + ' ' + data[i].desired_progress + ' ' + data[i].unit + '</td>';
 		content += '<td>' + +((data[i].current_progress/data[i].desired_progress)*100).toFixed(2) + '%</td>';
 		content += '</tr>';
@@ -104,5 +109,17 @@ $(function() {
 	
 	$('#leaderboard').append(content);
 	    
+	//when a checkbox is checked or unchecked
+	$('input[type="checkbox"]').on("change", function() {
+		//if it is checked, show that person's line. otherwise hide it
+		var user_id = this.getAttribute("user_id");
+		if($(this).is(':checked')) {
+			//$("path[user_id="+user_id+"]").prop("opacity", "1");
+			$("path[user_id="+user_id+"]").css("opacity", "1");
+		}
+		else {
+			$("path[user_id="+user_id+"]").css("opacity", "0");
+		}
+	});
 	
 });
