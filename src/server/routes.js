@@ -40,13 +40,15 @@ function reminder_emails() {
           if (checkins.length > 0) {
             most_recent = checkins[checkins.length - 1].created;
             time_now = new Date();
+            console.log("hello");
             if (time_now - most_recent > 86400000) {
               // send a reminder email.
               //console.log("email sent for: " + users[k].user_id);
-              User.findById(users[k].user_id, function(error, user){                
-                mailReminder(user);
+              User.findById(users[k].user_id, function(error, user){     
+                if (user.opt_out_emails !== "never"){
+                    mailReminder(user);
+                }           
               });
-              
               ob.push(users[k].user_id);
             }
           }
@@ -183,7 +185,9 @@ function mailReminder(user) {
     subject: "Check In Today for Achieve!",
     text: "necessary?",
     html: "We noticed that you have not checked in for one of the teams you are in."+
-    " Click the following link to check in your progress: <br/>" + linkSignup
+    " Click the following link to check in your progress: <br/>" + linkSignup+
+    "<br/><br/><br/><br/>"+
+    "If you want to opt-out of emails, sign in and set your reminder status as never"
   }
   //TODO: uncomment this out to send email!
 
@@ -248,7 +252,6 @@ module.exports = function(app, passport, debug) {
         });
       }
     });
-
     // gets information about every team that the user is in and all users in those teams
 	  Team.findList(req.user.teams,function(err, doc_teams){
 		  if (err){
@@ -260,8 +263,6 @@ module.exports = function(app, passport, debug) {
 					  console.log(err.message);
 				  }
 				  else{
-            console.log(doc_users);
-            console.log('------------------');
             var allcheckins = [];
 						for (var i = 0; i < doc_teams.length; i++){
               for (var x = 0; x < doc_teams[i].users.length;x++){
@@ -381,71 +382,122 @@ module.exports = function(app, passport, debug) {
     , errors = req.validationErrors(true); //Object format
     obj.errors = errors;
 
-    console.log(errors);
 		//TODO: Still needs to assert if deadline is after than today, Did not know how to convert
     //"html input date" type into Javascript Date type to compare the dates
     var now = new Date();
-    now.setDate(now.getDate());
-		var deadline = new Date();
-		if (req.param('deadline') > now){
-			obj.errors.deadline.param = "deadline";
-			obj.errors.deadline.msg = "Valid deadline is required";
-			obj.errors.deadline.value= '';
+    var deadline = new Date(req.param('deadline'));
+		if (deadline < now){
+      if (obj.errors == null){
+        obj.errors = {};
+      }
+      var deadline_error = {
+            param: "deadline"
+          , msg : "Deadline must be in the future"
+          , value : req.param('deadline')
+        };
+
+      obj.errors.deadline = deadline_error;
+
+      console.log(obj);
+      console.log(obj.errors);
 		}
-		if(errors){
-        if (!errors.name) {
+		if(obj.errors){
+      console.log()
+        if (!obj.errors.name) {
           obj.name = req.param('name');
         }
-        if (!errors.deadline) {
+        if (!obj.errors.deadline) {
           obj.deadline = req.param('deadline');
         }
         if (req.param('wager') != null || req.param('wager') != "") {
           obj.wager = req.param('wager');
         }
-        if (!errors.user1) {
+        if (!obj.errors.user1) {
           obj.user1 = req.param('user1');
         }
 			obj.title = 'New Team';
       obj.user = req.user;
       return res.render('team_new', obj);
 		}
-	  for (var i = 0; i < num_user; i++){
-	    var x = i;
-      User.invite(req.param('user'+(x+1)), function(err, user){
-		    if (err){
-  	      console.log(err);
-					obj.title = 'New Team';
-          return res.render('team_new', obj);
-		    }
-		    else{
-          mailSignup(user, req.user.name, req.param('name'));
-		      arr.push({"user_id": user._id, checkin:[]});
-		      if (arr.length-1 == (num_user)){
-	  	      Team.save({
-              deadline: req.param('deadline'),
-              wager: req.param('wager'),
-		  	      name: req.param('name'),
-		  	      leader_id: req.user.id,
-		  	      users: arr
-		  	    }, function(error,docs){
 
-	            // uh oh, log the error, pass into handlebars
-	            if(err) {
-	              console.log(err);
-								obj.title = 'New Team';
-      					return res.render('team_new', obj);
-	            }
-              else if (!docs) {
-                res.redirect('/')
-              }
-              else {
-               res.redirect('/goal/new/' + docs._id);
-              }
-		  	    });
-		      }
-		    }
-	    });
-	  };
+
+    //remove dupes and blanks from the array
+    var arrResult = {};
+    var email_array = [];
+    for (var i = 0; i < num_user; i++) {
+      if (req.param('user'+(i+1)) !== '') {
+        arrResult[req.param('user'+(i+1))] = req.param('user'+(i+1));
+      }
+    }
+    var y = 0;    
+    for(var item in arrResult) {
+        email_array[y++] = arrResult[item];
+    }
+
+    if(email_array.length == 0){
+        Team.save({
+          deadline: req.param('deadline'),
+          wager: req.param('wager'),
+          name: req.param('name'),
+          leader_id: req.user.id,
+          users: arr
+        }, function(error,docs){
+
+          // uh oh, log the error, pass into handlebars
+          if(error) {
+            console.log(error);
+            obj.title = 'New Team';
+            return res.render('team_new', obj);
+          }
+          else if (!docs) {
+            res.redirect('/')
+          }
+          else {
+           res.redirect('/goal/new/' + docs._id);
+          }
+        });
+    }
+    else{
+      for (var i = 0; i < email_array.length; i++){
+        var x = i;
+        console.log(email_array[i]);
+        User.invite(email_array[x], function(err, user){
+          if (err){
+            console.log(err);
+            obj.title = 'New Team';
+            return res.render('team_new', obj);
+          }
+          else{
+            mailSignup(user, req.user.name, req.param('name'));
+            arr.push({"user_id": user._id, checkin:[]});
+
+            if (arr.length-1 == email_array.length){
+              Team.save({
+                deadline: req.param('deadline'),
+                wager: req.param('wager'),
+                name: req.param('name'),
+                leader_id: req.user.id,
+                users: arr
+              }, function(error,docs){
+
+                // uh oh, log the error, pass into handlebars
+                if(error) {
+                  console.log(error);
+                  obj.title = 'New Team';
+                  return res.render('team_new', obj);
+                }
+                else if (!docs) {
+                  res.redirect('/')
+                }
+                else {
+                 res.redirect('/goal/new/' + docs._id);
+                }
+              });
+            }
+          }
+        });
+      }
+    }
   });
 
   // Teams Page
@@ -488,7 +540,12 @@ module.exports = function(app, passport, debug) {
     if(req.param('password2') != '') {
       data.password2 = req.param('password');
     }
-    if(req.param(''))
+    if(req.param('never') == "never") {
+      data.opt_out_emails = req.param('never');
+    }
+    else{
+      data.opt_out_emails = "daily";
+    }
     User.changeProfile(data, function(err, user) {
       res.redirect('/user/settings');
     });
@@ -539,8 +596,14 @@ module.exports = function(app, passport, debug) {
 
     //pass in email and name to html if they aren't problems
     if (obj.errors) {
-      console.log(obj.errors);
-      res.redirect('/');
+      Team.checkin({
+        user_id: req.user.id
+        , team_id: req.params.id
+        , amount: 0
+        , status: req.param('status')
+      }, function(error, docs){
+        res.redirect('/')
+      });
     }
     else{
   	  Team.checkin({
@@ -676,6 +739,9 @@ module.exports = function(app, passport, debug) {
               checkin.user_id = team.users[i].user_id;
               checkin.user_name = doc_users[0][i].name;
               checkin.allcomments = [];
+              checkin.team_name = team.name;
+              checkin.unit = team.users[i].unit;
+              checkin.verb = team.users[i].verb_past;
               for (var k = 0; k < checkin.comments.length; k++) {
                 comment = JSON.parse(JSON.stringify(checkin.comments[k]));
                 for (var j = 0; j < doc_users[0].length; j++) {
@@ -687,7 +753,6 @@ module.exports = function(app, passport, debug) {
                 checkin.allcomments.push(comment);
               }
               checkin.allcomments.reverse();
-              allcheckins.push(checkin);
               allcheckins.push(checkin);
             }
           }
@@ -770,7 +835,7 @@ module.exports = function(app, passport, debug) {
 
           //to past tense
           var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
-          var java_port = 15155;
+          var java_port = 15157;
           var net = require('net');
 
           var client = net.connect({port: java_port, host: java_host},
@@ -780,23 +845,23 @@ module.exports = function(app, passport, debug) {
           });
 
           client.on('data', function(data) {
+            client.end();
             console.log(data.toString());
             var past = data.toString();
             past = past.substring(past.indexOf("]")+2);
             user.verb_past = past;
             console.log("res: " + user.verb_past);
             finishloading();
-            client.end();
           });
 
           client.on('end', function() {
             console.log('client disconnected');
-            if (!user.verb_past) user.verb_past = "accomplished part of the goal:";
+            if (!user.verb_past) user.verb_past = "accomplished part of the goal";
             finishloading();
           });
 
           client.on('error', function() {
-            if (!user.verb_past) user.verb_past = "accomplished part of the goal:";
+            if (!user.verb_past) user.verb_past = "accomplished part of the goal";
             finishloading();
           });
         }
@@ -837,7 +902,6 @@ module.exports = function(app, passport, debug) {
 	
 	else{
 	  	Team.findCheckins(req.params.id, function(err, checkin_data) {
-	  		//console.log(checkin_data);
 	  		Team.findById(req.params.id, function(err,team){
 	  			var teamArray = [];
 	  			teamArray.push(team);
@@ -859,7 +923,7 @@ module.exports = function(app, passport, debug) {
 		  				}
 			  			console.log(req.params.id);
 			  			console.log(team);
-					  	res.render('team_progress', {
+				      res.render('team_progress', {
 					  		title: "Team Progress",
 							stylesheet: "../../css/progress.css", 
 							checkins: allcheckins, 
@@ -1043,7 +1107,6 @@ client.on('error', console.log);
   });
 
   app.post('/signup', function(req, res) {
-    //Validate passed information
     req.assert('name', 'Name is required').notEmpty();
     req.assert('email', 'Valid email required').notEmpty().isEmail();
     req.assert('password', 

@@ -89,7 +89,7 @@ public class Similarity implements Serializable {
 					if (pq.size() < k) {
 						pq.add(t);
 					} else {
-						if ((double) pq.peek().item2 < diceScore) {
+						if ((Double) pq.peek().item2 < diceScore) {
 							pq.poll();
 							pq.add(t);
 						}
