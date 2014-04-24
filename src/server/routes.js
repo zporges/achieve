@@ -221,7 +221,7 @@ var mongoose = require('mongoose')
 
 module.exports = function(app, passport, debug) {
   auth = require('./auth')(passport);
-  host = debug ? 'localhost:8080/' : 'pact-groupgoals.rhcloud.com/';
+  host = debug ? 'localhost:8080/' : 'achieve-cornell.rhcloud.com/';
   app.get('/', auth.isAuthenticated, function(req, res) {    
     User.is_user_confirmed(req.user, function(err, is_confirmed) {
       if (err) {
