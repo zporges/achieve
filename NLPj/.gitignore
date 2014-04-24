@@ -2,3 +2,17 @@
 /Server.class
 /VerbTense$1.class
 /VerbTense.class
+/Classifier.class
+/Crawler.class
+/DocumentStore$Tuple.class
+/DocumentStore.class
+/InvertedIndex.class
+/Main.class
+/Search.class
+/SentenceStore$Tuple.class
+/SentenceStore.class
+/Similarity.class
+/Tools.class
+/Tuple.class
+/Crawler$1.class
+/Tools$1.class

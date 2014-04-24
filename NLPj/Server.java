@@ -5,11 +5,14 @@ import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.List;
 
 public class Server {
+	private static Crawler crawler = new Crawler("data/crawl_queries");
+	private final int maxThreads = 32;
 
 	public static void main(String[] args) {
-		int port = 15151;
+		int port = 15155;
 		String host = "localhost";
 
 		if (args.length >= 2) {
@@ -44,7 +47,7 @@ public class Server {
 						String[] arr =  inputLine.split(";");
 
 						//input: "toPastTense;verb sentence to conjugate;gender"
-						if (arr.length > 1 && arr[0].equals("toPastTense")) {
+						if (arr.length > 2 && arr[0].equals("toPastTense")) {
 							String gender = arr[2].toLowerCase();
 							String val = VerbTense.toPastTense("I " + arr[1], gender);
 //							String val = "01234hello world";
@@ -57,6 +60,25 @@ public class Server {
 							val = val.substring(start).trim();
 							result = "[JAVA-SUCCESS-" + ++i + "] " + val;
 							
+						//input: "getAdvice;user's verb;user's comment"
+						} else if (arr.length > 2 && arr[0].equals("getAdvice")) {
+							String mainQuery = arr[1];
+							String subQuery = arr[2];
+							if (Search.shouldSearch(subQuery)) {
+								List<Tuple> results = Search.search(crawler, mainQuery, subQuery);
+								String val;
+								if (results.size() > 0) {
+									Tuple t = results.get(0);
+									String sen = (String) t.item1;
+									String url = (String) t.item2;
+									val = sen + "\n" + url;
+									result = "[JAVA-SUCCESS-" + ++i + "] " + val;
+								} else {
+									result = "[JAVA-ERROR-" + ++i + "] Nothing to recommend";
+								}
+							} else {
+								result = "[JAVA-ERROR-" + ++i + "] Should not search";
+							}
 						}
 
 

@@ -43,13 +43,7 @@ public class Classifier implements Serializable {
 			posToID = (HashMap<String, Integer>) in.readObject(); 
 			in.close();
 			fileIn.close();
-		} catch (MalformedURLException | ParseException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
