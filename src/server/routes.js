@@ -835,7 +835,7 @@ module.exports = function(app, passport, debug) {
 
           //to past tense
           var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
-          var java_port = 15155;
+          var java_port = 15157;
           var net = require('net');
 
           var client = net.connect({port: java_port, host: java_host},
@@ -845,23 +845,23 @@ module.exports = function(app, passport, debug) {
           });
 
           client.on('data', function(data) {
+            client.end();
             console.log(data.toString());
             var past = data.toString();
             past = past.substring(past.indexOf("]")+2);
             user.verb_past = past;
             console.log("res: " + user.verb_past);
             finishloading();
-            client.end();
           });
 
           client.on('end', function() {
             console.log('client disconnected');
-            if (!user.verb_past) user.verb_past = "accomplished part of the goal:";
+            if (!user.verb_past) user.verb_past = "accomplished part of the goal";
             finishloading();
           });
 
           client.on('error', function() {
-            if (!user.verb_past) user.verb_past = "accomplished part of the goal:";
+            if (!user.verb_past) user.verb_past = "accomplished part of the goal";
             finishloading();
           });
         }
