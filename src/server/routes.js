@@ -153,7 +153,7 @@ function mailSignup(user, leader, groupname) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Sign up for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: "<table align = \"center\" border = \"1\" cellpadding = \"0\" cellspacing = \"0\" width = \"100%\"style= \"border-collapse: collapse;\"><tr><td bgcolor = \"#5fcf80\" height = \"30%\"><h1 style= \" font-size: 200%; margin-left: 15%; color: #ffffff; font-family: 'Open Sans', Helvetica, Arial, sans-serif; \">Achieve</h1></td></tr><tr style=\"padding-top: 0;\"><td bgcolor = \"#ced6dc\" height = \"100%\" width = \"80%\" style=\" color; #000000; font-family: 'Open Sans', Helvetica, Arial, sans-serif; padding-top: 0px; padding-bottom:0px;\"><div style=\"margin-top:0px; margin-bottom:0px; margin-left: auto; margin-right:auto; padding: 15% 15% 10% 15%;font-size: 150%; background-color: #ffffff; width: 80%; height:100%;\"><span style= \"font-size: 100%;\">Hi, </span><br/><br/>Your friend "+leader+"invited you to join team: "+ groupname+ ". Now you can work towards your goals with your friends.Click the following link to sign up for Achieve:<br/><br/><a style= \"background-color:#378cab; width: 20%; height: 10%; color: #ffffff; font-size: 80%; text-decoration:none; padding: 2% 5% 2% 5%; margin-left:16%; margin-right:auto;\" href = \""+ linkSignup + "\">Sign up</a><br/><br/><br/></div></td></tr><tr><td bgcolor = \"#384047\" height = \"30px\"></td></tr></table>"
   }
   //TODO: uncomment this out to send email!
@@ -182,7 +182,7 @@ function mailReminder(user) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Check In Today for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: "<table align = \"center\" border = \"1\" cellpadding = \"0\" cellspacing = \"0\" width = \"100%\"style= \"border-collapse: collapse;\"><tr><td bgcolor = \"#5fcf80\" height = \"30%\"><h1 style= \" font-size: 250%; margin-left: 15%; padding-top: 5%; color: #ffffff; font-family: 'Open Sans', Helvetica, Arial, sans-serif; \">Achieve</h1></td></tr><tr style=\"padding-top: 0;\"><td bgcolor = \"#ced6dc\" height = \"100%\" width = \"80%\" style=\" color; #000000; font-family: 'Open Sans', Helvetica, Arial, sans-serif; padding-top: 0px; padding-bottom:0px;\"><div style=\"margin-top:0px; margin-bottom:0px; margin-left: auto; margin-right:auto; padding: 15% 15% 10% 15%;font-size: 150%; background-color: #ffffff; width: 80%; height:100%;\"><span style= \"font-size: 100%;\">Hi, "+user.name+"</span><br/><br/>Here is your daily reminder from Achieve<br/><br/>Did you make any progress today?<br/><br/>If yes, please click on the following link to check-in.<br/><br/>If not yet, please keep working towards your goal.<br/><br/><br/><a style= \"background-color:#378cab; width: 20%; height: 10%; color: #ffffff; font-size: 80%; text-decoration:none; padding: 2% 5% 2% 5%; margin-left:16%; margin-right:auto;\" href = \""+ linkSignup + "\">check-in progress</a><br/><br/><br/></div></td></tr><tr><td bgcolor = \"#384047\" height = \"30px\"></td></tr></table>"
   };
   //TODO: uncomment this out to send email!
