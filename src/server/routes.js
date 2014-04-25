@@ -44,9 +44,10 @@ function reminder_emails() {
               // send a reminder email.
               //console.log("email sent for: " + users[k].user_id);
               User.findById(users[k].user_id, function(error, user){                
-                mailReminder(user);
-              });
-              
+                if (user.opt_out_emails !== "never"){
+                    mailReminder(user);
+                }   
+              });  
               ob.push(users[k].user_id);
             }
           }
@@ -250,22 +251,19 @@ module.exports = function(app, passport, debug) {
         });
       }
     });
-
     // gets information about every team that the user is in and all users in those teams
 	  Team.findList(req.user.teams,function(err, doc_teams){
-		  if (err){
-			  console.log(err.message);
-		  }
-		  else{
-			  User.findList(doc_teams,function(err, doc_users){
-				  if (err){
-					  console.log(err.message);
-				  }
-				  else{
-            console.log(doc_users);
-            console.log('------------------');
+      if (err){
+        console.log(err.message);
+      }
+      else{
+        User.findList(doc_teams,function(err, doc_users){
+          if (err){
+            console.log(err.message);
+          }
+          else{
             var allcheckins = [];
-						for (var i = 0; i < doc_teams.length; i++){
+            for (var i = 0; i < doc_teams.length; i++){
               for (var x = 0; x < doc_teams[i].users.length;x++){
                 for (var t =0; t<doc_teams[i].users[x].checkin.length;t++){
                   checkin = JSON.parse(JSON.stringify(doc_teams[i].users[x].checkin[t]));
@@ -293,33 +291,33 @@ module.exports = function(app, passport, debug) {
               }
               var now = new Date();
               //now.setDate(now.getDate() +1);
-							//figure out if deadline includes the last day
-							doc_teams[i].countdown = Math.floor((doc_teams[i].deadline - now) / 86400000)
-							if (doc_teams[i].deadline < now){
-								doc_teams[i].has_deadline_passed = true;
-								doc_teams[i].save(function(err, team, num) {
-			            if(err) {
-			              res.send(err.message);
-			            }
-			          });
-							}
-						}
+              //figure out if deadline includes the last day
+              doc_teams[i].countdown = Math.floor((doc_teams[i].deadline - now) / 86400000)
+              if (doc_teams[i].deadline < now){
+                doc_teams[i].has_deadline_passed = true;
+                doc_teams[i].save(function(err, team, num) {
+                  if(err) {
+                    res.send(err.message);
+                  }
+                });
+              }
+            }
             allcheckins.sort(function(a, b) {
               a = new Date(a.created);
               b = new Date(b.created);
               return a>b ? -1 : a<b ? 1 : 0;
             });
-					  res.render('user_newsfeed', {
-			        title: "Personalized Newsfeed",
-		  		    teams: doc_teams,
-						  users: doc_users,
-		          user: req.user,
+            res.render('user_newsfeed', {
+              title: "Personalized Newsfeed",
+              teams: doc_teams,
+              users: doc_users,
+              user: req.user,
               allcheckins: allcheckins
-			      });
-				  }
-			  });
-		  }
-	  });
+            });
+          }
+        });
+      }
+    });
   });
 
   app.get('/resend_redirect', function(req, res){
@@ -895,7 +893,7 @@ module.exports = function(app, passport, debug) {
     });
 	}
   
-  app.get("/team/progress/:id", auth.isAuthenticated, function(req, res) {
+app.get("/team/progress/:id", auth.isAuthenticated, function(req, res) {
   User.findById(req.user.id, function(err,user){
   console.log(user);
     if (err){
