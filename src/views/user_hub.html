@@ -1,4 +1,11 @@
 <% include ejs/header.ejs %>
+
+<script>
+	var data = <%-JSON.stringify(teams)%>;
+	var user = <%-JSON.stringify(user)%>;
+	console.log(user);
+</script>
+
   <div id = "me_mygoals" class= "content">
   <header>
     <h1><%= user.name %></h1>
@@ -25,15 +32,16 @@
         </ul>
       </div>
     </div>
-    <div id = "dataVis"></div>
+    
       <p id = "individualProgress">Individual goal progress</p>
-      <script>
-      </script>
+      <div id = "dataVis"></div>
   <footer>
     <% include ejs/navbar.ejs %>
     <script type = "text/javascript" src = "../js/navbar.js"></script>
         <% include ejs/secondary_navbar.ejs %>
     <script type = "text/javascript" src = "../js/secondary_navbar.js"></script>
+    <script type = "text/javascript" src = "../../js/d3.min.js"></script>
+      <script type = "text/javascript" src = "../../js/individualViz.js"></script>
   </footer>
   </div>
 </body>

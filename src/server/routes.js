@@ -6,12 +6,63 @@ var schedule = require('node-schedule');
 
 // view https://www.npmjs.org/package/node-schedule for API
 var rule = new schedule.RecurrenceRule();
-rule.second = 5;
+
+// script will execute everyday at 8:00 PM
+rule.hour = 20;   // 8PM
+rule.minute = 0;  // :00 
+
 
 var j = schedule.scheduleJob(rule, function(){
-  // add chronjob here.
-  // loop through all users and send out emails.
+  reminder_emails();
 });
+
+function reminder_emails() {
+  Team.findAll(function(err, teams) {
+    if (err) {
+      console.log("findall from chronjob failed...");
+      return;    
+    }
+    // var that stores which users have received an email today
+    ob = [];
+  
+    for (var i = 0; i < teams.length; i++) {
+      // go through ever user, check to see if they checked in today
+      users = teams[i].users;
+      
+      for (var k = 0; k < users.length; k++) {
+        
+        if (ob.indexOf(users[k].user_id) == -1) {          
+          
+          // check to see if they checked in today
+          checkins = users[k].checkin;
+
+          // there are prior checkins 
+          if (checkins.length > 0) {
+            most_recent = checkins[checkins.length - 1].created;
+            time_now = new Date();
+            if (time_now - most_recent > 86400000) {
+              // send a reminder email.
+              //console.log("email sent for: " + users[k].user_id);
+              User.findById(users[k].user_id, function(error, user){                
+                mailReminder(user);
+              });
+              
+              ob.push(users[k].user_id);
+            }
+          }
+          else {
+            // no checkins yet
+            //console.log("email sent for: " + users[k].user_id);
+            User.findById(users[k].user_id, function(error, user){                
+                mailReminder(user);
+              });            
+            ob.push(users[k].user_id);
+          }
+        }
+      }
+    }
+  });
+}
 
 
 var host;
@@ -53,6 +104,37 @@ function mail_confirm_account(user) {
 
 }
 
+function forgot_password(user) {
+  link = host + "reset_password/" + user._id;
+
+  // NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
+  // console.log is necessary to make our code syncronous
+  // Mail experiences some asyncronous functionality if there isn't a console.log
+  console.log(user);
+  // NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
+
+  mailOptions = {
+    from: "Achieve ✔ <apppact@gmail.com>",
+    to: user.email,
+    subject: "Reset password for Achieve!",
+    text: "necessary?",
+    html: user.name + ", click the following " +
+      "link to reset your password. If this is not you, please disregard this email. <br/>" + 
+      link
+
+  }
+  smtpTransport.sendMail(mailOptions, function(error, response){
+    if (error) {
+      console.log(error);
+    } else {
+     // console.log("Message sent: " + response.message);
+    }
+  });
+
+}
+
+
+
 // for faster performance, directly pass in the appropriate email link
 function mailSignup(user, leader, groupname) {
 	linkSignup = host + "signup/" + user._id;
@@ -71,9 +153,9 @@ function mailSignup(user, leader, groupname) {
     to: user.email,
     subject: "Sign up for Achieve!",
     text: "necessary?",
-    html: leader + " has signed you up for the Achieve team:" + groupname +
-    ". Click the following link to sign up for Pact: <br/>" + linkSignup
-  }
+    html: "<table align = \"center\" border = \"1\" cellpadding = \"0\" cellspacing = \"0\" width = \"100%\"style= \"border-collapse: collapse;\"><tr><td bgcolor = \"#5fcf80\" height = \"30%\"><h1 style= \" font-size: 200%; margin-left: 15%; color: #ffffff; font-family: 'Open Sans', Helvetica, Arial, sans-serif; \">Achieve</h1></td></tr><tr style=\"padding-top: 0;\"><td bgcolor = \"#ced6dc\" height = \"100%\" width = \"80%\" style=\" color; #000000; font-family: 'Open Sans', Helvetica, Arial, sans-serif; padding-top: 0px; padding-bottom:0px;\"><div style=\"margin-top:0px; margin-bottom:0px; margin-left: auto; margin-right:auto; padding: 15% 15% 10% 15%;font-size: 150%; background-color: #ffffff; width: 80%; height:100%;\"><span style= \"font-size: 100%;\">Hi, </span><br/><br/>Your friend "+leader+"invited you to join team: "+ groupname+ ". Now you can work towards your goals with your friends.Click the following link to sign up for Achieve:<br/><br/><a style= \"background-color:#378cab; width: 20%; height: 10%; color: #ffffff; font-size: 80%; text-decoration:none; padding: 2% 5% 2% 5%; margin-left:16%; margin-right:auto;\" href = \""+ linkSignup + "\">Sign up</a><br/><br/><br/></div></td></tr><tr><td bgcolor = \"#384047\" height = \"30px\"></td></tr></table>"
+  }
+
   //TODO: uncomment this out to send email!
 
   smtpTransport.sendMail(mailOptions, function(error, response){
@@ -84,6 +166,38 @@ function mailSignup(user, leader, groupname) {
 		}
   });
 }
+
+// for faster performance, directly pass in the appropriate email link
+function mailReminder(user) {
+  linkSignup = host
+
+  // NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
+  // console.log is necessary to make our code syncronous
+  // Mail experiences some asyncronous functionality if there isn't a console.log
+  console.log(user);
+  // NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
+
+  console.log("<a style= \"background-color:#378cab; width: 20%; height: 50px; color: #ffffff; font-size: 28px; text-decoration:none; padding: 10px 30px 10px 30px; margin-left:22%; margin-right:auto;\" href = \""+ linkSignup + "\"");
+  mailOptions = {
+    from: "Achieve ✔ <apppact@gmail.com>",
+    to: user.email,
+    subject: "Check In Today for Achieve!",
+    text: "necessary?",
+    html: "<table align = \"center\" border = \"1\" cellpadding = \"0\" cellspacing = \"0\" width = \"100%\"style= \"border-collapse: collapse;\"><tr><td bgcolor = \"#5fcf80\" height = \"30%\"><h1 style= \" font-size: 250%; margin-left: 15%; padding-top: 5%; color: #ffffff; font-family: 'Open Sans', Helvetica, Arial, sans-serif; \">Achieve</h1></td></tr><tr style=\"padding-top: 0;\"><td bgcolor = \"#ced6dc\" height = \"100%\" width = \"80%\" style=\" color; #000000; font-family: 'Open Sans', Helvetica, Arial, sans-serif; padding-top: 0px; padding-bottom:0px;\"><div style=\"margin-top:0px; margin-bottom:0px; margin-left: auto; margin-right:auto; padding: 15% 15% 10% 15%;font-size: 150%; background-color: #ffffff; width: 80%; height:100%;\"><span style= \"font-size: 100%;\">Hi, "+user.name+"</span><br/><br/>Here is your daily reminder from Achieve<br/><br/>Did you make any progress today?<br/><br/>If yes, please click on the following link to check-in.<br/><br/>If not yet, please keep working towards your goal.<br/><br/><br/><a style= \"background-color:#378cab; width: 20%; height: 10%; color: #ffffff; font-size: 80%; text-decoration:none; padding: 2% 5% 2% 5%; margin-left:16%; margin-right:auto;\" href = \""+ linkSignup + "\">check-in progress</a><br/><br/><br/></div></td></tr><tr><td bgcolor = \"#384047\" height = \"30px\"></td></tr></table>"
+  }
+  //TODO: uncomment this out to send email!
+
+
+  smtpTransport.sendMail(mailOptions, function(error, response){
+    if (error) {
+      console.log(error);
+    } else {
+     // console.log("Message sent: " + response.message);
+    }
+  });
+
+}
+
 
 function sendMail(){
   smtpTransport.sendMail(mailOptions, function(error, response){
@@ -105,7 +219,7 @@ var mongoose = require('mongoose')
 module.exports = function(app, passport, debug) {
   auth = require('./auth')(passport);
   host = debug ? 'localhost:8080/' : 'pact-groupgoals.rhcloud.com/';
-  app.get('/', auth.isAuthenticated, function(req, res) {
+  app.get('/', auth.isAuthenticated, function(req, res) {    
     User.is_user_confirmed(req.user, function(err, is_confirmed) {
       if (err) {
         console.log(err.message);
@@ -193,6 +307,8 @@ module.exports = function(app, passport, debug) {
               b = new Date(b.created);
               return a>b ? -1 : a<b ? 1 : 0;
             });
+            mailReminder(req.user);
+
 					  res.render('user_newsfeed', {
 			        title: "Personalized Newsfeed",
 		  		    teams: doc_teams,
@@ -259,13 +375,14 @@ module.exports = function(app, passport, debug) {
 	  //adds leader into array
 	  arr.push({"user_id": req.user.id, checkin:[]});
 	  for (var i = 0; i < num_user; i++){
-	    req.assert('user'+(i+1), 'Valid Email required').isEmail();
+	     if (req.param('user'+(i+1)) !== '') {
+         req.assert('user'+(i+1), 'Valid Email required').isEmail();
+       }
 		}
     var obj = {}
     , errors = req.validationErrors(true); //Object format
     obj.errors = errors;
 
-    console.log(errors);
 		//TODO: Still needs to assert if deadline is after than today, Did not know how to convert
     //"html input date" type into Javascript Date type to compare the dates
     var now = new Date();
@@ -293,43 +410,85 @@ module.exports = function(app, passport, debug) {
       obj.user = req.user;
       return res.render('team_new', obj);
 		}
-	  for (var i = 0; i < num_user; i++){
-	    var x = i;
-      User.invite(req.param('user'+(x+1)), function(err, user){
-		    if (err){
-  	      console.log(err);
-					obj.title = 'New Team';
-          return res.render('team_new', obj);
-		    }
-		    else{
-          mailSignup(user, req.user.name, req.param('name'));
-		      arr.push({"user_id": user._id, checkin:[]});
-		      if (arr.length-1 == (num_user)){
-	  	      Team.save({
-              deadline: req.param('deadline'),
-              wager: req.param('wager'),
-		  	      name: req.param('name'),
-		  	      leader_id: req.user.id,
-		  	      users: arr
-		  	    }, function(error,docs){
 
-	            // uh oh, log the error, pass into handlebars
-	            if(err) {
-	              console.log(err);
-								obj.title = 'New Team';
-      					return res.render('team_new', obj);
-	            }
-              else if (!docs) {
-                res.redirect('/')
-              }
-              else {
-               res.redirect('/goal/new/' + docs._id);
-              }
-		  	    });
-		      }
-		    }
-	    });
-	  };
+
+    //remove dupes and blanks from the array
+    var arrResult = {};
+    var email_array = [];
+    for (var i = 0; i < num_user; i++) {
+      if (req.param('user'+(i+1)) !== '') {
+        arrResult[req.param('user'+(i+1))] = req.param('user'+(i+1));
+      }
+    }
+    var y = 0;    
+    for(var item in arrResult) {
+        email_array[y++] = arrResult[item];
+    }
+
+    if(email_array.length == 0){
+        Team.save({
+          deadline: req.param('deadline'),
+          wager: req.param('wager'),
+          name: req.param('name'),
+          leader_id: req.user.id,
+          users: arr
+        }, function(error,docs){
+
+          // uh oh, log the error, pass into handlebars
+          if(error) {
+            console.log(error);
+            obj.title = 'New Team';
+            return res.render('team_new', obj);
+          }
+          else if (!docs) {
+            res.redirect('/')
+          }
+          else {
+           res.redirect('/goal/new/' + docs._id);
+          }
+        });
+    }
+    else{
+      for (var i = 0; i < email_array.length; i++){
+        var x = i;
+        console.log(email_array[i]);
+        User.invite(email_array[x], function(err, user){
+          if (err){
+            console.log(err);
+            obj.title = 'New Team';
+            return res.render('team_new', obj);
+          }
+          else{
+            mailSignup(user, req.user.name, req.param('name'));
+            arr.push({"user_id": user._id, checkin:[]});
+
+            if (arr.length-1 == email_array.length){
+              Team.save({
+                deadline: req.param('deadline'),
+                wager: req.param('wager'),
+                name: req.param('name'),
+                leader_id: req.user.id,
+                users: arr
+              }, function(error,docs){
+
+                // uh oh, log the error, pass into handlebars
+                if(error) {
+                  console.log(error);
+                  obj.title = 'New Team';
+                  return res.render('team_new', obj);
+                }
+                else if (!docs) {
+                  res.redirect('/')
+                }
+                else {
+                 res.redirect('/goal/new/' + docs._id);
+                }
+              });
+            }
+          }
+        });
+      }
+    }
   });
 
   // Teams Page
@@ -423,16 +582,19 @@ module.exports = function(app, passport, debug) {
 
     //pass in email and name to html if they aren't problems
     if (obj.errors) {
+      console.log(obj.errors);
       res.redirect('/');
     }
-	  Team.checkin({
-		  user_id: req.user.id
-	   	, team_id: req.params.id
-      , amount: req.param('amount')
-      , status: req.param('status')
-	  }, function(error, docs){
-		  res.redirect('/')
-	  });
+    else{
+  	  Team.checkin({
+  		  user_id: req.user.id
+  	   	, team_id: req.params.id
+        , amount: req.param('amount')
+        , status: req.param('status')
+  	  }, function(error, docs){
+  		  res.redirect('/')
+  	  });
+    }
   });
 
   // Page for adding a comment/like to a checkin, will be removed
@@ -524,7 +686,6 @@ module.exports = function(app, passport, debug) {
                   user: user,
                   teams: doc_teams,
                   users: doc_users,
-                  user: user,
                   completed_teams: completed_teams,
                   num_checkins: num_checkins,
                   stylesheet:"user_hub.css"
@@ -558,6 +719,9 @@ module.exports = function(app, passport, debug) {
               checkin.user_id = team.users[i].user_id;
               checkin.user_name = doc_users[0][i].name;
               checkin.allcomments = [];
+              checkin.team_name = team.name;
+              checkin.unit = team.users[i].unit;
+              checkin.verb = team.users[i].verb_past;
               for (var k = 0; k < checkin.comments.length; k++) {
                 comment = JSON.parse(JSON.stringify(checkin.comments[k]));
                 for (var j = 0; j < doc_users[0].length; j++) {
@@ -569,7 +733,6 @@ module.exports = function(app, passport, debug) {
                 checkin.allcomments.push(comment);
               }
               checkin.allcomments.reverse();
-              allcheckins.push(checkin);
               allcheckins.push(checkin);
             }
           }
@@ -719,7 +882,6 @@ module.exports = function(app, passport, debug) {
 	
 	else{
 	  	Team.findCheckins(req.params.id, function(err, checkin_data) {
-	  		//console.log(checkin_data);
 	  		Team.findById(req.params.id, function(err,team){
 	  			var teamArray = [];
 	  			teamArray.push(team);
@@ -763,16 +925,14 @@ module.exports = function(app, passport, debug) {
     //Check useragent with a convoluted regex -> www.detectmobilebrowsers.com
     if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(ua)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(ua.substr(0,4))) {*/
         res.render('login', {stylesheet: 'login.css'});
-    /*
-    }
+    /*}
     //Else show the desktop landing page
     else {
       res.render('desktop',{
         title: 'Please use a mobile device!',
         stylesheet: "desktop.css"
       });
-    }
-    */
+    }*/
 
 /*
 var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
@@ -851,6 +1011,67 @@ client.on('error', console.log);
     });
   });
 
+  app.get("/forgot_password", function(req, res) {
+    User.findById(req.params.id, function(error, user){
+      res.render('forgot_password',{stylesheet: "/css/signup.css/"
+      });
+    });
+  });
+
+  app.post('/forgot_password', function(req, res) {
+    User.findByEmail(req.param('email'), function(error, user){
+      if (error === "no user"){
+        errors = {};
+        errors.email = "Email not found in database";
+        return res.render('forgot_password', errors);
+      }
+      else{
+        forgot_password(user);
+        return res.redirect("/");
+      }
+    });
+  });
+
+  app.get("/reset_password/:id", function(req, res) {
+    set_user_confirmed(req.params.id);
+    User.findById(req.params.id, function(error, user){
+      res.render('reset_password',{stylesheet: "/css/signup.css/",
+        email : user.email,
+        name : user.name,
+        user_id: user.id
+      });
+    });
+  });
+
+  app.post('/reset_password', function(req, res) {
+    req.assert('password', 
+      'Password must be at least 6 characters').len(6);
+    req.assert('password2', 'Passwords do not match').equals(req.body.password);
+    errors = req.validationErrors(true); //Object format
+    console.log(errors);
+    if (errors) {
+      res.render('reset_password/'+ req.param('user_id'),{stylesheet: "/css/signup.css/", errors:errors
+      });
+    }
+    else{
+      User.findById(req.param('user_id'), function(err, user) {
+        data = {};
+        data.password = req.param('password');
+        data.user_id = req.param('user_id');
+        User.changePassword(data, function(error, user){
+          if (error){
+            res.render('reset_password/'+ req.param('user_id'),{stylesheet: "/css/signup.css/"
+            });
+          }
+          else{
+            return res.redirect("/");
+          }
+        });
+      });
+    }
+  });
+
+
   app.get("/signup/:id", function(req, res) {
     set_user_confirmed(req.params.id);
     User.findById(req.params.id, function(error, user){
@@ -866,7 +1087,6 @@ client.on('error', console.log);
   });
 
   app.post('/signup', function(req, res) {
-    //Validate passed information
     req.assert('name', 'Name is required').notEmpty();
     req.assert('email', 'Valid email required').notEmpty().isEmail();
     req.assert('password', 
@@ -940,7 +1160,5 @@ client.on('error', console.log);
           });
       }
     });
-
-
   });
 }
