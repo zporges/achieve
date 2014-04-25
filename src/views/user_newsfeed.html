@@ -32,7 +32,7 @@
                 var uID = teams[i].users[k];
                 if (uID.user_id == user.id){
                   if (uID.checkin.length > 0){
-                    var time = uID.checkin[uID.checkin.length - 1].created.toDateString();%>
+                    var time = uID.checkin[uID.checkin.length - 1].created;%>
                     <%=time%>
                   <%}
                 else{%>
