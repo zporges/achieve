@@ -76,7 +76,7 @@ function reformatDate(element, checkin_status){
   else if (difference <  120000){
     element.text("1 minute ago");
   }
-  if (difference < 3600000){
+  else if (difference < 3600000){
     element.text(Math.round(difference/60000) + " minutes ago ");
   }
   else if (difference < 7200000){
