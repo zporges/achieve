@@ -14,16 +14,18 @@
       <% for(var i = 0; i < notifs.length; i++) {%>
         <div class="notification">
           <div class="info"> 
-            <span class="name">Someone</span>
-            <%= notifs[i].event_type %>ed on your check-in with
+            <span class="name"><%= notifs[i].user_name %></span>
+            <b><%= notifs[i].event_type %>ed</b> your checkin:
             "<%= notifs[i].info %>"
+            <br><br>
+            <span class="time"><%= notifs[i].created %></span>
           </div>
         </div>
       <% } %>
       
       <form method="post">
         <input type="hidden" name="cur_num" id="curNum" value=<%=load_num%> />
-        <input type="submit" value="Load More Notifs"/>
+        <input class="button" type="submit" value="Load More Notifs"/>
       </form>
 
     <!-- <a href= "getNotfis" onclick = "get_notifs()">Load More Notifications</a> -->
@@ -63,6 +65,7 @@
     <footer>
       <% include ejs/navbar.ejs %>
       <script type = "text/javascript" src = "../js/navbar.js"></script>
+      <script type = "text/javascript" src = "../js/homepage.js"></script>
     </footer>
   </div>
 </body>

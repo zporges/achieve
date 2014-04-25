@@ -40,15 +40,13 @@ function reminder_emails() {
           if (checkins.length > 0) {
             most_recent = checkins[checkins.length - 1].created;
             time_now = new Date();
-            console.log("hello");
             if (time_now - most_recent > 86400000) {
               // send a reminder email.
               //console.log("email sent for: " + users[k].user_id);
-              User.findById(users[k].user_id, function(error, user){     
-                if (user.opt_out_emails !== "never"){
-                    mailReminder(user);
-                }           
+              User.findById(users[k].user_id, function(error, user){                
+                mailReminder(user);
               });
+              
               ob.push(users[k].user_id);
             }
           }
@@ -90,7 +88,7 @@ function mail_confirm_account(user) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Confirm your account for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: user.name + ", thank you for signing up for Achieve! Click the following " +
       "link to confirm your account. If this is not you, please disregard this email. <br/>" + 
       link
@@ -119,7 +117,7 @@ function forgot_password(user) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Reset password for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: user.name + ", click the following " +
       "link to reset your password. If this is not you, please disregard this email. <br/>" + 
       link
@@ -154,7 +152,7 @@ function mailSignup(user, leader, groupname) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Sign up for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: leader + " has signed you up for the Achieve team:" + groupname +
     ". Click the following link to sign up for Achieve: <br/>" + linkSignup
   }
@@ -171,7 +169,7 @@ function mailSignup(user, leader, groupname) {
 
 // for faster performance, directly pass in the appropriate email link
 function mailReminder(user) {
-  linkSignup = host
+  linkSignup = host + "login/"
 
   // NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
   // console.log is necessary to make our code syncronous
@@ -183,12 +181,12 @@ function mailReminder(user) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Check In Today for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: "We noticed that you have not checked in for one of the teams you are in."+
     " Click the following link to check in your progress: <br/>" + linkSignup+
     "<br/><br/><br/><br/>"+
-    "If you want to opt-out of emails, sign in and set your reminder status as never"
-  }
+    "If you want to opt-out of emails, sign in and go into settings. Then set your reminder status as never"
+  };
   //TODO: uncomment this out to send email!
 
 
@@ -222,7 +220,7 @@ var mongoose = require('mongoose')
 
 module.exports = function(app, passport, debug) {
   auth = require('./auth')(passport);
-  host = debug ? 'localhost:8080/' : 'pact-groupgoals.rhcloud.com/';
+  host = debug ? 'localhost:8080/' : 'achieve-cornell.rhcloud.com/';
   app.get('/', auth.isAuthenticated, function(req, res) {    
     User.is_user_confirmed(req.user, function(err, is_confirmed) {
       if (err) {
@@ -252,6 +250,7 @@ module.exports = function(app, passport, debug) {
         });
       }
     });
+
     // gets information about every team that the user is in and all users in those teams
 	  Team.findList(req.user.teams,function(err, doc_teams){
 		  if (err){
@@ -263,6 +262,8 @@ module.exports = function(app, passport, debug) {
 					  console.log(err.message);
 				  }
 				  else{
+            console.log(doc_users);
+            console.log('------------------');
             var allcheckins = [];
 						for (var i = 0; i < doc_teams.length; i++){
               for (var x = 0; x < doc_teams[i].users.length;x++){
@@ -367,26 +368,26 @@ module.exports = function(app, passport, debug) {
     req.assert('name', 'Name is required').notEmpty();
     req.assert('deadline', 'Valid deadline required').notEmpty();
 
-	  //Checks to see the number of users and loops through the array 
+    //Checks to see the number of users and loops through the array 
     //and gets inputs based on number of users
-	  var num_user = parseInt(req.param('num_user'),10);
-	  var arr = [];
-	  //adds leader into array
-	  arr.push({"user_id": req.user.id, checkin:[]});
-	  for (var i = 0; i < num_user; i++){
-	     if (req.param('user'+(i+1)) !== '') {
+    var num_user = parseInt(req.param('num_user'),10);
+    var arr = [];
+    //adds leader into array
+    arr.push({"user_id": req.user.id, checkin:[]});
+    for (var i = 0; i < num_user; i++){
+       if (req.param('user'+(i+1)) !== '') {
          req.assert('user'+(i+1), 'Valid Email required').isEmail();
        }
-		}
+    }
     var obj = {}
     , errors = req.validationErrors(true); //Object format
     obj.errors = errors;
 
-		//TODO: Still needs to assert if deadline is after than today, Did not know how to convert
+    //TODO: Still needs to assert if deadline is after than today, Did not know how to convert
     //"html input date" type into Javascript Date type to compare the dates
     var now = new Date();
     var deadline = new Date(req.param('deadline'));
-		if (deadline < now){
+    if (deadline < now){
       if (obj.errors == null){
         obj.errors = {};
       }
@@ -400,8 +401,8 @@ module.exports = function(app, passport, debug) {
 
       console.log(obj);
       console.log(obj.errors);
-		}
-		if(obj.errors){
+    }
+    if(obj.errors){
       console.log()
         if (!obj.errors.name) {
           obj.name = req.param('name');
@@ -415,10 +416,10 @@ module.exports = function(app, passport, debug) {
         if (!obj.errors.user1) {
           obj.user1 = req.param('user1');
         }
-			obj.title = 'New Team';
+      obj.title = 'New Team';
       obj.user = req.user;
       return res.render('team_new', obj);
-		}
+    }
 
 
     //remove dupes and blanks from the array
@@ -553,10 +554,10 @@ module.exports = function(app, passport, debug) {
 
   // Notification Page
   app.get('/notifications/:id', auth.isAuthenticated, function(req,res){
-
     User.load_from_notifications(req.user.id, 10, function(err, arr){
-      // console.log("arr:::::: " + arr);
+      console.log("arr:::::: " + arr);
       User.findById(req.params.id, function(error, user){
+        console.log("test");
         res.render('notifications',{
           title: 'Notifications',
           user: user,
@@ -606,14 +607,14 @@ module.exports = function(app, passport, debug) {
       });
     }
     else{
-  	  Team.checkin({
-  		  user_id: req.user.id
-  	   	, team_id: req.params.id
+      Team.checkin({
+        user_id: req.user.id
+        , team_id: req.params.id
         , amount: req.param('amount')
         , status: req.param('status')
-  	  }, function(error, docs){
-  		  res.redirect('/')
-  	  });
+      }, function(error, docs){
+        res.redirect('/')
+      });
     }
   });
 
@@ -740,6 +741,7 @@ module.exports = function(app, passport, debug) {
               checkin.user_name = doc_users[0][i].name;
               checkin.allcomments = [];
               checkin.team_name = team.name;
+              checkin.team_id = team.id;
               checkin.unit = team.users[i].unit;
               checkin.verb = team.users[i].verb_past;
               for (var k = 0; k < checkin.comments.length; k++) {
@@ -835,7 +837,7 @@ module.exports = function(app, passport, debug) {
 
           //to past tense
           var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
-          var java_port = 15157;
+          var java_port = 15155;
           var net = require('net');
 
           var client = net.connect({port: java_port, host: java_host},
@@ -845,23 +847,23 @@ module.exports = function(app, passport, debug) {
           });
 
           client.on('data', function(data) {
-            client.end();
             console.log(data.toString());
             var past = data.toString();
             past = past.substring(past.indexOf("]")+2);
             user.verb_past = past;
             console.log("res: " + user.verb_past);
             finishloading();
+            client.end();
           });
 
           client.on('end', function() {
             console.log('client disconnected');
-            if (!user.verb_past) user.verb_past = "accomplished part of the goal";
+            if (!user.verb_past) user.verb_past = "accomplished part of the goal:";
             finishloading();
           });
 
           client.on('error', function() {
-            if (!user.verb_past) user.verb_past = "accomplished part of the goal";
+            if (!user.verb_past) user.verb_past = "accomplished part of the goal:";
             finishloading();
           });
         }
@@ -894,74 +896,62 @@ module.exports = function(app, passport, debug) {
 	}
   
   app.get("/team/progress/:id", auth.isAuthenticated, function(req, res) {
-	User.findById(req.user.id, function(err,user){
-	console.log(user);
-  	if (err){
-	  	console.log(err.message);
-  	}
-	
-	else{
-	  	Team.findCheckins(req.params.id, function(err, checkin_data) {
-	  		Team.findById(req.params.id, function(err,team){
-	  			var teamArray = [];
-	  			teamArray.push(team);
-	  			
-	  			User.findList(teamArray, function(err, doc_users){
-	  				if (err){
-		  				console.log(err.message);
-	  				}
-	  				else{
-	  					var allcheckins = [];
-	  					for(var i=0; i < team.users.length; i++){
-	  					if(doc_users[0][i] != null && doc_users[0][i].pending == false) {
-		  						var user = JSON.parse(JSON.stringify(team.users[i]));
-			  					user.user_name = doc_users[0][i].name;
-			  					user.team_start_date = teamArray[0].created;
-			  					user.team_end_date = teamArray[0].deadline;
-			  					allcheckins[i] = user;	  	
-		  					}				
-		  				}
-			  			console.log(req.params.id);
-			  			console.log(team);
-				      res.render('team_progress', {
-					  		title: "Team Progress",
-							stylesheet: "../../css/progress.css", 
-							checkins: allcheckins, 
-							user: user
-					    });
-	  				}	
-	  			});
-  			});
-		});		  		
-	}
-	
-	});
+  User.findById(req.user.id, function(err,user){
+  console.log(user);
+    if (err){
+      console.log(err.message);
+    }
+  
+  else{
+      Team.findCheckins(req.params.id, function(err, checkin_data) {
+        Team.findById(req.params.id, function(err,team){
+          var teamArray = [];
+          teamArray.push(team);
+          
+          User.findList(teamArray, function(err, doc_users){
+            if (err){
+              console.log(err.message);
+            }
+            else{
+              var allcheckins = [];
+              for(var i=0; i < team.users.length; i++){
+              if(doc_users[0][i] != null && doc_users[0][i].pending == false) {
+                  var user = JSON.parse(JSON.stringify(team.users[i]));
+                  user.user_name = doc_users[0][i].name;
+                  user.team_start_date = teamArray[0].created;
+                  user.team_end_date = teamArray[0].deadline;
+                  allcheckins[i] = user;      
+                }       
+              }
+              //console.log(req.params.id);
+              //console.log(team);
+              console.log(user);
+              console.log(user.id);
+
+              res.render('team_progress', {
+                title: "Team Progress",
+              stylesheet: "../../css/progress.css", 
+              checkins: allcheckins, 
+              team: team,
+              user: req.user
+              });
+            } 
+          });
+        });
+    });         
+  }
+  
+  });
   });
 
   app.get('/login', function(req, res) {
-    /*
     //If user is on mobile, show the login page
     var ua = req.headers['user-agent'].toLowerCase();
     //Check useragent with regular expressions
-    var ios = /ip(hone|od|ad)/.test(ua)||/ip(hone|od|ad)/.test(ua.substr(0,4));
-    var android = /android/.test(ua)||/android/.test(ua.substr(0,4));
-    var safari = /safari/.test(ua) || /safari/.test(ua.substr(0,4));
-    if(ios) {
-      //If we are in the app and not mobile safari, render the app
-      if (!safari) {*/
-        res.render('login', {stylesheet: 'login.css'});
-      /*}
-      //else redirect to appstore or to the app
-      else {
-        // If "custom-uri://" is registered the app will launch immediately and your
-        // timer won't fire. If it's not set, you'll get an ugly "Cannot Open Page"
-        // dialogue prior to the App Store application launching ... some solutions 
-        // I thought of included altering the UA, but express/consolidate doesn't like that.
-        res.render('redirect');
-      }
-    }
-    if(android) {
-      //TODO:
+    var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
+    if(mobile) {
+      //If we are on a mobile device, render the app
+      res.render('login',{stylesheet: "login.css"});
     }
     //Else show the desktop landing page
     else {
@@ -969,7 +959,7 @@ module.exports = function(app, passport, debug) {
         title: 'Please use a mobile device!',
         stylesheet: "desktop.css"
       });
-    }*/
+    }
 
 /*
 var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
@@ -997,12 +987,27 @@ client.on('error', console.log);
   });
 
   app.get("/login/:id", function(req, res) {
-    User.findById(req.params.id, function(error, user){
-      res.render('login',{
-        email : user.email,
-        name : user.name
+    //If user is on mobile, show the login page
+    var ua = req.headers['user-agent'].toLowerCase();
+    //Check useragent with regular expressions
+    var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
+    if(mobile) {
+      //If we are on a mobile device, render the app
+      set_user_confirmed(req.params.id);
+      User.findById(req.params.id, function(error, user){
+        res.render('login',{
+          email : user.email,
+          name : user.name
+        });
       });
-    });
+    }
+    //Else show the desktop landing page
+    else {
+      res.render('desktop',{
+        title: 'Please use a mobile device!',
+        stylesheet: "desktop.css"
+      });
+    }
   });
 
   app.get('/logout', function(req, res){
@@ -1050,10 +1055,24 @@ client.on('error', console.log);
   });
 
   app.get("/forgot_password", function(req, res) {
-    User.findById(req.params.id, function(error, user){
-      res.render('forgot_password',{stylesheet: "/css/signup.css/"
+    //If user is on mobile, show the login page
+    var ua = req.headers['user-agent'].toLowerCase();
+    //Check useragent with regular expressions
+    var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
+    if(mobile) {
+      //If we are on a mobile device, render the app
+      User.findById(req.params.id, function(error, user){
+        res.render('forgot_password',{stylesheet: "/css/signup.css/"
+        });
       });
-    });
+    }
+    //Else show the desktop landing page
+    else {
+      res.render('desktop',{
+        title: 'Please use a mobile device!',
+        stylesheet: "desktop.css"
+      });
+    }
   });
 
   app.post('/forgot_password', function(req, res) {
@@ -1071,60 +1090,117 @@ client.on('error', console.log);
   });
 
   app.get("/reset_password/:id", function(req, res) {
-    set_user_confirmed(req.params.id);
-    User.findById(req.params.id, function(error, user){
-      res.render('reset_password',{stylesheet: "/css/signup.css/",
-        email : user.email,
-        name : user.name,
-        user_id: user.id
+    //If user is on mobile, show the login page
+    var ua = req.headers['user-agent'].toLowerCase();
+    //Check useragent with regular expressions
+    var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
+    if(mobile) {
+      //If we are on a mobile device, render the app
+      set_user_confirmed(req.params.id);
+      User.findById(req.params.id, function(error, user){
+        res.render('reset_password',{stylesheet: "/css/signup.css/",
+          email : user.email,
+          name : user.name,
+          user_id: user.id
+        });
       });
-    });
+    }
+    //Else show the desktop landing page
+    else {
+      res.render('desktop',{
+        title: 'Please use a mobile device!',
+        stylesheet: "desktop.css"
+      });
+    }
   });
 
   app.post('/reset_password', function(req, res) {
-    req.assert('password', 
-      'Password must be at least 6 characters').len(6);
-    req.assert('password2', 'Passwords do not match').equals(req.body.password);
-    errors = req.validationErrors(true); //Object format
-    console.log(errors);
-    if (errors) {
-      res.render('reset_password/'+ req.param('user_id'),{stylesheet: "/css/signup.css/", errors:errors
-      });
-    }
-    else{
-      User.findById(req.param('user_id'), function(err, user) {
-        data = {};
-        data.password = req.param('password');
-        data.user_id = req.param('user_id');
-        User.changePassword(data, function(error, user){
-          if (error){
-            res.render('reset_password/'+ req.param('user_id'),{stylesheet: "/css/signup.css/"
-            });
-          }
-          else{
-            return res.redirect("/");
-          }
+    //If user is on mobile, show the login page
+    var ua = req.headers['user-agent'].toLowerCase();
+    //Check useragent with regular expressions
+    var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
+    if(mobile) {
+      //If we are on a mobile device, render the app
+      req.assert('password', 
+        'Password must be at least 6 characters').len(6);
+      req.assert('password2', 'Passwords do not match').equals(req.body.password);
+      errors = req.validationErrors(true); //Object format
+      console.log(errors);
+      if (errors) {
+        res.render('reset_password/'+ req.param('user_id'),{stylesheet: "/css/signup.css/", errors:errors
         });
+      }
+      else{
+        User.findById(req.param('user_id'), function(err, user) {
+          data = {};
+          data.password = req.param('password');
+          data.user_id = req.param('user_id');
+          User.changePassword(data, function(error, user){
+            if (error){
+              res.render('reset_password/'+ req.param('user_id'),{stylesheet: "/css/signup.css/"
+              });
+            }
+            else{
+              return res.redirect("/");
+            }
+          });
+        });
+      }
+    }
+    //Else show the desktop landing page
+    else {
+      res.render('desktop',{
+        title: 'Please use a mobile device!',
+        stylesheet: "desktop.css"
       });
     }
   });
 
 
   app.get("/signup/:id", function(req, res) {
-    set_user_confirmed(req.params.id);
-    User.findById(req.params.id, function(error, user){
-      res.render('signup',{stylesheet: "/css/signup.css/",
-        email : user.email,
-        name : user.name,
+    //If user is on mobile, show the ` page
+    var ua = req.headers['user-agent'].toLowerCase();
+    //Check useragent with regular expressions
+    var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
+    if(mobile) {
+      //If we are on a mobile device, render the app
+        set_user_confirmed(req.params.id);
+        User.findById(req.params.id, function(error, user){
+          res.render('signup',{stylesheet: "/css/signup.css/",
+            email : user.email,
+            name : user.name,
+          });
+        });
+      }
+    //Else show the desktop landing page
+    else {
+      res.render('desktop',{
+        title: 'Please use a mobile device!',
+        stylesheet: "desktop.css"
       });
-    });
+    }
   });
 
   app.get("/signup", function(req, res) {
-    res.render('signup', {stylesheet: "signup.css"});
+    //If user is on mobile, show the login page
+    var ua = req.headers['user-agent'].toLowerCase();
+    //Check useragent with regular expressions
+    var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
+    if(mobile) {
+      //If we are on a mobile device, render the app
+      res.render('signup', {stylesheet: "signup.css"});
+    }
+    //Else show the desktop landing page
+    else {
+      res.render('desktop',{
+        title: 'Please use a mobile device!',
+        stylesheet: "desktop.css"
+      });
+    }
   });
 
   app.post('/signup', function(req, res) {
+    //Validate passed information
     req.assert('name', 'Name is required').notEmpty();
     req.assert('email', 'Valid email required').notEmpty().isEmail();
     req.assert('password', 

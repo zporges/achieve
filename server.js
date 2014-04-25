@@ -171,15 +171,17 @@ var p = process.env.OPENSHIFT_NODEJS_PORT
 var java_port = p || 15157;
 var exec = require('child_process').exec;
 var child;
+console.log("--->>>" + __dirname);
 
-java_command = "java -Djava.library.path=$PWD/NLPj "
+//java_command = "java -Djava.library.path=$PWD/NLPj "
+java_command = "java -Djava.library.path=" + __dirname + "/NLPj:NLPj "
 java_command += "-cp NLPj/stanford-parser-3.3.1-models.jar:"
 java_command += "NLPj/stanford-parser.jar:"
 java_command += "NLPj/stanford-postagger-3.3.1.jar:"
 java_command += "NLPj/simplenlg-v4.4.2.jar:"
 java_command += "NLPj/ejml-0.23.jar:"
 java_command += "NLPj/jnisvmlight.jar:"
-java_command += "NLPj/jsoup-1.7.3.jar:"
+//java_command += "NLPj/jsoup-1.7.3.jar:"
 java_command += "NLPj/stanford-corenlp-3.3.1.jar:"
 java_command += "NLPj/stanford-corenlp-3.3.1-models.jar:"
 java_command += "NLPj Server "
