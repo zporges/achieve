@@ -14,8 +14,8 @@ $(document).ready(function(){
     reformatDate($(element), true);
   });
 
-  $(".time").each(function(index, element) {
-    reformatDate($(element), true);
+  $(".info .time").each(function(index, element) {
+    reformatDate($(element), false);
   });
 
   $(".checkin_box").click(function(e){
@@ -66,7 +66,6 @@ function reformatDate(element, checkin_status){
       element.parent().prev().prev().find(".fill").css("fill", "#61cf80");
     }
   }
-
   else if (difference < 1000){
     element.text("1 second ago ");
   }
