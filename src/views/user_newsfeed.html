@@ -78,13 +78,14 @@
                   } output+='}'%>
                   <%=output%><br/>
           </li> -->
+
           <div class = "progress_box">
             <div class = "main_progress">
-              <h3><span class = "name"><%=allcheckins[i].user_name%></span> <%=allcheckins[i].verb%>: <span class = "amount"><%= allcheckins[i].amount%> <%= allcheckins[i].unit %></span>.</h3>
+              <h3><span class = "name"><%=allcheckins[i].user_name%></span> <%=allcheckins[i].verb%> <span class = "amount"><%= allcheckins[i].amount%> <%= allcheckins[i].unit %></span>.</h3>
               <p>"<%=allcheckins[i].status%>"</p>
               <h4><span><%=time%> </span> <%=commentSize%> comments <%=likeSize%> likes</h4>
             </div>
-            <%for(var k = 0; k<allcheckins[i].allcomments.length; k++){%>
+            <%for(var k = allcheckins[i].allcomments.length - 1; k>=0; k--){%>
               <div class = "progress_comment">
                 <h4>"<%= allcheckins[i].allcomments[k].text %>"</h4>
                 <p><span class = "name"><%= allcheckins[i].allcomments[k].name %></span> commented <span class = "time"><%= allcheckins[i].allcomments[k].created %></span></p>

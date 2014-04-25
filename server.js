@@ -168,10 +168,26 @@ pact.start();
 
 var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
 var p = process.env.OPENSHIFT_NODEJS_PORT
-var java_port = p || 15155;
+var java_port = p || 15157;
 var exec = require('child_process').exec;
 var child;
+console.log("--->>>" + __dirname);
 
+//java_command = "java -Djava.library.path=$PWD/NLPj "
+java_command = "java -Djava.library.path=" + __dirname + "/NLPj:NLPj "
+java_command += "-cp NLPj/stanford-parser-3.3.1-models.jar:"
+java_command += "NLPj/stanford-parser.jar:"
+java_command += "NLPj/stanford-postagger-3.3.1.jar:"
+java_command += "NLPj/simplenlg-v4.4.2.jar:"
+java_command += "NLPj/ejml-0.23.jar:"
+java_command += "NLPj/jnisvmlight.jar:"
+//java_command += "NLPj/jsoup-1.7.3.jar:"
+java_command += "NLPj/stanford-corenlp-3.3.1.jar:"
+java_command += "NLPj/stanford-corenlp-3.3.1-models.jar:"
+java_command += "NLPj Server "
+java_command += java_host + " " + java_port
+
+/*
 java_command = "java -cp "
 java_command += "NLPj/stanford-parser-3.3.1-models.jar:"
 java_command += "NLPj/stanford-parser.jar:"
@@ -179,6 +195,8 @@ java_command += "NLPj/stanford-postagger-3.3.1.jar:"
 java_command += "NLPj/simplenlg-v4.4.2.jar:"
 java_command += "NLPj Server "
 java_command += java_host + " " + java_port
+*/
+
 
 child = exec(java_command,
    function (error, stdout, stderr) {
@@ -226,5 +244,23 @@ setTimeout(function() {
   });
 }, 1000);
 
+setTimeout(function() {
+  var net = require('net');
+
+  var client = net.connect({port: java_port, host: java_host},
+    function() {
+      console.log('client connected');
+      client.write('getAdvice;study;this is the worst;\r\n');
+  });
+  client.on('data', function(data) {
+    console.log(data.toString());
+    client.end();
+  });
+  client.on('end', function() {
+    console.log('client disconnected');
+  });
+  client.on('error', console.log);
+  
+}, 5000);
 
 

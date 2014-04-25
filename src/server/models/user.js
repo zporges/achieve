@@ -12,6 +12,7 @@ var mongoose = require('mongoose')
     , hash: String
     , created: {type: Date, default: Date.now}
     , pending: {type: Boolean, default: false }
+    , opt_out_emails: String
     , user_confirmed: {type: Boolean, default: false}  // is account confirmed via email
 		, teams: [{
       team_id: String
@@ -282,6 +283,9 @@ var mongoose = require('mongoose')
         }
         if (data.gender) {
           user.gender = data.gender;
+        }
+        if(data.opt_out_emails ){
+          user.opt_out_emails = data.opt_out_emails;
         }
         if(data.password && data.password2 && data.password === data.password2) {
           bcrypt.genSalt(10, function(err, salt) {

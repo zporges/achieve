@@ -37,11 +37,14 @@
           %>
             <div class = "progress_box">
             <div class = "main_progress">
-              <h3><span class = "name"><%=allcheckins[i].user_name%></span> completed <span class = "amount"><%= allcheckins[i].amount%> <%= allcheckins[i].unit %></span> of their goal.</h3>
+              <h3>
+                <span class = "name"><%=allcheckins[i].user_name%></span> 
+                completed <span class = "amount"><%= allcheckins[i].amount%> <%= allcheckins[i].unit %></span> of their goal.
+              </h3>
               <p>"<%=allcheckins[i].status%>"</p>
               <h4><span><%=time%> </span> <%=commentSize%> comments <%=likeSize%> likes</h4>
             </div>
-            <%for(var k = 0; k<allcheckins[i].allcomments.length; k++){%>
+            <%for(var k = allcheckins[i].allcomments.length - 1; k>= 0; k--){%>
               <div class = "progress_comment">
                 <h4>"<%= allcheckins[i].allcomments[k].text %>"</h4>
                 <p><span class = "name"><%= allcheckins[i].allcomments[k].name %></span> commented <span class = "time">
@@ -49,7 +52,7 @@
               </div>
             <%}%>
               <div class = "progress_comment add_comment">
-                <form method= "post" action="/team/<%= allcheckins[i].team_id %>/checkin/comment/<%= allcheckins[i]._id %>">
+                <form method= "post" action="../../team/<%= allcheckins[i].team_id %>/checkin/comment/<%= allcheckins[i]._id %>">
                   <div class = "comment_box">
                     <textarea rows="1" cols="50" name="comment" placeholder="Add Comment..."></textarea><br>
                   </div>
@@ -66,9 +69,9 @@
 
   <footer>
     <% include ejs/navbar.ejs %>
-    <script type = "text/javascript" src = "../js/navbar.js"></script>
+    <script type = "text/javascript" src = "../../js/navbar.js"></script>
     <% include ejs/secondary_navbar2.ejs %>
-    <script type = "text/javascript" src = "js/homepage.js"></script>
+    <script type = "text/javascript" src = "../../js/homepage.js"></script>
   </footer>
   </div>
 </body>

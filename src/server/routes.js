@@ -44,9 +44,10 @@ function reminder_emails() {
               // send a reminder email.
               //console.log("email sent for: " + users[k].user_id);
               User.findById(users[k].user_id, function(error, user){                
-                mailReminder(user);
-              });
-              
+                if (user.opt_out_emails !== "never"){
+                    mailReminder(user);
+                }   
+              });  
               ob.push(users[k].user_id);
             }
           }
@@ -88,7 +89,7 @@ function mail_confirm_account(user) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Confirm your account for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: user.name + ", thank you for signing up for Achieve! Click the following " +
       "link to confirm your account. If this is not you, please disregard this email. <br/>" + 
       link
@@ -117,7 +118,7 @@ function forgot_password(user) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Reset password for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: user.name + ", click the following " +
       "link to reset your password. If this is not you, please disregard this email. <br/>" + 
       link
@@ -155,7 +156,10 @@ function mailSignup(user, leader, groupname) {
     text: "necessary?",
     html: "<table align = \"center\" border = \"1\" cellpadding = \"0\" cellspacing = \"0\" width = \"100%\"style= \"border-collapse: collapse;\"><tr><td bgcolor = \"#5fcf80\" height = \"30%\"><h1 style= \" font-size: 200%; margin-left: 15%; color: #ffffff; font-family: 'Open Sans', Helvetica, Arial, sans-serif; \">Achieve</h1></td></tr><tr style=\"padding-top: 0;\"><td bgcolor = \"#ced6dc\" height = \"100%\" width = \"80%\" style=\" color; #000000; font-family: 'Open Sans', Helvetica, Arial, sans-serif; padding-top: 0px; padding-bottom:0px;\"><div style=\"margin-top:0px; margin-bottom:0px; margin-left: auto; margin-right:auto; padding: 15% 15% 10% 15%;font-size: 150%; background-color: #ffffff; width: 80%; height:100%;\"><span style= \"font-size: 100%;\">Hi, </span><br/><br/>Your friend "+leader+"invited you to join team: "+ groupname+ ". Now you can work towards your goals with your friends.Click the following link to sign up for Achieve:<br/><br/><a style= \"background-color:#378cab; width: 20%; height: 10%; color: #ffffff; font-size: 80%; text-decoration:none; padding: 2% 5% 2% 5%; margin-left:16%; margin-right:auto;\" href = \""+ linkSignup + "\">Sign up</a><br/><br/><br/></div></td></tr><tr><td bgcolor = \"#384047\" height = \"30px\"></td></tr></table>"
   }
-
+    text: "Message from Achieve",
+    html: leader + " has signed you up for the Achieve team:" + groupname +
+    ". Click the following link to sign up for Achieve: <br/>" + linkSignup
+  }
   //TODO: uncomment this out to send email!
 
   smtpTransport.sendMail(mailOptions, function(error, response){
@@ -169,7 +173,7 @@ function mailSignup(user, leader, groupname) {
 
 // for faster performance, directly pass in the appropriate email link
 function mailReminder(user) {
-  linkSignup = host
+  linkSignup = host + "login/"
 
   // NOTE: VERY IMPORTANT. DO NOT REMOVE CONSOLE.LOG
   // console.log is necessary to make our code syncronous
@@ -185,6 +189,12 @@ function mailReminder(user) {
     text: "necessary?",
     html: "<table align = \"center\" border = \"1\" cellpadding = \"0\" cellspacing = \"0\" width = \"100%\"style= \"border-collapse: collapse;\"><tr><td bgcolor = \"#5fcf80\" height = \"30%\"><h1 style= \" font-size: 250%; margin-left: 15%; padding-top: 5%; color: #ffffff; font-family: 'Open Sans', Helvetica, Arial, sans-serif; \">Achieve</h1></td></tr><tr style=\"padding-top: 0;\"><td bgcolor = \"#ced6dc\" height = \"100%\" width = \"80%\" style=\" color; #000000; font-family: 'Open Sans', Helvetica, Arial, sans-serif; padding-top: 0px; padding-bottom:0px;\"><div style=\"margin-top:0px; margin-bottom:0px; margin-left: auto; margin-right:auto; padding: 15% 15% 10% 15%;font-size: 150%; background-color: #ffffff; width: 80%; height:100%;\"><span style= \"font-size: 100%;\">Hi, "+user.name+"</span><br/><br/>Here is your daily reminder from Achieve<br/><br/>Did you make any progress today?<br/><br/>If yes, please click on the following link to check-in.<br/><br/>If not yet, please keep working towards your goal.<br/><br/><br/><a style= \"background-color:#378cab; width: 20%; height: 10%; color: #ffffff; font-size: 80%; text-decoration:none; padding: 2% 5% 2% 5%; margin-left:16%; margin-right:auto;\" href = \""+ linkSignup + "\">check-in progress</a><br/><br/><br/></div></td></tr><tr><td bgcolor = \"#384047\" height = \"30px\"></td></tr></table>"
   }
+    text: "Message from Achieve",
+    html: "We noticed that you have not checked in for one of the teams you are in."+
+    " Click the following link to check in your progress: <br/>" + linkSignup+
+    "<br/><br/><br/><br/>"+
+    "If you want to opt-out of emails, sign in and go into settings. Then set your reminder status as never"
+  };
   //TODO: uncomment this out to send email!
 
 
@@ -218,7 +228,7 @@ var mongoose = require('mongoose')
 
 module.exports = function(app, passport, debug) {
   auth = require('./auth')(passport);
-  host = debug ? 'localhost:8080/' : 'pact-groupgoals.rhcloud.com/';
+  host = debug ? 'localhost:8080/' : 'achieve-cornell.rhcloud.com/';
   app.get('/', auth.isAuthenticated, function(req, res) {    
     User.is_user_confirmed(req.user, function(err, is_confirmed) {
       if (err) {
@@ -248,22 +258,19 @@ module.exports = function(app, passport, debug) {
         });
       }
     });
-
     // gets information about every team that the user is in and all users in those teams
 	  Team.findList(req.user.teams,function(err, doc_teams){
-		  if (err){
-			  console.log(err.message);
-		  }
-		  else{
-			  User.findList(doc_teams,function(err, doc_users){
-				  if (err){
-					  console.log(err.message);
-				  }
-				  else{
-            console.log(doc_users);
-            console.log('------------------');
+      if (err){
+        console.log(err.message);
+      }
+      else{
+        User.findList(doc_teams,function(err, doc_users){
+          if (err){
+            console.log(err.message);
+          }
+          else{
             var allcheckins = [];
-						for (var i = 0; i < doc_teams.length; i++){
+            for (var i = 0; i < doc_teams.length; i++){
               for (var x = 0; x < doc_teams[i].users.length;x++){
                 for (var t =0; t<doc_teams[i].users[x].checkin.length;t++){
                   checkin = JSON.parse(JSON.stringify(doc_teams[i].users[x].checkin[t]));
@@ -291,22 +298,23 @@ module.exports = function(app, passport, debug) {
               }
               var now = new Date();
               //now.setDate(now.getDate() +1);
-							//figure out if deadline includes the last day
-							doc_teams[i].countdown = Math.floor((doc_teams[i].deadline - now) / 86400000)
-							if (doc_teams[i].deadline < now){
-								doc_teams[i].has_deadline_passed = true;
-								doc_teams[i].save(function(err, team, num) {
-			            if(err) {
-			              res.send(err.message);
-			            }
-			          });
-							}
-						}
+              //figure out if deadline includes the last day
+              doc_teams[i].countdown = Math.floor((doc_teams[i].deadline - now) / 86400000)
+              if (doc_teams[i].deadline < now){
+                doc_teams[i].has_deadline_passed = true;
+                doc_teams[i].save(function(err, team, num) {
+                  if(err) {
+                    res.send(err.message);
+                  }
+                });
+              }
+            }
             allcheckins.sort(function(a, b) {
               a = new Date(a.created);
               b = new Date(b.created);
               return a>b ? -1 : a<b ? 1 : 0;
             });
+
             mailReminder(req.user);
 
 					  res.render('user_newsfeed', {
@@ -314,12 +322,18 @@ module.exports = function(app, passport, debug) {
 		  		    teams: doc_teams,
 						  users: doc_users,
 		          user: req.user,
+
+            res.render('user_newsfeed', {
+              title: "Personalized Newsfeed",
+              teams: doc_teams,
+              users: doc_users,
+              user: req.user,
               allcheckins: allcheckins
-			      });
-				  }
-			  });
-		  }
-	  });
+            });
+          }
+        });
+      }
+    });
   });
 
   app.get('/resend_redirect', function(req, res){
@@ -368,48 +382,58 @@ module.exports = function(app, passport, debug) {
     req.assert('name', 'Name is required').notEmpty();
     req.assert('deadline', 'Valid deadline required').notEmpty();
 
-	  //Checks to see the number of users and loops through the array 
+    //Checks to see the number of users and loops through the array 
     //and gets inputs based on number of users
-	  var num_user = parseInt(req.param('num_user'),10);
-	  var arr = [];
-	  //adds leader into array
-	  arr.push({"user_id": req.user.id, checkin:[]});
-	  for (var i = 0; i < num_user; i++){
-	     if (req.param('user'+(i+1)) !== '') {
+    var num_user = parseInt(req.param('num_user'),10);
+    var arr = [];
+    //adds leader into array
+    arr.push({"user_id": req.user.id, checkin:[]});
+    for (var i = 0; i < num_user; i++){
+       if (req.param('user'+(i+1)) !== '') {
          req.assert('user'+(i+1), 'Valid Email required').isEmail();
        }
-		}
+    }
     var obj = {}
     , errors = req.validationErrors(true); //Object format
     obj.errors = errors;
 
-		//TODO: Still needs to assert if deadline is after than today, Did not know how to convert
+    //TODO: Still needs to assert if deadline is after than today, Did not know how to convert
     //"html input date" type into Javascript Date type to compare the dates
     var now = new Date();
-    now.setDate(now.getDate());
-		var deadline = new Date();
-		if (req.param('deadline') > now){
-			obj.errors.deadline.param = "deadline";
-			obj.errors.deadline.msg = "Valid deadline is required";
-			obj.errors.deadline.value= '';
-		}
-		if(errors){
-        if (!errors.name) {
+    var deadline = new Date(req.param('deadline'));
+    if (deadline < now){
+      if (obj.errors == null){
+        obj.errors = {};
+      }
+      var deadline_error = {
+            param: "deadline"
+          , msg : "Deadline must be in the future"
+          , value : req.param('deadline')
+        };
+
+      obj.errors.deadline = deadline_error;
+
+      console.log(obj);
+      console.log(obj.errors);
+    }
+    if(obj.errors){
+      console.log()
+        if (!obj.errors.name) {
           obj.name = req.param('name');
         }
-        if (!errors.deadline) {
+        if (!obj.errors.deadline) {
           obj.deadline = req.param('deadline');
         }
         if (req.param('wager') != null || req.param('wager') != "") {
           obj.wager = req.param('wager');
         }
-        if (!errors.user1) {
+        if (!obj.errors.user1) {
           obj.user1 = req.param('user1');
         }
-			obj.title = 'New Team';
+      obj.title = 'New Team';
       obj.user = req.user;
       return res.render('team_new', obj);
-		}
+    }
 
 
     //remove dupes and blanks from the array
@@ -531,7 +555,12 @@ module.exports = function(app, passport, debug) {
     if(req.param('password2') != '') {
       data.password2 = req.param('password');
     }
-    if(req.param(''))
+    if(req.param('never') == "never") {
+      data.opt_out_emails = req.param('never');
+    }
+    else{
+      data.opt_out_emails = "daily";
+    }
     User.changeProfile(data, function(err, user) {
       res.redirect('/user/settings');
     });
@@ -539,10 +568,10 @@ module.exports = function(app, passport, debug) {
 
   // Notification Page
   app.get('/notifications/:id', auth.isAuthenticated, function(req,res){
-
     User.load_from_notifications(req.user.id, 10, function(err, arr){
-      // console.log("arr:::::: " + arr);
+      console.log("arr:::::: " + arr);
       User.findById(req.params.id, function(error, user){
+        console.log("test");
         res.render('notifications',{
           title: 'Notifications',
           user: user,
@@ -582,18 +611,24 @@ module.exports = function(app, passport, debug) {
 
     //pass in email and name to html if they aren't problems
     if (obj.errors) {
-      console.log(obj.errors);
-      res.redirect('/');
+      Team.checkin({
+        user_id: req.user.id
+        , team_id: req.params.id
+        , amount: 0
+        , status: req.param('status')
+      }, function(error, docs){
+        res.redirect('/')
+      });
     }
     else{
-  	  Team.checkin({
-  		  user_id: req.user.id
-  	   	, team_id: req.params.id
+      Team.checkin({
+        user_id: req.user.id
+        , team_id: req.params.id
         , amount: req.param('amount')
         , status: req.param('status')
-  	  }, function(error, docs){
-  		  res.redirect('/')
-  	  });
+      }, function(error, docs){
+        res.redirect('/')
+      });
     }
   });
 
@@ -720,6 +755,7 @@ module.exports = function(app, passport, debug) {
               checkin.user_name = doc_users[0][i].name;
               checkin.allcomments = [];
               checkin.team_name = team.name;
+              checkin.team_id = team.id;
               checkin.unit = team.users[i].unit;
               checkin.verb = team.users[i].verb_past;
               for (var k = 0; k < checkin.comments.length; k++) {
@@ -873,66 +909,71 @@ module.exports = function(app, passport, debug) {
     });
 	}
   
-  app.get("/team/progress/:id", auth.isAuthenticated, function(req, res) {
-	User.findById(req.user.id, function(err,user){
-	console.log(user);
-  	if (err){
-	  	console.log(err.message);
-  	}
-	
-	else{
-	  	Team.findCheckins(req.params.id, function(err, checkin_data) {
-	  		Team.findById(req.params.id, function(err,team){
-	  			var teamArray = [];
-	  			teamArray.push(team);
-	  			
-	  			User.findList(teamArray, function(err, doc_users){
-	  				if (err){
-		  				console.log(err.message);
-	  				}
-	  				else{
-	  					var allcheckins = [];
-	  					for(var i=0; i < team.users.length; i++){
-	  					if(doc_users[0][i] != null && doc_users[0][i].pending == false) {
-		  						var user = JSON.parse(JSON.stringify(team.users[i]));
-			  					user.user_name = doc_users[0][i].name;
-			  					user.team_start_date = teamArray[0].created;
-			  					user.team_end_date = teamArray[0].deadline;
-			  					allcheckins[i] = user;	  	
-		  					}				
-		  				}
-			  			console.log(req.params.id);
-			  			console.log(team);
-					  	res.render('team_progress', {
-					  		title: "Team Progress",
-							stylesheet: "../../css/progress.css", 
-							checkins: allcheckins, 
-							user: user
-					    });
-	  				}	
-	  			});
-  			});
-		});		  		
-	}
-	
-	});
+app.get("/team/progress/:id", auth.isAuthenticated, function(req, res) {
+  User.findById(req.user.id, function(err,user){
+  console.log(user);
+    if (err){
+      console.log(err.message);
+    }
+  
+  else{
+      Team.findCheckins(req.params.id, function(err, checkin_data) {
+        Team.findById(req.params.id, function(err,team){
+          var teamArray = [];
+          teamArray.push(team);
+          
+          User.findList(teamArray, function(err, doc_users){
+            if (err){
+              console.log(err.message);
+            }
+            else{
+              var allcheckins = [];
+              for(var i=0; i < team.users.length; i++){
+              if(doc_users[0][i] != null && doc_users[0][i].pending == false) {
+                  var user = JSON.parse(JSON.stringify(team.users[i]));
+                  user.user_name = doc_users[0][i].name;
+                  user.team_start_date = teamArray[0].created;
+                  user.team_end_date = teamArray[0].deadline;
+                  allcheckins[i] = user;      
+                }       
+              }
+              //console.log(req.params.id);
+              //console.log(team);
+              console.log(user);
+              console.log(user.id);
+
+              res.render('team_progress', {
+                title: "Team Progress",
+              stylesheet: "../../css/progress.css", 
+              checkins: allcheckins, 
+              team: team,
+              user: req.user
+              });
+            } 
+          });
+        });
+    });         
+  }
+  
+  });
   });
 
   app.get('/login', function(req, res) {
-    /*
     //If user is on mobile, show the login page
     var ua = req.headers['user-agent'].toLowerCase();
-    //Check useragent with a convoluted regex -> www.detectmobilebrowsers.com
-    if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i.test(ua)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(ua.substr(0,4))) {*/
-        res.render('login', {stylesheet: 'login.css'});
-    /*}
+    //Check useragent with regular expressions
+    var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
+    if(mobile) {
+      //If we are on a mobile device, render the app
+      res.render('login',{stylesheet: "login.css"});
+    }
     //Else show the desktop landing page
     else {
       res.render('desktop',{
         title: 'Please use a mobile device!',
         stylesheet: "desktop.css"
       });
-    }*/
+    }
 
 /*
 var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
@@ -947,6 +988,7 @@ var client = net.connect({port: python_port, host: python_host},
   console.log('client connected');
   client.write('toPastTense clean my room\r\n');
 });
+
 client.on('data', function(data) {
   console.log(data.toString());
   client.end();
@@ -959,12 +1001,27 @@ client.on('error', console.log);
   });
 
   app.get("/login/:id", function(req, res) {
-    User.findById(req.params.id, function(error, user){
-      res.render('login',{
-        email : user.email,
-        name : user.name
+    //If user is on mobile, show the login page
+    var ua = req.headers['user-agent'].toLowerCase();
+    //Check useragent with regular expressions
+    var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
+    if(mobile) {
+      //If we are on a mobile device, render the app
+      set_user_confirmed(req.params.id);
+      User.findById(req.params.id, function(error, user){
+        res.render('login',{
+          email : user.email,
+          name : user.name
+        });
       });
-    });
+    }
+    //Else show the desktop landing page
+    else {
+      res.render('desktop',{
+        title: 'Please use a mobile device!',
+        stylesheet: "desktop.css"
+      });
+    }
   });
 
   app.get('/logout', function(req, res){
@@ -1012,10 +1069,24 @@ client.on('error', console.log);
   });
 
   app.get("/forgot_password", function(req, res) {
-    User.findById(req.params.id, function(error, user){
-      res.render('forgot_password',{stylesheet: "/css/signup.css/"
+    //If user is on mobile, show the login page
+    var ua = req.headers['user-agent'].toLowerCase();
+    //Check useragent with regular expressions
+    var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
+    if(mobile) {
+      //If we are on a mobile device, render the app
+      User.findById(req.params.id, function(error, user){
+        res.render('forgot_password',{stylesheet: "/css/signup.css/"
+        });
       });
-    });
+    }
+    //Else show the desktop landing page
+    else {
+      res.render('desktop',{
+        title: 'Please use a mobile device!',
+        stylesheet: "desktop.css"
+      });
+    }
   });
 
   app.post('/forgot_password', function(req, res) {
@@ -1033,60 +1104,117 @@ client.on('error', console.log);
   });
 
   app.get("/reset_password/:id", function(req, res) {
-    set_user_confirmed(req.params.id);
-    User.findById(req.params.id, function(error, user){
-      res.render('reset_password',{stylesheet: "/css/signup.css/",
-        email : user.email,
-        name : user.name,
-        user_id: user.id
+    //If user is on mobile, show the login page
+    var ua = req.headers['user-agent'].toLowerCase();
+    //Check useragent with regular expressions
+    var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
+    if(mobile) {
+      //If we are on a mobile device, render the app
+      set_user_confirmed(req.params.id);
+      User.findById(req.params.id, function(error, user){
+        res.render('reset_password',{stylesheet: "/css/signup.css/",
+          email : user.email,
+          name : user.name,
+          user_id: user.id
+        });
       });
-    });
+    }
+    //Else show the desktop landing page
+    else {
+      res.render('desktop',{
+        title: 'Please use a mobile device!',
+        stylesheet: "desktop.css"
+      });
+    }
   });
 
   app.post('/reset_password', function(req, res) {
-    req.assert('password', 
-      'Password must be at least 6 characters').len(6);
-    req.assert('password2', 'Passwords do not match').equals(req.body.password);
-    errors = req.validationErrors(true); //Object format
-    console.log(errors);
-    if (errors) {
-      res.render('reset_password/'+ req.param('user_id'),{stylesheet: "/css/signup.css/", errors:errors
-      });
-    }
-    else{
-      User.findById(req.param('user_id'), function(err, user) {
-        data = {};
-        data.password = req.param('password');
-        data.user_id = req.param('user_id');
-        User.changePassword(data, function(error, user){
-          if (error){
-            res.render('reset_password/'+ req.param('user_id'),{stylesheet: "/css/signup.css/"
-            });
-          }
-          else{
-            return res.redirect("/");
-          }
+    //If user is on mobile, show the login page
+    var ua = req.headers['user-agent'].toLowerCase();
+    //Check useragent with regular expressions
+    var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
+    if(mobile) {
+      //If we are on a mobile device, render the app
+      req.assert('password', 
+        'Password must be at least 6 characters').len(6);
+      req.assert('password2', 'Passwords do not match').equals(req.body.password);
+      errors = req.validationErrors(true); //Object format
+      console.log(errors);
+      if (errors) {
+        res.render('reset_password/'+ req.param('user_id'),{stylesheet: "/css/signup.css/", errors:errors
         });
+      }
+      else{
+        User.findById(req.param('user_id'), function(err, user) {
+          data = {};
+          data.password = req.param('password');
+          data.user_id = req.param('user_id');
+          User.changePassword(data, function(error, user){
+            if (error){
+              res.render('reset_password/'+ req.param('user_id'),{stylesheet: "/css/signup.css/"
+              });
+            }
+            else{
+              return res.redirect("/");
+            }
+          });
+        });
+      }
+    }
+    //Else show the desktop landing page
+    else {
+      res.render('desktop',{
+        title: 'Please use a mobile device!',
+        stylesheet: "desktop.css"
       });
     }
   });
 
 
   app.get("/signup/:id", function(req, res) {
-    set_user_confirmed(req.params.id);
-    User.findById(req.params.id, function(error, user){
-      res.render('signup',{stylesheet: "/css/signup.css/",
-        email : user.email,
-        name : user.name,
+    //If user is on mobile, show the ` page
+    var ua = req.headers['user-agent'].toLowerCase();
+    //Check useragent with regular expressions
+    var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
+    if(mobile) {
+      //If we are on a mobile device, render the app
+        set_user_confirmed(req.params.id);
+        User.findById(req.params.id, function(error, user){
+          res.render('signup',{stylesheet: "/css/signup.css/",
+            email : user.email,
+            name : user.name,
+          });
+        });
+      }
+    //Else show the desktop landing page
+    else {
+      res.render('desktop',{
+        title: 'Please use a mobile device!',
+        stylesheet: "desktop.css"
       });
-    });
+    }
   });
 
   app.get("/signup", function(req, res) {
-    res.render('signup', {stylesheet: "signup.css"});
+    //If user is on mobile, show the login page
+    var ua = req.headers['user-agent'].toLowerCase();
+    //Check useragent with regular expressions
+    var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
+    if(mobile) {
+      //If we are on a mobile device, render the app
+      res.render('signup', {stylesheet: "signup.css"});
+    }
+    //Else show the desktop landing page
+    else {
+      res.render('desktop',{
+        title: 'Please use a mobile device!',
+        stylesheet: "desktop.css"
+      });
+    }
   });
 
   app.post('/signup', function(req, res) {
+    //Validate passed information
     req.assert('name', 'Name is required').notEmpty();
     req.assert('email', 'Valid email required').notEmpty().isEmail();
     req.assert('password', 

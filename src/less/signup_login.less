@@ -1,8 +1,22 @@
+html{
+  height:100%;
+  width:100%;
+  margin:0;
+  padding:0;
+}
+
+body{
+  height:100%;
+  width:100%;
+  margin:0;
+  padding:0;
+}
 
 #login{
     background-color:@primary-color;
     width: 100%;
     height: 100%;
+<<<<<<< HEAD
     float:left;
     margin:auto;
     color:@placeholder-gray;
@@ -12,12 +26,31 @@
   margin: 60px auto;
   width: 80%;
   height: 86%;
+=======
+    margin:0;
+    padding:0;
+    top:0;
+    left:0;
+    color:@placeholder-gray;
+    fill:white;
+    position:relative;
+
+#content{
+  width: 80%;
+  height:86%;
+  position:absolute;
+>>>>>>> 65f92c17f3123709dccf49e37151a80fcdc4195a
   background-color: #c2d8c5;
   border-radius: 1px;
+  box-style:border-box;
+  top:7%;
+  left:50%;
+  margin-left:-40%;
+  overflow:scroll;
 }
 
-#content img{
-  margin-top: 15px;
+#logo{
+  margin-top: 5%;
   margin-left: 13%;
   width: 70%;
   height: auto;
@@ -27,11 +60,16 @@ form{
   margin: 0;
   position: relative;
   top:-40px;
+  width:100%;
 }
 
 .formfield{
   position:relative;
+<<<<<<< HEAD
   width: 90%;
+=======
+  width: 100%;
+>>>>>>> 65f92c17f3123709dccf49e37151a80fcdc4195a
   height: 40px;
   margin: 0px auto;
   margin-top: 5%;
@@ -51,7 +89,7 @@ form{
 }
 
 .formfield input[type="submit"]{
-  width: 90%;
+  width: 100%;
   margin: auto;
   background-color: #adb3b3;
   margin-top: 8px;
@@ -84,7 +122,7 @@ form{
 .form_icon{
   float:left;
   height:40px;
-  width:30%;
+  width:0.5%;
 }
 
 .form_icon circle{
@@ -93,12 +131,12 @@ form{
 
 .form_icon line{
   stroke: @placeholder-gray;
-  stroke-width:4%;
+  stroke-width:8%;
   stroke-linecap: round;
 }
 
 .form_label h4{
-  width: 62%;
+  width: 61%;
   float:left;
   padding:0;
   margin:0;
@@ -108,6 +146,13 @@ form{
   padding-left: 8%;
 }
 
+.form_label img{
+    height:28px;
+    padding-top:6px;
+    width:30%;
+    float:left;
+}
+
 #remember{
   text-align:center;
   float:left;
@@ -115,9 +160,7 @@ form{
   margin-top:10px;
   width:100%;
 }
-#main{
-  margin: 50px 50px 80px 50px;
-}
+
 #main a{
   text-decoration:none;
   color: #2b673d;
@@ -140,5 +183,31 @@ form{
 
 .formfield input[type="submit"]{
   margin-top:0px;
+  height:40px;
+}
+
+.formfield select{
+  margin:0px;
+  padding:0px;
+  height:40px;
+  background-color:#838485;
+}
+
+#signup_format{
+  width:100%;
+  height:100%;
+  overflow:scroll;
+}
+
+#login_format{
+  width:100%;
+  height:240px;
+  position:absolute;
+  top:50%;
+  margin-top:-120px;
+
+  form{
+  margin-top:10px;
+  }
 }
 }

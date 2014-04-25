@@ -17,8 +17,8 @@ public class Tuple implements Comparable<Tuple>, Serializable {
 	
 	public int compareTo(Tuple other) {
 		if (item2 instanceof Double && other.item2 instanceof Double) {
-			double value = (double) item2;
-			double value2 = (double) other.item2;
+			double value = (Double) item2;
+			double value2 = (Double) other.item2;
 			
 			if (value < value2) return -1;
 			else if (value == value2) return 0;
