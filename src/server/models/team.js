@@ -148,11 +148,11 @@ return [1] is the actual array of checkins
       }
 
       //Finds advice
-      var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
-      var java_port = 15160;
+      //var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
+      //var java_port = 9123;
       var net = require('net');
 
-      var client = net.connect({port: java_port, host: java_host},
+      var client = net.connect({port: global.java_port, host: global.java_host},
         function() {
           console.log('client connected');
           client.write('getAdvice;' + user.verb + ';' + data.status + ';\r\n');

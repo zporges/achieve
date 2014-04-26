@@ -11,6 +11,8 @@ var rule = new schedule.RecurrenceRule();
 rule.hour = 20;   // 8PM
 rule.minute = 0;  // :00 
 
+// set to true to bypass the mobile only screen
+var ignore_mobile = false;
 
 var j = schedule.scheduleJob(rule, function(){
   reminder_emails();
@@ -834,11 +836,11 @@ module.exports = function(app, passport, debug) {
           }
 
           //to past tense
-          var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
-          var java_port = 15160;
+          //var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
+          //var java_port = 9123;
           var net = require('net');
 
-          var client = net.connect({port: java_port, host: java_host},
+          var client = net.connect({port: global.java_port, host: global.java_host},
               function() { //'connect' listener
             console.log('client connected');
             client.write('toPastTense;' + req.param('verb') +';' + req.user.gender + ';\r\n');
@@ -943,11 +945,12 @@ app.get("/team/progress/:id", auth.isAuthenticated, function(req, res) {
   });
 
   app.get('/login', function(req, res) {
+
     //If user is on mobile, show the login page
     var ua = req.headers['user-agent'].toLowerCase();
     //Check useragent with regular expressions
     var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
-    if(mobile) {
+    if(mobile || ignore_mobile) {
       //If we are on a mobile device, render the app
       res.render('login',{stylesheet: "login.css"});
     }
@@ -958,6 +961,7 @@ app.get("/team/progress/:id", auth.isAuthenticated, function(req, res) {
         stylesheet: "desktop.css"
       });
     }
+    
 
 /*
 var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
@@ -989,7 +993,7 @@ client.on('error', console.log);
     var ua = req.headers['user-agent'].toLowerCase();
     //Check useragent with regular expressions
     var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
-    if(mobile) {
+    if(mobile || ignore_mobile) {
       //If we are on a mobile device, render the app
       set_user_confirmed(req.params.id);
       User.findById(req.params.id, function(error, user){
@@ -1057,7 +1061,7 @@ client.on('error', console.log);
     var ua = req.headers['user-agent'].toLowerCase();
     //Check useragent with regular expressions
     var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
-    if(mobile) {
+    if(mobile || ignore_mobile) {
       //If we are on a mobile device, render the app
       User.findById(req.params.id, function(error, user){
         res.render('forgot_password',{stylesheet: "/css/signup.css/"
@@ -1092,7 +1096,7 @@ client.on('error', console.log);
     var ua = req.headers['user-agent'].toLowerCase();
     //Check useragent with regular expressions
     var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
-    if(mobile) {
+    if(mobile || ignore_mobile) {
       //If we are on a mobile device, render the app
       set_user_confirmed(req.params.id);
       User.findById(req.params.id, function(error, user){
@@ -1117,7 +1121,7 @@ client.on('error', console.log);
     var ua = req.headers['user-agent'].toLowerCase();
     //Check useragent with regular expressions
     var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
-    if(mobile) {
+    if(mobile || ignore_mobile) {
       //If we are on a mobile device, render the app
       req.assert('password', 
         'Password must be at least 6 characters').len(6);
@@ -1160,7 +1164,7 @@ client.on('error', console.log);
     var ua = req.headers['user-agent'].toLowerCase();
     //Check useragent with regular expressions
     var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
-    if(mobile) {
+    if(mobile || ignore_mobile) {
       //If we are on a mobile device, render the app
         set_user_confirmed(req.params.id);
         User.findById(req.params.id, function(error, user){
@@ -1184,7 +1188,7 @@ client.on('error', console.log);
     var ua = req.headers['user-agent'].toLowerCase();
     //Check useragent with regular expressions
     var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
-    if(mobile) {
+    if(mobile || ignore_mobile) {
       //If we are on a mobile device, render the app
       res.render('signup', {stylesheet: "signup.css"});
     }

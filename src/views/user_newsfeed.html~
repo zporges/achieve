@@ -1,0 +1,115 @@
+<% include ejs/header.ejs %>
+  <div id = "home" class = "content">
+  <header>
+    <h1>Achieve</h1>
+  </header>
+
+<!--   <section id = "userPage">
+    <a href="/user/<%= user.id %>">User Settings</a>
+    <a href="/pending">Pending Requests</a>
+    <a href= "/logout">Logout</a>
+
+  </section> -->
+
+  <section id = "main">
+    <section id = "goals">
+    <h2>My Goals</h2>
+    <ul id = "checkins">
+
+
+      <% for(var i=0; i<teams.length; i++) {%>
+      <li class = "checkin_box">
+        <div class = "checkin_header">
+          <div class = "checkbox">
+            <svg>
+              <rect class="outer" x="15" y="15" width="20" height="20"/>
+              <rect class="fill" x="17" y="17" width="16" height="16"/>
+            </svg>
+          </div>
+          <h3><%= teams[i].name %></h3>
+          <h4>
+            Last Checkin:
+            <span class = "time"><%
+              for(var k=0; k < teams[i].users.length; k++){
+                var uID = teams[i].users[k];
+                if (uID.user_id == user.id){
+                  if (uID.checkin.length > 0){
+                    var time = uID.checkin[uID.checkin.length - 1].created.toDateString();%>
+                    <%=time%>
+                  <%}
+                else{%>
+                  Never
+                <%}
+                }%></span><%
+              }
+            %>
+          </h4>
+        </div>
+        <form method= "post" action="/checkin/new/<%= teams[i].id %>">
+          <div>
+            <textarea rows="4" cols="50" name="status" placeholder="Comment"></textarea>
+            <input type="number" name="amount" placeholder="0"/>
+          </div>
+          <h5>unit per time period</h5>
+          <input type="submit" value="Checkin"/>
+        </form>
+      </li>
+      <% } %>
+    </ul>
+    </section>
+
+    <section id = "progress">
+      <h2>My Friends' Progress</h2>
+        <% for(var i=0; i<allcheckins.length; i++) {
+            var time = allcheckins[i].created;
+            var commentSize = allcheckins[i].comments.length;
+            var likeSize = allcheckins[i].likes.length;
+          %>
+<!--             <li>
+              <a href="/team/<%= allcheckins[i].team_id %>/checkin/<%= allcheckins[i]._id %>">Checkin: <%= allcheckins[i].status %></a> by <%= allcheckins[i].user_name %> in <%= allcheckins[i].team_name %>
+              created on <%= allcheckins[i].created %>
+              <br/>
+              <a href="/team/<%= allcheckins[i].team_id %>/checkin/<%= allcheckins[i]._id %>/delete">Delete</a>
+              <br/>
+              <% var output = '{';
+                  for (var property in allcheckins[i]) {
+                      output += property + ': ' + allcheckins[i][property]+'; ';
+                  } output+='}'%>
+                  <%=output%><br/>
+          </li> -->
+          <div class = "progress_box">
+            <div class = "main_progress">
+              <h3><span class = "name"><%=allcheckins[i].user_name%></span> <%=allcheckins[i].verb%> <span class = "amount"><%= allcheckins[i].amount%> <%= allcheckins[i].unit %></span> of their goal.</h3>
+              <p>"<%=allcheckins[i].status%>"</p>
+              <h4><span><%=time%> </span> <%=commentSize%> comments <%=likeSize%> likes</h4>
+            </div>
+            <%for(var k = 0; k<allcheckins[i].comments.length; k++){%>
+              <div class = "progress_comment">
+                <h4>"<%= allcheckins[i].comments[k].text %>"</h4>
+                <p><span class = "name"><%= allcheckins[i].comments[k].name %></span> commented <span class = "time"><%= allcheckins[i].comments[k].created %></span></p>
+              </div>
+            <%}%>
+              <div class = "progress_comment add_comment">
+                <form method= "post" action="/team/<%= allcheckins[i].team_id %>/checkin/comment/<%= allcheckins[i]._id %>">
+                  <div class = "comment_box">
+                    <textarea rows="1" cols="50" name="comment" placeholder="Add Comment..."></textarea><br>
+                  </div>
+                  <div class = "comment_submit">
+                    <input type="submit" value="Submit"/>
+                  </div>
+                </form>
+              </div>
+          </div>
+        <% } %>
+    </section>
+  </section>
+
+  <footer>
+    <% include ejs/navbar.ejs %>
+    <% include ejs/secondary_navbar.ejs %>
+    <script type = "text/javascript" src = "js/navbar.js"></script>
+    <script type = "text/javascript" src = "js/homepage.js"></script>
+  </footer>
+  </div>
+</body>
+</html>

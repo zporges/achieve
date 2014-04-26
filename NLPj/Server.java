@@ -8,7 +8,7 @@ import java.net.Socket;
 import java.util.List;
 
 public class Server {
-	private static Crawler crawler = new Crawler("data/crawl_queries");
+	private static Crawler crawler = null;
 	private final int maxThreads = 32;
 
 	public static void main(String[] args) {
@@ -29,18 +29,12 @@ public class Server {
 			serverSocket.bind(isa);
 			while (true) {
 				try {
-
-					//				ServerSocket serverSocket = new ServerSocket(port);
-
+					if (crawler == null) crawler = new Crawler("data/crawl_queries");
 					Socket clientSocket = serverSocket.accept();
 					PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true);
 					BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-
+					
 					String inputLine;
-
-					// Initiate conversation with client
-//					outputLine = "Hello, World";
-//					out.println(outputLine);
 					while ((inputLine = in.readLine()) != null) {
 
 						String result = "[ERROR]";

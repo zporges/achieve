@@ -126,10 +126,12 @@ var Pact = function() {
     }
     self.app.engine('html', cons.ejs);
 
-    var uri = 'mongodb://' + self.mongo_host + ':' + self.mongo_port + '/pact'
+    //var uri = 'mongodb://' + self.mongo_host + ':' + self.mongo_port + '/pact'
+    //  , options = { user : "pact", pass : "danco<3ch33se" }
+    var uri = 'mongodb://' + self.mongo_host + ':' + self.mongo_port + '/achieve'
       , options = { user : "pact", pass : "danco<3ch33se" }
       ;
-    if(self.mongo_host == "localhost") {
+    if(true || self.mongo_host == "localhost") {
       mongoose.connect(uri);
     }
     else {
@@ -166,9 +168,11 @@ pact.start();
 
 
 
-var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
-var p = process.env.OPENSHIFT_NODEJS_PORT
-var java_port = p || 15160;
+global.java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
+//global.java_port = process.env.OPENSHIFT_NODEJS_PORT || 31111;
+//TODO automatically find port
+global.java_port = 30000;
+/*
 var exec = require('child_process').exec;
 var child;
 
@@ -186,7 +190,9 @@ java_command += "NLPj/stanford-corenlp-3.3.1.jar:"
 java_command += "NLPj/stanford-corenlp-3.3.1-models.jar:"
 java_command += "NLPj/libsvm.jar:"
 java_command += "NLPj Server "
-java_command += java_host + " " + java_port
+//java_command += "localhost 15160";
+java_command += java_host + " " + java_port;
+*/
 
 /*
 java_command = "java -cp "
@@ -198,15 +204,46 @@ java_command += "NLPj Server "
 java_command += java_host + " " + java_port
 */
 
+var cp = "NLPj/stanford-parser-3.3.1-models.jar:"
+cp += "NLPj/stanford-parser.jar:"
+cp += "NLPj/stanford-postagger-3.3.1.jar:"
+cp += "NLPj/simplenlg-v4.4.2.jar:"
+cp += "NLPj/ejml-0.23.jar:"
+cp += "NLPj/jnisvmlight.jar:"
+cp += "NLPj/jsoup-1.7.3.jar:"
+cp += "NLPj/stanford-corenlp-3.3.1.jar:"
+cp += "NLPj/stanford-corenlp-3.3.1-models.jar:"
+cp += "NLPj/libsvm.jar:"
+cp += "NLPj";
 
+
+var spawn = require('child_process').spawn,
+    java    = spawn("java", ["-cp", cp, "Server", java_host, java_port]);
+
+java.stdout.on('data', function (data) {
+  console.log('[Java Server] stdout: ' + data);
+});
+
+java.stderr.on('data', function (data) {
+  console.log('[Java Server] stderr: ' + data);
+});
+
+java.on('close', function (code) {
+  console.log('[Java Server] child process exited with code ' + code);
+});
+
+/*
 child = exec(java_command,
    function (error, stdout, stderr) {
       console.log('stdout: ' + stdout);
       console.log('stderr: ' + stderr);
       if (error !== null) {
           console.log('exec error: ' + error);
+      } else {
+        console.log("good");
       }
    });
+*/
 
 //Calls toPastTense so that Java libraries can load
 setTimeout(function() {
