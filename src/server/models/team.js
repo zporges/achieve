@@ -149,7 +149,7 @@ return [1] is the actual array of checkins
 
       //Finds advice
       var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
-      var java_port = 15157;
+      var java_port = 15160;
       var net = require('net');
 
       var client = net.connect({port: java_port, host: java_host},

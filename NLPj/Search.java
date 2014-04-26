@@ -53,7 +53,9 @@ public class Search {
 		for (String token : subQuerySet) {
 			String[] words = crawler.relatedWords.similarWords.get(token);
 			if (words != null) {
-				for (String word : words) {
+				for (int i = 0; i < words.length && i < 3; i++) {
+					String word = words[i];
+//				for (String word : words) {
 					if (!mainQuerySet.contains(word)) {
 						expandedQuerySet.add(word);
 					}
@@ -118,6 +120,7 @@ public class Search {
 				}
 			}
 		}
+
 		LinkedList<Tuple> results = new LinkedList<Tuple>();
 		while (!pq.isEmpty()) {
 			Tuple t = pq.poll();

@@ -7,7 +7,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import edu.stanford.nlp.ling.HasWord;
 
@@ -16,12 +22,13 @@ public class Crawler implements Serializable {
 	DocumentStore docStore;
 	SentenceStore senStore;
 	InvertedIndex index;
-	Classifier classifier = new Classifier("data/advice_full");
+//	Classifier classifier = new Classifier("data/advice_full");
+	Classifier2 classifier = new Classifier2("data/advice");
 	Similarity relatedWords;
 	int relatedWordsWindow = 10;
 	int numRelatedWord = 10; //to expand queries
 
-	int maxFilesToIndex = 5;//10;
+	int maxFilesToIndex = 10;
 	
 	HashSet<String> titleSkipList = new HashSet<String>(){{
 		add("How to Lose Weight (with Calculator) - wikiHow"); add("How to clean animal bones - the complete guide : Jake's Bones");
@@ -31,46 +38,27 @@ public class Crawler implements Serializable {
 
 	public Crawler(String filename) {
 		Crawler crawler = null;
-		try
-		{
-			FileInputStream fileIn = new FileInputStream(filename + ".ser");
-			ObjectInputStream in = new ObjectInputStream(fileIn);
-			crawler = (Crawler) in.readObject();
-			in.close();
-			fileIn.close();
-		} catch(IOException i) {
-			System.out.println("Crawler serialized file not found");
-		} catch(ClassNotFoundException c) {
-			System.out.println("Crawler class not found");
-			c.printStackTrace();
-		}
-
-		if (crawler == null) {
-			docStore = new DocumentStore();
-			senStore = new SentenceStore();
-			index = new InvertedIndex();
-			relatedWords = new Similarity();
-			crawl(filename + ".txt");
-			relatedWords.findSimilarWords(numRelatedWord);
-			System.out.println("Done crawling.");
-			try
-			{
-				FileOutputStream fileOut = new FileOutputStream(filename + ".ser");
-				ObjectOutputStream out = new ObjectOutputStream(fileOut);
-				out.writeObject(this);
-				out.close();
-				fileOut.close();
-				System.out.printf("Serialized data is saved in " + filename + ".ser");
-			} catch(IOException i) {
-				i.printStackTrace();
-			}
-		} else {
+		Object obj = Tools.readFromFile(filename + ".ser");
+		if (obj != null && obj instanceof Crawler) {
+			crawler = (Crawler) obj;
 			docStore = crawler.docStore;
 			senStore = crawler.senStore;
 			index = crawler.index;
 			relatedWords = crawler.relatedWords;
+			
+		} else {
+			System.out.println("Loaded null object or loaded object is not of type Crawler");
+			docStore = new DocumentStore();
+			senStore = new SentenceStore();
+			index = new InvertedIndex();
+			relatedWords = new Similarity();
+			System.out.println("Crawling...");
+			crawl(filename + ".txt");
+			relatedWords.findSimilarWords(numRelatedWord);
+			System.out.println("Done crawling.");
+			Tools.writeToFile(filename + ".ser", this);
+		
 		}
-
 	}
 
 	private void crawl(String path) {
@@ -79,17 +67,17 @@ public class Crawler implements Serializable {
 			String sCurrentLine;
 			br = new BufferedReader(new FileReader(path));
 			while ((sCurrentLine = br.readLine()) != null) {
+				System.out.println(sCurrentLine);
 				searchAndStore(sCurrentLine);
 			}
 		} catch (Exception e) {
-
+			e.printStackTrace();
 		}
 		//				searchAndStore("how to work out");
 		//		searchAndStore("how to clean my room");
 	}
 
 	private void searchAndStore(String query) {
-		/*
 		Document doc;
 		try{
 			String url = "http://www.google.com/search?q=";
@@ -104,16 +92,17 @@ public class Crawler implements Serializable {
 
 				Elements titles = link.select("h3[class=r]");
 				String title = titles.text();
-				if (titleSkipList.contains(title)) continue;
-
 				String anchor = titles.select("a").attr("href");
 				if (anchor.startsWith("/")) anchor = "http://www.google.com" + anchor;
+				
+				if (titleSkipList.contains(title) || anchor.contains("www.youtube.com")) continue;
 
-				Elements bodies = link.select("span[class=st]");
-				String body = bodies.text();
 
-				System.out.println(anchor);
+//				Elements bodies = link.select("span[class=st]");
+//				String body = bodies.text();
+
 				System.out.println("Title: "+title);
+				System.out.println(anchor);
 				//				System.out.println("Body: "+body+"\n");
 
 				processUrl(anchor, title);
@@ -125,7 +114,6 @@ public class Crawler implements Serializable {
 		} catch (IllegalArgumentException e2) {
 			e2.printStackTrace();
 		}
-		*/
 	}
 
 	private void processUrl(String url, String title) {
@@ -140,7 +128,6 @@ public class Crawler implements Serializable {
 
 	private int processPage(String url, String docId) {
 		int numGoodSentences = 1;
-		/*
 		try {
 			Document page = Jsoup.connect(url).userAgent("Mozilla").ignoreHttpErrors(true).timeout(0).get();
 			String pageText = page.text();
@@ -176,7 +163,6 @@ public class Crawler implements Serializable {
 		} catch (IOException e2) {
 			e2.printStackTrace();
 		}
-		*/
 		return numGoodSentences;
 	}
 

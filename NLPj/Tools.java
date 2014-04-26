@@ -1,5 +1,10 @@
 import java.io.BufferedReader;
-import java.io.PrintWriter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,13 +16,8 @@ import edu.stanford.nlp.ling.HasWord;
 import edu.stanford.nlp.ling.TaggedWord;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.semgraph.SemanticGraph;
-import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
 import edu.stanford.nlp.sentiment.SentimentCoreAnnotations.ClassName;
-import edu.stanford.nlp.sentiment.SentimentPipeline;
 import edu.stanford.nlp.tagger.maxent.MaxentTagger;
-import edu.stanford.nlp.trees.Tree;
-import edu.stanford.nlp.trees.TreeCoreAnnotations;
 import edu.stanford.nlp.util.ArrayCoreMap;
 import edu.stanford.nlp.util.CoreMap;
 
@@ -56,7 +56,7 @@ public class Tools {
 	public static String tokensToSentence(List<HasWord> tokens) {
 		StringBuilder sb = new StringBuilder();
 		for (HasWord token : tokens) {
-			String str = token.toString();
+			String str = token.toString().toLowerCase();
 			if (str.equals("-lrb-")) {
 				sb.append(" (");
 			} else if (str.equals("-rrb-")) {
@@ -96,6 +96,34 @@ public class Tools {
 			} else return -1;
 		}
 		return -2;
+	}
+
+	public static void writeToFile(String path, Object obj) {
+		try {
+			FileOutputStream fileOut = new FileOutputStream(path);
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			out.writeObject(obj);
+			out.close();
+			fileOut.close();
+			System.out.println("Saved data to " + path + ": " + obj);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public static Object readFromFile(String path) {
+		Object obj = null;
+		try {
+			FileInputStream fileIn = new FileInputStream(path);
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			obj = in.readObject();
+			in.close();
+			fileIn.close();
+			System.out.println("Loaded object from file " + path + ": " + obj);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return obj;
 	}
 
 	public static void main(String[] args) {
