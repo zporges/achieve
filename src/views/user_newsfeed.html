@@ -87,7 +87,14 @@
             </div>
             <%for(var k = allcheckins[i].allcomments.length - 1; k>=0; k--){%>
               <div class = "progress_comment">
-                <h4>"<%= allcheckins[i].allcomments[k].text %>"</h4>
+                <%if (allcheckins[i].allcomments[k].user_id == -1 && allcheckins[i].allcomments[k].name == "AdviceBot") {%>
+                  <%var idx = allcheckins[i].allcomments[k].text.lastIndexOf(";");%>
+                  <%var text = allcheckins[i].allcomments[k].text.substring(0, idx);%>
+                  <%var url = allcheckins[i].allcomments[k].text.substring(idx+1);%>
+                  <h4>"<%=text%>" - See more <a href=<%=url%> target="_blank">here</a>.</h4>
+                <%} else {%>
+                  <h4>"<%= allcheckins[i].allcomments[k].text %>"</h4>
+                <%}%>
                 <p><span class = "name"><%= allcheckins[i].allcomments[k].name %></span> commented <span class = "time"><%= allcheckins[i].allcomments[k].created %></span></p>
               </div>
             <%}%>

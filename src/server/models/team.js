@@ -167,9 +167,9 @@ return [1] is the actual array of checkins
             var idx = res.indexOf('\n');
             var sen = res.substring(0, idx);
             var url = res.substring(idx + 1);
-            var msg = '"' + sen + '" - See more at: ' + url;
+            var msg = sen + ";" + url;//'"' + sen + '" - See more at: ' + url;
             var newcheckin = user.checkin[user.checkin.length-1];
-            newcheckin.comments.push({'text' : msg, 'user_id' : 1, 'name' : 'AdviceBot'});
+            newcheckin.comments.push({'text' : msg, 'user_id' : -1, 'name' : 'AdviceBot'});
         }
         finishloading();
       });

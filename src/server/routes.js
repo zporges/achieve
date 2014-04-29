@@ -12,7 +12,7 @@ rule.hour = 20;   // 8PM
 rule.minute = 0;  // :00 
 
 // set to true to bypass the mobile only screen
-var ignore_mobile = false;
+var ignore_mobile = true;
 
 var j = schedule.scheduleJob(rule, function(){
   reminder_emails();

@@ -11,6 +11,8 @@ var rule = new schedule.RecurrenceRule();
 rule.hour = 20;   // 8PM
 rule.minute = 0;  // :00 
 
+// set to true to bypass the mobile only screen
+var ignore_mobile = false;
 
 var j = schedule.scheduleJob(rule, function(){
   reminder_emails();
@@ -153,7 +155,7 @@ function mailSignup(user, leader, groupname) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Sign up for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: "<table align = \"center\" border = \"1\" cellpadding = \"0\" cellspacing = \"0\" width = \"100%\"style= \"border-collapse: collapse;\"><tr><td bgcolor = \"#5fcf80\" height = \"30%\"><h1 style= \" font-size: 200%; margin-left: 15%; color: #ffffff; font-family: 'Open Sans', Helvetica, Arial, sans-serif; \">Achieve</h1></td></tr><tr style=\"padding-top: 0;\"><td bgcolor = \"#ced6dc\" height = \"100%\" width = \"80%\" style=\" color; #000000; font-family: 'Open Sans', Helvetica, Arial, sans-serif; padding-top: 0px; padding-bottom:0px;\"><div style=\"margin-top:0px; margin-bottom:0px; margin-left: auto; margin-right:auto; padding: 15% 15% 10% 15%;font-size: 150%; background-color: #ffffff; width: 80%; height:100%;\"><span style= \"font-size: 100%;\">Hi, </span><br/><br/>Your friend "+leader+"invited you to join team: "+ groupname+ ". Now you can work towards your goals with your friends.Click the following link to sign up for Achieve:<br/><br/><a style= \"background-color:#378cab; width: 20%; height: 10%; color: #ffffff; font-size: 80%; text-decoration:none; padding: 2% 5% 2% 5%; margin-left:16%; margin-right:auto;\" href = \""+ linkSignup + "\">Sign up</a><br/><br/><br/></div></td></tr><tr><td bgcolor = \"#384047\" height = \"30px\"></td></tr></table>"
   }
   //TODO: uncomment this out to send email!
@@ -182,7 +184,7 @@ function mailReminder(user) {
     from: "Achieve ✔ <apppact@gmail.com>",
     to: user.email,
     subject: "Check In Today for Achieve!",
-    text: "necessary?",
+    text: "Message from Achieve",
     html: "<table align = \"center\" border = \"1\" cellpadding = \"0\" cellspacing = \"0\" width = \"100%\"style= \"border-collapse: collapse;\"><tr><td bgcolor = \"#5fcf80\" height = \"30%\"><h1 style= \" font-size: 250%; margin-left: 15%; padding-top: 5%; color: #ffffff; font-family: 'Open Sans', Helvetica, Arial, sans-serif; \">Achieve</h1></td></tr><tr style=\"padding-top: 0;\"><td bgcolor = \"#ced6dc\" height = \"100%\" width = \"80%\" style=\" color; #000000; font-family: 'Open Sans', Helvetica, Arial, sans-serif; padding-top: 0px; padding-bottom:0px;\"><div style=\"margin-top:0px; margin-bottom:0px; margin-left: auto; margin-right:auto; padding: 15% 15% 10% 15%;font-size: 150%; background-color: #ffffff; width: 80%; height:100%;\"><span style= \"font-size: 100%;\">Hi, "+user.name+"</span><br/><br/>Here is your daily reminder from Achieve<br/><br/>Did you make any progress today?<br/><br/>If yes, please click on the following link to check-in.<br/><br/>If not yet, please keep working towards your goal.<br/><br/><br/><a style= \"background-color:#378cab; width: 20%; height: 10%; color: #ffffff; font-size: 80%; text-decoration:none; padding: 2% 5% 2% 5%; margin-left:16%; margin-right:auto;\" href = \""+ linkSignup + "\">check-in progress</a><br/><br/><br/></div></td></tr><tr><td bgcolor = \"#384047\" height = \"30px\"></td></tr></table>"
   };
   //TODO: uncomment this out to send email!
@@ -834,11 +836,11 @@ module.exports = function(app, passport, debug) {
           }
 
           //to past tense
-          var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
-          var java_port = 15050;
+          //var java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
+          //var java_port = 9123;
           var net = require('net');
 
-          var client = net.connect({port: java_port, host: java_host},
+          var client = net.connect({port: global.java_port, host: global.java_host},
               function() { //'connect' listener
             console.log('client connected');
             client.write('toPastTense;' + req.param('verb') +';' + req.user.gender + ';\r\n');
@@ -943,11 +945,12 @@ app.get("/team/progress/:id", auth.isAuthenticated, function(req, res) {
   });
 
   app.get('/login', function(req, res) {
+
     //If user is on mobile, show the login page
     var ua = req.headers['user-agent'].toLowerCase();
     //Check useragent with regular expressions
     var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
-    if(mobile) {
+    if(mobile || ignore_mobile) {
       //If we are on a mobile device, render the app
       res.render('login',{stylesheet: "login.css"});
     }
@@ -958,6 +961,7 @@ app.get("/team/progress/:id", auth.isAuthenticated, function(req, res) {
         stylesheet: "desktop.css"
       });
     }
+    
 
 /*
 var python_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
@@ -989,7 +993,7 @@ client.on('error', console.log);
     var ua = req.headers['user-agent'].toLowerCase();
     //Check useragent with regular expressions
     var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
-    if(mobile) {
+    if(mobile || ignore_mobile) {
       //If we are on a mobile device, render the app
       set_user_confirmed(req.params.id);
       User.findById(req.params.id, function(error, user){
@@ -1057,7 +1061,7 @@ client.on('error', console.log);
     var ua = req.headers['user-agent'].toLowerCase();
     //Check useragent with regular expressions
     var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
-    if(mobile) {
+    if(mobile || ignore_mobile) {
       //If we are on a mobile device, render the app
       User.findById(req.params.id, function(error, user){
         res.render('forgot_password',{stylesheet: "/css/signup.css/"
@@ -1092,7 +1096,7 @@ client.on('error', console.log);
     var ua = req.headers['user-agent'].toLowerCase();
     //Check useragent with regular expressions
     var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
-    if(mobile) {
+    if(mobile || ignore_mobile) {
       //If we are on a mobile device, render the app
       set_user_confirmed(req.params.id);
       User.findById(req.params.id, function(error, user){
@@ -1117,7 +1121,7 @@ client.on('error', console.log);
     var ua = req.headers['user-agent'].toLowerCase();
     //Check useragent with regular expressions
     var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
-    if(mobile) {
+    if(mobile || ignore_mobile) {
       //If we are on a mobile device, render the app
       req.assert('password', 
         'Password must be at least 6 characters').len(6);
@@ -1160,7 +1164,7 @@ client.on('error', console.log);
     var ua = req.headers['user-agent'].toLowerCase();
     //Check useragent with regular expressions
     var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
-    if(mobile) {
+    if(mobile || ignore_mobile) {
       //If we are on a mobile device, render the app
         set_user_confirmed(req.params.id);
         User.findById(req.params.id, function(error, user){
@@ -1184,7 +1188,7 @@ client.on('error', console.log);
     var ua = req.headers['user-agent'].toLowerCase();
     //Check useragent with regular expressions
     var mobile = /iphone|ipod|android|blackberry|iemobile/.test(ua);
-    if(mobile) {
+    if(mobile || ignore_mobile) {
       //If we are on a mobile device, render the app
       res.render('signup', {stylesheet: "signup.css"});
     }
