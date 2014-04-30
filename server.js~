@@ -126,10 +126,12 @@ var Pact = function() {
     }
     self.app.engine('html', cons.ejs);
 
-    var uri = 'mongodb://' + self.mongo_host + ':' + self.mongo_port + '/pact'
+    //var uri = 'mongodb://' + self.mongo_host + ':' + self.mongo_port + '/pact'
+    //  , options = { user : "pact", pass : "danco<3ch33se" }
+    var uri = 'mongodb://' + self.mongo_host + ':' + self.mongo_port + '/achieve'
       , options = { user : "pact", pass : "danco<3ch33se" }
       ;
-    if(self.mongo_host == "localhost") {
+    if(true || self.mongo_host == "localhost") {
       mongoose.connect(uri);
     }
     else {
@@ -166,8 +168,11 @@ pact.start();
 
 
 
-var java_host = "localhost";//process.env.OPENSHIFT_NODEJS_IP || "localhost";
-var java_port = 15160;//process.env.OPENSHIFT_NODEJS_PORT || 15160;
+global.java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
+//global.java_port = process.env.OPENSHIFT_NODEJS_PORT || 31111;
+//TODO automatically find port
+global.java_port = 0;//30000;
+/*
 var exec = require('child_process').exec;
 var child;
 
@@ -187,6 +192,7 @@ java_command += "NLPj/libsvm.jar:"
 java_command += "NLPj Server "
 //java_command += "localhost 15160";
 java_command += java_host + " " + java_port;
+*/
 
 /*
 java_command = "java -cp "
@@ -215,6 +221,9 @@ var spawn = require('child_process').spawn,
     java    = spawn("java", ["-cp", cp, "Server", java_host, java_port]);
 
 java.stdout.on('data', function (data) {
+  if ((data + "").substring(0, 5) == "port=") {
+    global.java_port = data.substring(5);
+  }
   console.log('[Java Server] stdout: ' + data);
 });
 

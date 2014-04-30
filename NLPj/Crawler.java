@@ -23,7 +23,7 @@ public class Crawler implements Serializable {
 	SentenceStore senStore;
 	InvertedIndex index;
 //	Classifier classifier = new Classifier("data/advice_full");
-	Classifier2 classifier = new Classifier2("data/advice");
+	Classifier2 classifier;
 	Similarity relatedWords;
 	int relatedWordsWindow = 10;
 	int numRelatedWord = 10; //to expand queries
@@ -178,6 +178,7 @@ public class Crawler implements Serializable {
 				token.setWord(")");
 			}
 		}
+		if (classifier == null) classifier = new Classifier2("data/advice");
 		if (length <= 5 || sen.size() <= 4 || sen.size() > 20 || classifier.classify(sen) < 0.5) {
 			return false;
 		}

@@ -129,9 +129,10 @@ var Pact = function() {
     //var uri = 'mongodb://' + self.mongo_host + ':' + self.mongo_port + '/pact'
     //  , options = { user : "pact", pass : "danco<3ch33se" }
     var uri = 'mongodb://' + self.mongo_host + ':' + self.mongo_port + '/achieve'
-      , options = { user : "pact", pass : "danco<3ch33se" }
+      //, options = { user : "pact", pass : "danco<3ch33se" }
+      , options = { user : "admin", pass : "39u_-jcKvaQM" }
       ;
-    if(true || self.mongo_host == "localhost") {
+    if(self.mongo_host == "localhost") {
       mongoose.connect(uri);
     }
     else {
@@ -171,7 +172,7 @@ pact.start();
 global.java_host = process.env.OPENSHIFT_NODEJS_IP || "localhost";
 //global.java_port = process.env.OPENSHIFT_NODEJS_PORT || 31111;
 //TODO automatically find port
-global.java_port = 30000;
+//global.java_port = 0;//30000;
 /*
 var exec = require('child_process').exec;
 var child;
@@ -218,9 +219,12 @@ cp += "NLPj";
 
 
 var spawn = require('child_process').spawn,
-    java    = spawn("java", ["-cp", cp, "Server", java_host, java_port]);
+    java    = spawn("java", ["-cp", cp, "Server", java_host, 0/*java_port*/]);
 
 java.stdout.on('data', function (data) {
+  if (data.toString().substring(0, 5) == "port=") {
+    global.java_port = data.toString().substring(5);
+  }
   console.log('[Java Server] stdout: ' + data);
 });
 
@@ -249,7 +253,7 @@ child = exec(java_command,
 setTimeout(function() {
   var net = require('net');
 
-  var client = net.connect({port: java_port, host: java_host},
+  var client = net.connect({port: global.java_port, host: global.java_host},
     function() {
     console.log('client connected');
     client.write('toPastTense;test past tense verbs;male;\r\n');
@@ -265,7 +269,7 @@ setTimeout(function() {
     setTimeout(function() {
       var net = require('net');
 
-      var client = net.connect({port: java_port, host: java_host},
+      var client = net.connect({port: global.java_port, host: global.java_host},
         function() {
         console.log('client connected');
         client.write('toPastTense;test past tense verbs;male;\r\n');
@@ -285,7 +289,7 @@ setTimeout(function() {
 setTimeout(function() {
   var net = require('net');
 
-  var client = net.connect({port: java_port, host: java_host},
+  var client = net.connect({port: global.java_port, host: global.java_host},
     function() {
       console.log('client connected');
       client.write('getAdvice;study;this is the worst;\r\n');

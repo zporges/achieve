@@ -27,6 +27,7 @@ public class Server {
 		try {
 			ServerSocket serverSocket = new ServerSocket();
 			serverSocket.bind(isa);
+			System.out.println("port=" + serverSocket.getLocalPort());
 			while (true) {
 				try {
 					if (crawler == null) crawler = new Crawler("data/crawl_queries");
@@ -36,7 +37,6 @@ public class Server {
 					
 					String inputLine;
 					while ((inputLine = in.readLine()) != null) {
-
 						String result = "[ERROR]";
 						String[] arr =  inputLine.split(";");
 
