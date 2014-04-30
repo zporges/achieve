@@ -1,0 +1,197 @@
+html{
+  height:100%;
+  width:100%;
+  margin:0;
+  padding:0;
+}
+
+body{
+  height:100%;
+  width:100%;
+  margin:0;
+  padding:0;
+}
+
+#login{
+    background-color:@primary-color;
+    width: 100%;
+    height: 100%;
+    margin:0;
+    padding:0;
+    top:0;
+    left:0;
+    color:@placeholder-gray;
+    fill:white;
+    position:relative;
+
+#content{
+  width: 80%;
+  height:86%;
+  position:absolute;
+  background-color: #c2d8c5;
+  border-radius: 1px;
+  box-style:border-box;
+  top:7%;
+  left:50%;
+  margin-left:-40%;
+  overflow:scroll;
+}
+
+#logo{
+  margin-top: 5%;
+  margin-left: 13%;
+  width: 70%;
+  height: auto;
+}
+form{
+  padding: 0;
+  margin: 0;
+  position: relative;
+  top:-40px;
+  width:100%;
+}
+
+.formfield{
+  position:relative;
+  width: 100%;
+  height: 40px;
+  margin: 0px auto;
+  margin-top: 5%;
+  margin-bottom: 5%;
+}
+
+.formfield input{
+  background-color: #838485;
+  height:100%;
+  width: 100%;
+  border-style:none;
+  margin:0px;
+  padding:0px;
+  -webkit-appearance: none;
+  -webkit-border-radius: 0;
+  border-radius: 5px;
+}
+
+.formfield input[type="submit"]{
+  width: 100%;
+  margin: auto;
+  background-color: #adb3b3;
+  margin-top: 8px;
+  border-color: #9da2a2;
+  border-style: solid;
+  border-width:1%;
+  color: #4d4e4f;
+  cursor:pointer;
+}
+
+#remember input[type="checkbox"]{
+  height:16px;
+  width:16px;
+  border-radius:2px;
+  padding:0;
+  margin:0;
+  margin-left:10px;
+  border-color:#4d4e4f;
+}
+
+.form_label{
+  position:absolute;
+  top:0px;
+  left:0px;
+  width:100%;
+  height: 40px;
+  margin:0px auto;
+  cursor:text;
+}
+.form_icon{
+  float:left;
+  height:40px;
+  width:0.5%;
+}
+
+.form_icon circle{
+  fill: @placeholder-gray;
+}
+
+.form_icon line{
+  stroke: @placeholder-gray;
+  stroke-width:8%;
+  stroke-linecap: round;
+}
+
+.form_label h4{
+  width: 61%;
+  float:left;
+  padding:0;
+  margin:0;
+  margin-top: 8px;
+  color: @placeholder-gray;
+  text-align: left;
+  padding-left: 8%;
+}
+
+.form_label img{
+    height:28px;
+    padding-top:6px;
+    width:30%;
+    float:left;
+}
+
+#remember{
+  text-align:center;
+  float:left;
+  color: #4d4e4f;
+  margin-top:10px;
+  width:100%;
+}
+
+#main a{
+  text-decoration:none;
+  color: #2b673d;
+  float:left;
+  width:100%;
+}
+
+#main p{
+  position: relative;
+  top: -20px;
+  padding:0;
+  margin-top:0px;
+  margin-left:10px;
+  text-align: left;
+}
+
+form{
+  margin-top:-20px;
+}
+
+.formfield input[type="submit"]{
+  margin-top:0px;
+  height:40px;
+}
+
+.formfield select{
+  margin:0px;
+  padding:0px;
+  height:40px;
+  background-color:#838485;
+}
+
+#signup_format{
+  width:100%;
+  height:100%;
+  overflow:scroll;
+}
+
+#login_format{
+  width:100%;
+  height:240px;
+  position:absolute;
+  top:50%;
+  margin-top:-120px;
+
+  form{
+  margin-top:10px;
+  }
+}
+
