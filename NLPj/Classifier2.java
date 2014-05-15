@@ -33,7 +33,7 @@ public class Classifier2 implements Serializable {
 				Classifier2 classifier = (Classifier2) obj;
 				stringToIndex = classifier.stringToIndex;
 				posToID = classifier.posToID;
-//				model = classifier.model;
+				//				model = classifier.model;
 				try {
 					model = svm.svm_load_model(filename + "Classifier_model.dat");
 				} catch (IOException e) {
@@ -66,9 +66,11 @@ public class Classifier2 implements Serializable {
 	public Classifier2(String filename) {
 		this(filename, true);
 	}
+	
+	private Classifier2() {	}
 
 	public double classify(List<HasWord> tokens) {
-//		System.out.println("model == null: " + (model == null));
+		//		System.out.println("model == null: " + (model == null));
 		return svm.svm_predict(model, vectorize(tokens, false));
 	}
 
@@ -106,7 +108,7 @@ public class Classifier2 implements Serializable {
 		return problem;
 	}
 
-	private void parse(String path, boolean trainOnFullCorpus) {
+	private double parse(String path, boolean trainOnFullCorpus) {
 		svm_problem trainProblem;
 		svm_problem testProblem;
 
@@ -116,6 +118,7 @@ public class Classifier2 implements Serializable {
 			testProblem.l = 0;
 			testProblem.x = new svm_node[0][0];
 			testProblem.y = new double[0];
+			//testProblem = parseCorpus(path + ".train", false);
 		} else {
 			trainProblem = parseCorpus(path + ".train", true);
 			testProblem = parseCorpus(path + ".test", false);
@@ -171,9 +174,11 @@ public class Classifier2 implements Serializable {
 				//TODO see what it gets wrong
 			}
 		}
-		System.out.println("\n" + ((double) numCorrect / testProblem.x.length) + " accuracy on test set.");
+		double accuracy = (double) numCorrect / (double) testProblem.x.length;
+		System.out.println("\n" + accuracy + " accuracy on test set.");
 		System.out.println("DONE.");
 		this.model = model;
+		return accuracy;
 	}
 
 	private svm_node[] vectorize(List<HasWord> tokens, boolean trainingData) {
@@ -181,19 +186,19 @@ public class Classifier2 implements Serializable {
 
 		//bag of words
 		HashMap<String, Integer> counts = new HashMap<String, Integer>();
-//				for (HasWord token : tokens) {
-//					String str = token.toString().toLowerCase();
-//					if (!stringToIndex.containsKey(str) && trainingData) {
-//						stringToIndex.put(str, stringToIndex.size() + 1 + bagOfWordsOffset);
-//					}
-//					if (stringToIndex.containsKey(str)) {
-//						int value = 1;
-//						if (counts.containsKey(str)) {
-//							value += counts.get(str);
-//						}
-//						counts.put(str, value);
-//					}
-//				}
+		//				for (HasWord token : tokens) {
+		//					String str = token.toString().toLowerCase();
+		//					if (!stringToIndex.containsKey(str) && trainingData) {
+		//						stringToIndex.put(str, stringToIndex.size() + 1 + bagOfWordsOffset);
+		//					}
+		//					if (stringToIndex.containsKey(str)) {
+		//						int value = 1;
+		//						if (counts.containsKey(str)) {
+		//							value += counts.get(str);
+		//						}
+		//						counts.put(str, value);
+		//					}
+		//				}
 
 		svm_node[] vector = new svm_node[counts.size() + bagOfWordsOffset];
 		for (int i = 0; i < vector.length; i++) vector[i] = new svm_node();
@@ -229,7 +234,7 @@ public class Classifier2 implements Serializable {
 				Double.parseDouble(str);
 				numberOfNumbers++;
 			} catch (NumberFormatException e) {
-				
+
 			}
 		}
 
@@ -357,11 +362,58 @@ public class Classifier2 implements Serializable {
 		}
 	}
 
+	/**
+	 * Divides the corpus at path into a training and test set (roughly 80% and 20%, respectively)
+	 * @param path
+	 */
+	public static void createLeaveOneOutSets(String path) {
+		LinkedList<String> corpus = new LinkedList<String>();
+		BufferedReader br = null;
+		try {
+			String sCurrentLine;
+			br = new BufferedReader(new FileReader(path));
+			while ((sCurrentLine = br.readLine()) != null) {
+				corpus.add(sCurrentLine);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		for (int i = 0; i < corpus.size(); i++) {
+			try {
+				PrintWriter testWriter = new PrintWriter(path + i + ".test", "UTF-8");
+				testWriter.println(corpus.get(i));
+				testWriter.close();
+				PrintWriter trainWriter = new PrintWriter(path + i + ".train", "UTF-8");
+				for (int j = 0; j < corpus.size(); j++) {
+					if (i != j) {
+						trainWriter.println(corpus.get(j));
+					}
+				}
+				trainWriter.close();
+
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static void testLOO(String path, int numFiles) {
+		double averageAccuracy = 0;
+		for (int i = 0; i < numFiles; i++) {
+			averageAccuracy += new Classifier2().parse(path + i, false);
+		}
+		averageAccuracy /= numFiles;
+		System.out.println("Average: " + averageAccuracy);
+	}
+
 	public static void main(String[] args) {
 		//Use for testing - splits into a training and test set and finds accuracy
-		new Classifier2("data/advice", false);
+		new Classifier2("data/advice", true);
 		
-//		createTrainAndTestSets("data/advice");
+//		testLOO("data/advice", 247);
+//		createLeaveOneOutSets("data/advice");
+		//		createTrainAndTestSets("data/advice");
 	}
 
 }
